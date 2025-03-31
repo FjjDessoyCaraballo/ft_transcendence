@@ -10,20 +10,17 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Install Tailwind CSS
-RUN npm install tailwindcss postcss autoprefixer
-
 # Copy the rest of the application code
 COPY . .
+
+# Compile TypeScript files
+RUN npx tsc
 
 # Build the application
 RUN npm run build
 
-# Install a simple server to serve the built files
-RUN npm install -g serve
-
 # Expose the port the app will run on
-EXPOSE 80
+EXPOSE 9000
 
 # Command to run the application
-CMD ["serve", "-s", "build", "-l", "80"]
+CMD ["npm", "run", "dev"]
