@@ -1,10 +1,10 @@
-import { Button } from "./Button.js";
-import { stateManager, curUser } from "./index.js";
-import { MainMenu } from "./MainMenu.js";
-import { canvas, ctx } from "./index.js"; // Sort of weird to use this globally here to pass it to InGame...
-import { GameStates, IGameState, } from "./GameStates.js";
-import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LOGIN_CHECK_KEY } from "./constants.js";
-import { UserManager } from "./UserManager.js";
+import { Button } from "./Button";
+import { stateManager, curUser } from "./index";
+import { MainMenu } from "./MainMenu";
+import { canvas, ctx } from "./index"; // Sort of weird to use this globally here to pass it to InGame...
+import { GameStates, IGameState, } from "./GameStates";
+import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LOGIN_CHECK_KEY } from "./constants";
+import { UserManager } from "./UserManager";
 
 export class StartButton extends Button
 {

@@ -1,8 +1,8 @@
-import { GameStateManager, GameStates, IGameState } from "./GameStates.js";
-import { ReturnMainMenuButton } from "./EndScreen.js";
-import { ctx } from "./index.js";
-import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./constants.js";
-import { UserManager } from "./UserManager.js";
+import { GameStateManager, GameStates, IGameState } from "./GameStates";
+import { ReturnMainMenuButton } from "./EndScreen";
+import { ctx } from "./index";
+import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./constants";
+import { UserManager } from "./UserManager";
 
 export class Instructions implements IGameState
 {

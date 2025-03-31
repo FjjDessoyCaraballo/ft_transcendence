@@ -1,12 +1,12 @@
-import { Player } from './Player.js';
-import { Player2 } from './Player2.js';
-import { Platform, PlatformDir } from './Platform.js';
-import { collType } from './CollisionShape.js';
-import { drawGround, drawWalls} from './Environment.js';
-import { stateManager } from './index.js';
-import { GameStates, IGameState } from './GameStates.js';
-import { EndScreen } from './EndScreen.js';
-import { User, UserManager } from './UserManager.js';
+import { Player } from './Player';
+import { Player2 } from './Player2';
+import { Platform, PlatformDir } from './Platform';
+import { collType } from './CollisionShape';
+import { drawGround, drawWalls} from './Environment';
+import { stateManager } from './index';
+import { GameStates, IGameState } from './GameStates';
+import { EndScreen } from './EndScreen';
+import { User, UserManager } from './UserManager';
 
 export class InGame implements IGameState
 {

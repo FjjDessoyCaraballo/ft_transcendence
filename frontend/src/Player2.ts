@@ -1,7 +1,7 @@
-import { Player } from "./Player.js";
-import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER } from "./constants.js";
-import { PlatformDir } from "./Platform.js";
-import { User } from "./UserManager.js";
+import { Player } from "./Player";
+import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER } from "./constants";
+import { PlatformDir } from "./Platform";
+import { User } from "./UserManager";
 
 export class Player2 extends Player {
 

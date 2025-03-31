@@ -1,4 +1,4 @@
-import { BULLET_DMG } from "./constants.js";
+import { BULLET_DMG } from "./constants";
 
 
 export enum collType

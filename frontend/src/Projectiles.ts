@@ -1,5 +1,5 @@
-import { CollisionShape, collType } from "./CollisionShape.js";
-import { WALL_THICKNESS, FLOOR_THICKNESS } from "./constants.js";
+import { CollisionShape, collType } from "./CollisionShape";
+import { WALL_THICKNESS, FLOOR_THICKNESS } from "./constants";
 
 export class Projectile {
     x: number;

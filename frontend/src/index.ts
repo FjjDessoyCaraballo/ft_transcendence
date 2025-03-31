@@ -1,6 +1,6 @@
-import { GameStateManager } from './GameStates.js'; 
-import { StartScreen } from './StartScreen.js';
-import { setupLogin } from './TEST_logIn_register.js';
+import { GameStateManager } from './GameStates'; 
+import { StartScreen } from './StartScreen';
+import { setupLogin } from './TEST_logIn_register';
 
 const canvas: HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;

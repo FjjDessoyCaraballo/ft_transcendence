@@ -1,10 +1,10 @@
-import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT} from "./constants.js";
-import { Projectile } from "./Projectiles.js";
-import { gameArea } from "./Environment.js";
-import { CollisionShape, collType } from "./CollisionShape.js";
-import { Platform, PlatformDir } from "./Platform.js";
-import { Health } from "./Health.js";
-import { User, UserManager } from "./UserManager.js";
+import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT} from "./constants";
+import { Projectile } from "./Projectiles";
+import { gameArea } from "./Environment";
+import { CollisionShape, collType } from "./CollisionShape";
+import { Platform, PlatformDir } from "./Platform";
+import { Health } from "./Health";
+import { User, UserManager } from "./UserManager";
 
 export class Player {
     x: number;

@@ -1,11 +1,11 @@
-import { GameStates, IGameState } from "./GameStates.js";
-import { Button } from "./Button.js";
-import { stateManager, canvas, ctx, curUser } from "./index.js"; // canvas again globally used... is it bad?
-import { InGame } from "./InGame.js";
-import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "./constants.js";
-import { Instructions } from "./Instructions.js";
-import { UserHUB } from "./UserHUB.js";
-import { UserManager, User } from "./UserManager.js";
+import { GameStates, IGameState } from "./GameStates";
+import { Button } from "./Button";
+import { stateManager, canvas, ctx, curUser } from "./index"; // canvas again globally used... is it bad?
+import { InGame } from "./InGame";
+import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "./constants";
+import { Instructions } from "./Instructions";
+import { UserHUB } from "./UserHUB";
+import { UserManager, User } from "./UserManager";
 
 // BUTTONS
 

@@ -1,10 +1,10 @@
-import { ctx, canvas, stateManager } from "./index.js"; // GLOBAL USE OF ctx and canvas
-import { curUser, updateCurUser } from "./index.js"; // GLOBAL USE
-import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "./constants.js";
-import { StartScreen } from "./StartScreen.js";
-import { GameStates } from "./GameStates.js";
-import { Button } from "./Button.js";
-import { RankingHandler } from "./RankingPoints.js";
+import { ctx, canvas, stateManager } from "./index"; // GLOBAL USE OF ctx and canvas
+import { curUser, updateCurUser } from "./index"; // GLOBAL USE
+import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "./constants";
+import { StartScreen } from "./StartScreen";
+import { GameStates } from "./GameStates";
+import { Button } from "./Button";
+import { RankingHandler } from "./RankingPoints";
 
 
 export interface User {

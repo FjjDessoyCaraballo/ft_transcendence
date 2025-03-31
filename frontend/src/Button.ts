@@ -1,5 +1,5 @@
-import { ctx } from "./index.js"; // is this bad...? Using global variable?
-import { TEXT_PADDING } from "./constants.js";
+import { ctx } from "./index"; // is this bad...? Using global variable?
+import { TEXT_PADDING } from "./constants";
 
 export abstract class Button
 {

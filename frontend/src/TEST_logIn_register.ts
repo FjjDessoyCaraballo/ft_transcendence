@@ -1,6 +1,6 @@
-import { User } from "./UserManager.js";
-import { USER_ARR_KEY, LOGIN_CHECK_KEY } from "./constants.js";
-import { updateCurUser } from "./index.js";
+import { User } from "./UserManager";
+import { USER_ARR_KEY, LOGIN_CHECK_KEY } from "./constants";
+import { updateCurUser } from "./index";
 
 /*
 	CHECK ERROR HANDLING LATER!!

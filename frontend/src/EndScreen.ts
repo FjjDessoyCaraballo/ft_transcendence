@@ -1,9 +1,9 @@
-import { GameStates, IGameState } from "./GameStates.js";
-import { Button } from "./Button.js";
-import { stateManager, canvas, ctx } from "./index.js";
-import { MainMenu } from "./MainMenu.js";
-import { TEXT_PADDING } from "./constants.js";
-import { UserManager, User } from "./UserManager.js";
+import { GameStates, IGameState } from "./GameStates";
+import { Button } from "./Button";
+import { stateManager, canvas, ctx } from "./index";
+import { MainMenu } from "./MainMenu";
+import { TEXT_PADDING } from "./constants";
+import { UserManager, User } from "./UserManager";
 
 export class ReturnMainMenuButton extends Button
 {

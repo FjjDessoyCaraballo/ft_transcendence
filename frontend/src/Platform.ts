@@ -1,6 +1,6 @@
-import { PLATFORM_THICKNESS, PLATFORM_SPEED } from "./constants.js";
-import { gameArea } from "./Environment.js";
-import { CollisionShape, collType} from "./CollisionShape.js";
+import { PLATFORM_THICKNESS, PLATFORM_SPEED } from "./constants";
+import { gameArea } from "./Environment";
+import { CollisionShape, collType} from "./CollisionShape";
 
 export enum PlatformDir{
 	UP_DOWN,
