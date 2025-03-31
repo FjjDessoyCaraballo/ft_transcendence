@@ -11,12 +11,12 @@ BLUE = \033[34m
 .PHONY: all build start stop restart clean logs setup db help
 
 # Build the Docker images
-build: setup
+build:
 	@echo "$(BLUE)Building Docker images...$(RESET)"
 	docker-compose -f $(COMPOSE_FILE) build
 
 # Start the containers in the background
-start: setup
+start:
 	@echo "$(GREEN)Starting containers...$(RESET)"
 	docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)Services are running:$(RESET)"
@@ -24,7 +24,7 @@ start: setup
 	@echo "$(GREEN)- Backend API: http://localhost:$$(grep BACKEND_PORT $(ENV_FILE) | cut -d '=' -f2 || echo 3000)$(RESET)"
 
 # Start containers in development mode with logs visible
-dev: setup
+dev:
 	@echo "$(GREEN)Starting containers in development mode...$(RESET)"
 	docker-compose -f $(COMPOSE_FILE) up
 
