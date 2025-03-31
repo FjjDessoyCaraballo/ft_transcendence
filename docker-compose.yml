@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "${FRONTEND_PORT:-8080}:80"
+      - "${FRONTEND_PORT:-8080}:9000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
