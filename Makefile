@@ -66,6 +66,8 @@ db:
 # Help command
 help:
 	@echo "$(BLUE)Available commands:$(RESET)"
+	@echo "  going into frontend container		- docker exec -it frontend sh"
+	@echo "  going into backend container		- docker exec -it backend sh"
 	@echo "  make setup    - Create initial .env file and data directory"
 	@echo "  make build    - Build Docker images"
 	@echo "  make start    - Start containers in detached mode"
