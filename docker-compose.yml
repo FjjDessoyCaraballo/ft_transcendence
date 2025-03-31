@@ -24,13 +24,13 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "${FRONTEND_PORT:-8080}:9000"
+      - "${FRONTEND_PORT:-9000}:9000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:3000}
+      # - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:3000}
     depends_on:
       - backend
     restart: unless-stopped
