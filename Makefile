@@ -48,7 +48,6 @@ clean:
 fclean: clean
 	@echo "$(RED)Removing all unused Docker volumes...$(RESET)"
 	docker volume prune -f
-	@rm -rf frontend/src/*.js
 	@echo "$(RED)Removing all Docker images...$(RESET)"
 	docker rmi -f $$(docker images -q) || true
 
