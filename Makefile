@@ -14,8 +14,6 @@ BLUE = \033[34m
 # Main commands
 .PHONY: all build start stop restart clean logs help
 
-all: build start
-
 # Build the Docker images
 build:
 	@echo "$(BLUE)Building Docker images...$(RESET)"
