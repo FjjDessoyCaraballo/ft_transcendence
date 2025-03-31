@@ -23,7 +23,7 @@ RUN npm run build
 RUN npm install -g serve
 
 # Expose the port the app will run on
-EXPOSE 80
+EXPOSE 3000
 
-# Command to run the application
-CMD ["serve", "-s", "build", "-l", "80"]
+# Command to run the application in development mode
+CMD ["npm", "run", "dev"]
