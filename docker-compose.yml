@@ -15,7 +15,6 @@ services:
       - JWT_SECRET=${JWT_SECRET:-dev_jwt_secret}
       - COOKIE_SECRET=${COOKIE_SECRET:-dev_cookie_secret}
       - DB_PATH=${DB_PATH:-/app/data/database.sqlite}
-      - AI_DIFFICULTY=${AI_DIFFICULTY:-medium}
     restart: unless-stopped
 
   frontend:
