@@ -39,10 +39,17 @@ restart: stop start
 # Clean up containers, images, and volumes
 clean:
 	@echo "$(RED)Cleaning up Docker resources...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) down -v --rmi all
+	docker-compose -f $(COMPOSE_FILE) down -v
 	@echo "$(RED)Removing data directory contents...$(RESET)"
 	rm -rf data/*
 	touch data/.gitkeep
+
+# Full clean: remove everything, including images and unused volumes
+fclean: clean
+	@echo "$(RED)Removing all unused Docker volumes...$(RESET)"
+	docker volume prune -f
+	@echo "$(RED)Removing all Docker images...$(RESET)"
+	docker rmi -f $$(docker images -q) || true
 
 # Show container logs
 logs:
