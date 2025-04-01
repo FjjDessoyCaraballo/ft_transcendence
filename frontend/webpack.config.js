@@ -2,7 +2,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    index: "./src/index.ts",  // Panu
+    main: "./src/main.ts",  // Pong game
+  },
   module: {
     rules: [
       {
@@ -24,12 +27,13 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'bundle.js',
+    filename: "[name].js", // Generates index.js and main.js separately
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html',
+      chunks: ["index", "main"], // Ensures both scripts are included in HTML
     }),
   ],
   devServer: {
