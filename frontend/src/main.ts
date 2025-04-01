@@ -139,13 +139,13 @@ class Game {
 
   updatePlayerPositions() {
     // Player 1 movement (W and S keys)
-    if (this.keysPressed['w']) this.player1.paddle.moveUp();
+    if (this.keysPressed['q']) this.player1.paddle.moveUp();
     if (this.keysPressed['s']) this.player1.paddle.moveDown();
 
     if (this.twoPlayerMode) {
       // Player 2 movement (ArrowUp and ArrowDown keys)
-      if (this.keysPressed['ArrowUp']) this.player2.paddle.moveUp();
-      if (this.keysPressed['ArrowDown']) this.player2.paddle.moveDown();
+      if (this.keysPressed['o']) this.player2.paddle.moveUp();
+      if (this.keysPressed['k']) this.player2.paddle.moveDown();
     } else {
       // AI movement for Player 2
       const lerpSpeed = 0.1; // Smooth movement
