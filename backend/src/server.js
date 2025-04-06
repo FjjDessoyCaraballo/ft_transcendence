@@ -1,7 +1,7 @@
-// Import required packages
+// src/server.js
+const path = require('path');  // Add this missing import
 const fastify = require('fastify')({ logger: true });
 const config = require('../config');
-const path = require('path');
 
 // Register plugins
 fastify.register(require('@fastify/cors'), {
@@ -18,10 +18,8 @@ fastify.register(require('@fastify/static'), {
   prefix: '/public/'
 });
 
-// Add a simple route
-fastify.get('/', async (request, reply) => {
-  return { hello: 'world' };
-});
+// Register routes
+fastify.register(require('./routes'));
 
 // Start the server
 const start = async () => {
