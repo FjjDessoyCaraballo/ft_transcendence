@@ -1,6 +1,7 @@
 // Import required packages
 const fastify = require('fastify')({ logger: true });
 const config = require('../config');
+const path = require('path');
 
 // Register plugins
 fastify.register(require('@fastify/cors'), {
