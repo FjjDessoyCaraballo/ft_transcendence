@@ -33,3 +33,20 @@ sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS users (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the user was last updated
   deleted_at DATETIME DEFAULT NULL               -- Timestamp for soft deletion (NULL if not deleted)
 );"
+
+# Execute the SQL commands to create the friends table
+sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS friends (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,          -- Unique identifier for each friendship
+  user_id INTEGER NOT NULL,                      -- ID of the user who initiated the friendship
+  friend_id INTEGER NOT NULL,                    -- ID of the friend
+  status TEXT NOT NULL DEFAULT 'pending',        -- Status of the friendship (pending, accepted, blocked)
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the friendship was created
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the friendship was last updated
+  deleted_at DATETIME DEFAULT NULL,              -- Timestamp for soft deletion (NULL if not deleted)
+  FOREIGN KEY (user_id) REFERENCES users(id),    -- Foreign key constraint referencing users table
+  FOREIGN KEY (friend_id) REFERENCES users(id)   -- Foreign key constraint referencing users table
+  UNIQUE (user_id, friend_id)                  -- Ensure that each user can only have one friendship with another user
+);"
+
+
+
