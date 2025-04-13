@@ -1,5 +1,5 @@
 // src/routes/users.js
-const { hashPassword, comparePassword } = require('../utils/passwordUtils');
+const { hashPassword, comparePassword } = require('../utils/passwords');
 
 async function userRoutes(fastify, options) {
   // Register the DB plugin if not already done

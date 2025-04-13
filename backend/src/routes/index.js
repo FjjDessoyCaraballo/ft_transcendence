@@ -1,7 +1,7 @@
 async function routes(fastify, options) {
 	// Register all route files here
-	fastify.register(require('./users'), { prefix: '/api/users' });
-	fastify.register(require('./games'), { prefix: '/api/games' });
+	fastify.register(require('./user'), { prefix: '/api/users' });
+	fastify.register(require('./game'), { prefix: '/api/games' });
 	fastify.register(require('./friend'), { prefix: '/api/friends' });
 	
 	// Add a simple root route

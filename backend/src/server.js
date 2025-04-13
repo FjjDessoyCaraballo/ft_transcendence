@@ -31,7 +31,7 @@ fastify.addHook('onReady', async () => {
 });
 
 // Socket.IO setup
-fastify.register(require('@fastify/socket.io'), {
+fastify.register(require('fastify-socket.io'), {
   cors: {
     origin: config.corsOrigin,
     credentials: true

@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y sqlite3
 RUN npm install fastify @fastify/cors @fastify/static @fastify/jwt
 RUN npm install sqlite3 better-sqlite3
 RUN npm install fastify-socket.io
+RUN npm install bcrypt
 
 # Install bcrypt for password hashing
 RUN npm install bcrypt
