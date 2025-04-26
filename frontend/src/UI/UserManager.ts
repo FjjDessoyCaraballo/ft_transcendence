@@ -6,7 +6,7 @@ import { StartScreen } from "../Game/StartScreen";
 import { GameStates } from "../Game/GameStates";
 import { Button } from "./Button";
 import { RankingHandler } from "../Game/RankingPoints";
-
+import { UserHubState } from "./Types";
 
 export interface User {
     username: string;
@@ -33,6 +33,20 @@ export class ChallengeButton extends Button
 }
 
 export class PongButton extends Button
+{
+	user: User;
+
+	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	{
+		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.user = user;
+	}
+
+	clickAction(): void {
+	}
+}
+
+export class TournamentButton extends Button
 {
 	user: User;
 
@@ -157,7 +171,7 @@ export class UserManager {
     }
 
 
-	static drawUserInfo(user: User, x: number, y: number): ChallengeButton
+	static drawUserInfo(user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
 	{
 		// Draw avatar box & text (JUST A TEST)
 		const avatarW = 200;
@@ -188,6 +202,7 @@ export class UserManager {
 		const infoHeight = usernameY + 60;
 		const infoWidth = 200;
 		const lineHeight = 30;
+		const buttonOffset = 20;
 
 		ctx.font = '20px arial';
 		ctx.fillStyle = '#1111d6';
@@ -200,14 +215,38 @@ export class UserManager {
 		ctx.fillStyle = 'black';
 		ctx.fillText(user.rankingPoint.toFixed(2), boxX + boxPadding + infoWidth, infoHeight + lineHeight);
 
-		// Draw challenge button
+		// Create challenge button
+		if (state === UserHubState.SINGLE_GAME)
+		{
+			let text = 'BLOCK WARS';
+			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
+			const buttonY = infoHeight - buttonOffset;
+			const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
+			return challengeButton;
+		}
+		else
+		{
+			let tournamentBtn;
 
-		let text = 'BLOCK WARS';
-		const buttonX = boxX + boxPadding + infoWidth * 2;
-		const buttonY = infoHeight;
-		const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
+			if (!isInTournament)
+			{
+				let text = 'ADD TO TOURNAMENT';
+				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 - 20;
+				const buttonY = infoHeight - buttonOffset;
+				tournamentBtn = new TournamentButton(buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user);
+			}
+			else
+			{
+				let text = 'REMOVE';
+				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 + 40;
+				const buttonY = infoHeight - buttonOffset;
+				tournamentBtn = new TournamentButton(buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user);
+			}
 
-		return challengeButton;
+			return tournamentBtn;
+
+		}
+
 	}
 
 

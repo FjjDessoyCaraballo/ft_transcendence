@@ -8,6 +8,7 @@ export enum GameStates
 	MATCH_INTRO,
 	IN_GAME,
     PONG,
+	TOURNAMENT,
 	END_SCREEN
 };
 
