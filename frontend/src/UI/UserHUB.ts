@@ -1,4 +1,4 @@
-import { GameStates, IGameState } from "../Game/GameStates";
+import { GameStateManager, GameStates, IGameState } from "../Game/GameStates";
 import { ReturnMainMenuButton } from "../Game/EndScreen";
 import { curUser, stateManager } from "../components/index";
 import { ctx } from "../components/Canvas";
