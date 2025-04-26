@@ -8,7 +8,7 @@ YELLOW = \033[33m
 RED = \033[31m
 BLUE = \033[34m
 
-.PHONY: all build start stop restart clean logs setup db help
+.PHONY: all build start stop restart clean logs setup db help backend
 
 # Build the Docker images
 build:
@@ -64,6 +64,9 @@ logs-backend:
 logs-frontend:
 	@echo "$(BLUE)Showing frontend logs...$(RESET)"
 	docker-compose -f $(COMPOSE_FILE) logs -f frontend
+
+backend:
+	docker-compose -f $(COMPOSE_FILE) up backend
 
 # Show database contents (for SQLite)
 db:

@@ -25,6 +25,8 @@ sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS users (
   username TEXT NOT NULL UNIQUE,                 -- Unique username of the user
   password TEXT NOT NULL,                        -- Hashed password of the user
   email TEXT NOT NULL UNIQUE,                    -- Unique mail address of the user
+  avatar_url TEXT DEFAULT '/public/avatars/bee.png', -- URL to the user's avatar
+  color TEXT DEFAULT 'blue',                     -- User's preferred color
   games_played INTEGER DEFAULT 0,                -- Total number of games played by the user
   games_won INTEGER DEFAULT 0,                   -- Total number of games won by the user
   games_lost INTEGER DEFAULT 0,                  -- Total number of games lost by the user
@@ -48,5 +50,18 @@ sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS friends (
   UNIQUE (user_id, friend_id)                  -- Ensure that each user can only have one friendship with another user
 );"
 
-
-
+# Create the games table to track game history
+sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS games (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,          -- Unique identifier for each game
+  game_type TEXT NOT NULL,                       -- Type of game (pong, other_game)
+  player1_id INTEGER NOT NULL,                   -- ID of player 1
+  player2_id INTEGER NOT NULL,                   -- ID of player 2
+  winner_id INTEGER,                             -- ID of the winner (NULL if draw)
+  player1_score INTEGER DEFAULT 0,               -- Score of player 1
+  player2_score INTEGER DEFAULT 0,               -- Score of player 2
+  duration_seconds INTEGER,                      -- Duration of the game in seconds
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the game was created
+  FOREIGN KEY (player1_id) REFERENCES users(id), -- Foreign key constraint
+  FOREIGN KEY (player2_id) REFERENCES users(id), -- Foreign key constraint
+  FOREIGN KEY (winner_id) REFERENCES users(id)   -- Foreign key constraint
+);"
