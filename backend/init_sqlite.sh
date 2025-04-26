@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  
 
-DB_FILE="./data/trancendence.db"
+DB_FILE="./data/database.sqlite"
 
 # Ensure the data directory exists
 DATA_DIR="./data"
@@ -26,7 +26,6 @@ sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS users (
   password TEXT NOT NULL,                        -- Hashed password of the user
   email TEXT NOT NULL UNIQUE,                    -- Unique mail address of the user
   avatar_url TEXT DEFAULT '/public/avatars/bee.png', -- URL to the user's avatar
-  color TEXT DEFAULT 'blue',                     -- User's preferred color
   games_played INTEGER DEFAULT 0,                -- Total number of games played by the user
   games_won INTEGER DEFAULT 0,                   -- Total number of games won by the user
   games_lost INTEGER DEFAULT 0,                  -- Total number of games lost by the user

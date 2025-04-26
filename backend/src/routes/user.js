@@ -34,7 +34,7 @@ async function userRoutes(fastify, options) {
   // GET all users
   fastify.get('/', async (request, reply) => {
     const users = fastify.db.prepare(`
-      SELECT id, username, email, avatar_url, color, games_won, games_lost, elo_rank 
+      SELECT id, username, email, avatar_url, games_won, games_lost, elo_rank 
       FROM users
       WHERE deleted_at IS NULL
     `).all();
@@ -44,7 +44,7 @@ async function userRoutes(fastify, options) {
   // GET user by ID
   fastify.get('/:id', async (request, reply) => {
     const user = fastify.db.prepare(`
-      SELECT id, username, email, avatar_url, color, games_won, games_lost, elo_rank 
+      SELECT id, username, email, avatar_url, games_won, games_lost, elo_rank 
       FROM users 
       WHERE id = ? AND deleted_at IS NULL
     `).get(request.params.id);
@@ -59,7 +59,7 @@ async function userRoutes(fastify, options) {
 
   // Register new user
   fastify.post('/register', async (request, reply) => {
-    const { username, email, password, color } = request.body;
+    const { username, email, password } = request.body;
     
     // Validate input
     if (!username || !email || !password) {
@@ -83,10 +83,10 @@ async function userRoutes(fastify, options) {
       // Insert the user with additional fields
       const result = fastify.db.prepare(`
         INSERT INTO users (
-          username, email, password, avatar_url, color, 
+          username, email, password, avatar_url, 
           games_won, games_lost, elo_rank
         ) VALUES (?, ?, ?, ?, ?, 0, 0, 1000)
-      `).run(username, email, hashedPassword, avatarUrl, color || 'blue');
+      `).run(username, email, hashedPassword, avatarUrl);
       
       reply.code(201);
       return { 
@@ -94,7 +94,6 @@ async function userRoutes(fastify, options) {
         username, 
         email, 
         avatar_url: avatarUrl,
-        color: color || 'blue',
         games_won: 0,
         games_lost: 0,
         elo_rank: 1000
@@ -124,7 +123,7 @@ async function userRoutes(fastify, options) {
     
     // Find user by email
     const user = fastify.db.prepare(`
-      SELECT id, username, email, password, avatar_url, color, games_won, games_lost, elo_rank 
+      SELECT id, username, email, password, avatar_url, games_won, games_lost, elo_rank 
       FROM users 
       WHERE email = ? AND deleted_at IS NULL
     `).get(email);
@@ -155,7 +154,6 @@ async function userRoutes(fastify, options) {
         username: user.username,
         email: user.email,
         avatar_url: user.avatar_url,
-        color: user.color,
         games_won: user.games_won,
         games_lost: user.games_lost,
         elo_rank: user.elo_rank
@@ -166,7 +164,7 @@ async function userRoutes(fastify, options) {
   // Update user profile
   fastify.put('/profile', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
-    const { username, email, color } = request.body;
+    const { username, email } = request.body;
     
     try {
       // Start building the SQL query and parameters
@@ -183,10 +181,6 @@ async function userRoutes(fastify, options) {
         params.push(email);
       }
       
-      if (color) {
-        setClause.push('color = ?');
-        params.push(color);
-      }
       
       if (setClause.length === 0) {
         reply.code(400);
@@ -210,7 +204,7 @@ async function userRoutes(fastify, options) {
       
       // Fetch updated user data
       const updatedUser = fastify.db.prepare(`
-        SELECT id, username, email, avatar_url, color, games_won, games_lost, elo_rank 
+        SELECT id, username, email, avatar_url, games_won, games_lost, elo_rank 
         FROM users 
         WHERE id = ? AND deleted_at IS NULL
       `).get(userId);
@@ -330,7 +324,7 @@ async function userRoutes(fastify, options) {
     
     // Get user data
     const userData = fastify.db.prepare(`
-      SELECT id, username, email, avatar_url, color, games_played, 
+      SELECT id, username, email, avatar_url, games_played, 
              games_won, games_lost, elo_rank, created_at, updated_at 
       FROM users 
       WHERE id = ? AND deleted_at IS NULL

@@ -28,10 +28,10 @@ RUN chmod 700 /app/data
 
 # Copy the rest of the application code
 COPY init_sqlite.sh /app/init_sqlite.sh
-RUN chmod +x /app/init_sqlite.sh && /app/init_sqlite.sh
+RUN chmod +x /app/init_sqlite.sh
 
 # Expose the port the server will run on
 EXPOSE 3000
 
 # Command to run the server
-CMD ["node", "src/server.js"]
+CMD ["/bin/bash", "-c", "/app/init_sqlite.sh && node src/server.js"]
