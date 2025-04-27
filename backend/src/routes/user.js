@@ -85,8 +85,8 @@ async function userRoutes(fastify, options) {
         INSERT INTO users (
           username, email, password, avatar_url, 
           games_won, games_lost, elo_rank
-        ) VALUES (?, ?, ?, ?, ?, 0, 0, 1000)
-      `).run(username, email, hashedPassword, avatarUrl);
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(username, email, hashedPassword, avatarUrl, 0, 0, 1000);
       
       reply.code(201);
       return { 
