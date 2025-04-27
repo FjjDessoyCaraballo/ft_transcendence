@@ -6,7 +6,7 @@ class FriendRepository {
 	// Send friend request
 	sendRequest(userId, friendId) {
 	  return this.db.prepare(`
-		INSERT INTO friendships (user_id, friend_id, status)
+		INSERT INTO friends (user_id, friend_id, status)
 		VALUES (?, ?, 'pending')
 	  `).run(userId, friendId);
 	}
@@ -14,7 +14,7 @@ class FriendRepository {
 	// Accept friend request
 	acceptRequest(userId, friendId) {
 	  return this.db.prepare(`
-		UPDATE friendships
+		UPDATE friends
 		SET status = 'accepted', updated_at = CURRENT_TIMESTAMP
 		WHERE friend_id = ? AND user_id = ? AND status = 'pending'
 	  `).run(userId, friendId);
@@ -23,7 +23,7 @@ class FriendRepository {
 	// Reject friend request
 	rejectRequest(userId, friendId) {
 	  return this.db.prepare(`
-		UPDATE friendships
+		UPDATE friends
 		SET status = 'rejected', updated_at = CURRENT_TIMESTAMP
 		WHERE friend_id = ? AND user_id = ? AND status = 'pending'
 	  `).run(userId, friendId);
@@ -32,12 +32,12 @@ class FriendRepository {
 	// Remove friendship
 	removeFriend(userId, friendId) {
 	  const stmt1 = this.db.prepare(`
-		DELETE FROM friendships
+		DELETE FROM friends
 		WHERE user_id = ? AND friend_id = ? AND status = 'accepted'
 	  `);
 	  
 	  const stmt2 = this.db.prepare(`
-		DELETE FROM friendships
+		DELETE FROM friends
 		WHERE friend_id = ? AND user_id = ? AND status = 'accepted'
 	  `);
 	  
@@ -55,12 +55,12 @@ class FriendRepository {
 	  return this.db.prepare(`
 		SELECT u.id, u.username, u.elo_rank, f.created_at as friends_since
 		FROM users u
-		JOIN friendships f ON f.friend_id = u.id
+		JOIN friends f ON f.friend_id = u.id
 		WHERE f.user_id = ? AND f.status = 'accepted'
 		UNION
 		SELECT u.id, u.username, u.elo_rank, f.created_at as friends_since
 		FROM users u
-		JOIN friendships f ON f.user_id = u.id
+		JOIN friends f ON f.user_id = u.id
 		WHERE f.friend_id = ? AND f.status = 'accepted'
 	  `).all(userId, userId);
 	}
@@ -70,7 +70,7 @@ class FriendRepository {
 	  return this.db.prepare(`
 		SELECT u.id, u.username, f.created_at as requested_at
 		FROM users u
-		JOIN friendships f ON f.user_id = u.id
+		JOIN friends f ON f.user_id = u.id
 		WHERE f.friend_id = ? AND f.status = 'pending'
 	  `).all(userId);
 	}
@@ -78,7 +78,7 @@ class FriendRepository {
 	// Check if users are friends
 	areFriends(userId, friendId) {
 	  const result = this.db.prepare(`
-		SELECT COUNT(*) as count FROM friendships
+		SELECT COUNT(*) as count FROM friends
 		WHERE ((user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?))
 		AND status = 'accepted'
 	  `).get(userId, friendId, friendId, userId);
