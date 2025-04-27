@@ -71,7 +71,7 @@ backend:
 # Show database contents (for SQLite)
 db:
 	@echo "$(BLUE)SQLite database contents:$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) exec backend sqlite3 /app/data/database.sqlite .tables
+	docker-compose -f $(COMPOSE_FILE) exec backend sqlite3 /app/data/database.sqlite
 
 # Help command
 help:
