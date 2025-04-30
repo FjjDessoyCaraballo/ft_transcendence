@@ -1,6 +1,7 @@
 import { GameStateManager } from '../Game/GameStates'; 
 import { StartScreen } from '../Game/StartScreen';
 import { setupLogin } from '../UI/TEST_logIn_register';
+import '../styles/main.css';
 
 const canvas: HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
