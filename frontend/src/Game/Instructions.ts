@@ -1,8 +1,8 @@
 import { GameStateManager, GameStates, IGameState } from "./GameStates";
 import { ReturnMainMenuButton } from "./EndScreen";
-import { ctx } from "./components/index";
-import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./constants";
-import { UserManager } from "./UserManager";
+import { ctx } from "../components/index";
+import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./Constants";
+import { UserManager } from "../UI/UserManager";
 
 export class Instructions implements IGameState
 {

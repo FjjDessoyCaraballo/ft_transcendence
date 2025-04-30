@@ -1,10 +1,10 @@
-import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT} from "./constants";
+import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT} from "./Constants";
 import { Projectile } from "./Projectiles";
 import { gameArea } from "./Environment";
 import { CollisionShape, collType } from "./CollisionShape";
 import { Platform, PlatformDir } from "./Platform";
 import { Health } from "./Health";
-import { User, UserManager } from "./UserManager";
+import { User, UserManager } from "../UI/UserManager";
 
 export class Player {
     x: number;

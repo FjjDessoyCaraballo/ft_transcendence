@@ -1,5 +1,5 @@
 import { CollisionShape, collType } from "./CollisionShape";
-import { WALL_THICKNESS, FLOOR_THICKNESS } from "./constants";
+import { WALL_THICKNESS, FLOOR_THICKNESS } from "./Constants";
 
 export class Projectile {
     x: number;

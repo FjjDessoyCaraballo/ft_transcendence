@@ -1,11 +1,11 @@
-import { GameStateManager, GameStates, IGameState } from "./GameStates";
-import { ReturnMainMenuButton } from "./EndScreen";
-import { ctx, curUser, stateManager } from "./components/index";
-import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "./constants";
+import { GameStateManager, GameStates, IGameState } from "../Game/GameStates";
+import { ReturnMainMenuButton } from "../Game/EndScreen";
+import { ctx, curUser, stateManager } from "../components/index";
+import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../Game/Constants";
 import { ChallengeButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
-import { InGame } from "./InGame";
-import { MatchIntro } from "./MatchIntro";
+import { InGame } from "../Game/InGame";
+import { MatchIntro } from "../Game/MatchIntro";
 
 export class NextPageButton extends Button
 {

@@ -1,0 +1,22 @@
+Agreed modules:
+
+- framework for backend (web - major);
+	- Felipe, Lauri
+- AI opponent (AI-algo - major);
+	- Tom
+- another game (game - major)
+    - Panu
+- standard user management, authentication, users across tournaments (web - major);
+	- Felipe, Lauri, Tom
+- user and game stats dashboards (AI-algo - minor);
+	- Panu, Lauri, Felipe
+- use a database for the backend (web - minor);
+	- Lauri
+- use a framework or a toolkit to build the frontend (web - minor);
+	- Felipe
+- GDPR (cybersecurity - minor);
+	- Felipe
+- expanding browser compatibility (accessibility - minor);
+	- Michael, Tom
+- multiple languages (accessibility - minor);
+	- Everyone (depends on research)
