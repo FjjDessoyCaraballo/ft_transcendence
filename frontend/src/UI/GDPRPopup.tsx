@@ -47,7 +47,7 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 						Can't really do much without consent, can we?
 					</p>
 					<p>
-						If you really don't want to play, just close the tab.
+						If you really don't want to play, just close the tab. 🗿
 					</p>
 					</div>
 					<div className='gdpr-buttons'>

@@ -1,4 +1,4 @@
-Agreed modules:
+# Agreed modules:
 
 - framework for backend (web - major);
 	- Felipe, Lauri
@@ -20,3 +20,32 @@ Agreed modules:
 	- Michael, Tom
 - multiple languages (accessibility - minor);
 	- Everyone (depends on research)
+
+
+## Frontend TODO's
+
+- web browser compatibility
+
+- tournament logic
+
+- GDPR window (user information, stats, timestamps) ✅
+
+- Delete account
+
+- Make sure to use TLSv1.2 or TLS1.3
+
+- react and tailwind switch
+
+- update information button
+
+- avatar logic
+
+- friends logic
+
+- match history logic
+
+- another game module: create window guiding users to the repo
+
+- AI constraints and movement anticipation
+
+- dashboard with statistics (has to be interactive and)
