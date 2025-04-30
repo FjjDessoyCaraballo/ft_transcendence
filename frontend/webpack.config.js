@@ -21,7 +21,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
   output: {
     filename: 'bundle.js',
@@ -39,6 +39,7 @@ module.exports = {
     compress: true,
     port: 9000,
     hot: true,
-    open: true
+    open: true,
+    historyApiFallback: true
   },
 };
