@@ -44,7 +44,11 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 					For any inquiries or questions, you can contact the data protection officer: 
 					Felipe Dessoy, fdessoy-@hive.student.fi
 				</p>
+				<div className='gdpr-buttons'>
+					<button className="decline-button" onClick={handleDecline}>Decline</button>
+					<button className="accept-button" onClick={handleAccept}>Accept</button>
+				</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
