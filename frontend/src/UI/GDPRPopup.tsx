@@ -11,6 +11,7 @@ interface GDPRPopupProps {
 
 export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => {
 	const [visible, setVisible] = useState(true);
+	const [declinedMessage, setShowDeclined] = useState(false);
 
 	useEffect(() => {
 		const hasAccepted = localStorage.getItem('gdpr-accepted');
@@ -27,11 +28,34 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 	};
 
 	const handleDecline = () => {
-		setVisible(false);
+		// setVisible(false);
+		localStorage.setItem('gdpr-accepted', 'false')
+		setShowDeclined(true);
 		onDecline();
 	};
 
 	if (!visible) return null;
+
+
+	if (declinedMessage)
+		return (
+			<div className="gdpr-popup">
+				<div className="gdpr-content">
+					<h2 className="gdpr-title">GDPR Disclosure</h2>
+					<div className="gdpr-content-scrollable">
+					<p>
+						Can't really do much without consent, can we?
+					</p>
+					<p>
+						If you really don't want to play, just close the tab.
+					</p>
+					</div>
+					<div className='gdpr-buttons'>
+						<button className="accept-button" onClick={handleAccept}>Accept</button>
+					</div>
+				</div>
+			</div>
+		);
 
 	return (
 		<div className="gdpr-popup">
@@ -39,13 +63,14 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 				<h2 className="gdpr-title">GDPR Disclosure</h2>
 				<div className="gdpr-content-scrollable">
 				<p>
-					This website stores data locally in your computer using 
+				This website stores data locally in your computer using 
 					localStorage to enchance your gaming experience.
 					This includes user account information and game metrics.
 					This information is saved in our servers for one day solely for the purpose
 					of displaying the gaming metrics for the player and making it possible for you
 					to log into your account again after the browser is closed.
 				</p>
+				<p></p>
 				<p>
 					For any inquiries or questions, you can contact the data protection officer: 
 					Felipe Dessoy, fdessoy-@hive.student.fi
