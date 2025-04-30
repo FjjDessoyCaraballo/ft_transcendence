@@ -3,7 +3,7 @@ import { Player2 } from './Player2';
 import { Platform, PlatformDir } from './Platform';
 import { collType } from './CollisionShape';
 import { drawGround, drawWalls} from './Environment';
-import { stateManager } from './index';
+import { stateManager } from './components/index';
 import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
 import { User, UserManager } from './UserManager';

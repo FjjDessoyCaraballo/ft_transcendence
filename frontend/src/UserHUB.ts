@@ -1,6 +1,6 @@
 import { GameStateManager, GameStates, IGameState } from "./GameStates";
 import { ReturnMainMenuButton } from "./EndScreen";
-import { ctx, curUser, stateManager } from "./index";
+import { ctx, curUser, stateManager } from "./components/index";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "./constants";
 import { ChallengeButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";

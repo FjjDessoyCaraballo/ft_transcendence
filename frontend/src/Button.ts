@@ -1,4 +1,4 @@
-import { ctx } from "./index"; // is this bad...? Using global variable?
+import { ctx } from "./components/index"; // is this bad...? Using global variable?
 import { TEXT_PADDING } from "./constants";
 
 export abstract class Button

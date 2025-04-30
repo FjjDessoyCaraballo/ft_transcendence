@@ -1,5 +1,5 @@
-import { ctx, canvas, stateManager } from "./index"; // GLOBAL USE OF ctx and canvas
-import { curUser, updateCurUser } from "./index"; // GLOBAL USE
+import { ctx, canvas, stateManager } from "./components/index"; // GLOBAL USE OF ctx and canvas
+import { curUser, updateCurUser } from "./components/index"; // GLOBAL USE
 import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "./constants";
 import { StartScreen } from "./StartScreen";
 import { GameStates } from "./GameStates";

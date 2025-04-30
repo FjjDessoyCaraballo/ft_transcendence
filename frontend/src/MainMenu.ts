@@ -1,6 +1,6 @@
 import { GameStates, IGameState } from "./GameStates";
 import { Button } from "./Button";
-import { stateManager, canvas, ctx, curUser } from "./index"; // canvas again globally used... is it bad?
+import { stateManager, canvas, ctx, curUser } from "./components/index"; // canvas again globally used... is it bad?
 import { InGame } from "./InGame";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "./constants";
 import { Instructions } from "./Instructions";
