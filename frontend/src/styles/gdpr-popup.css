@@ -1,59 +1,90 @@
-/* GDPR Popup Styles */
 .gdpr-popup {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 9999;
+	position: fixed !important;
+	top: 0 !important;
+	left: 0 !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex !important;
+	justify-content: center !important;
+	align-items: center !important;
+	z-index: 9999 !important;
   }
   
-  .gdpr-content {
+  /* main popup container */
+  .gdpr-popup .gdpr-content {
 	background-color: white;
 	border-radius: 8px;
-	width: 90%;
-	max-width: 600px;
-	padding: 30px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  }
-  
-  .gdpr-content h2 {
-	margin-top: 0;
-	color: #333;
-	font-size: 24px;
-	margin-bottom: 15px;
-  }
-  
-  .gdpr-content p {
-	color: #666;
-	margin-bottom: 20px;
-	line-height: 1.5;
-  }
-  
-  .gdpr-buttons {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	width: 600px;
+	max-width: 90%;
+	max-height: 80vh;
 	display: flex;
-	justify-content: flex-end;
-	gap: 10px;
+	flex-direction: column;
+	overflow: hidden;
+	margin: auto;
+	position: relative;
   }
   
-  .gdpr-buttons button {
-	padding: 10px 20px;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
+  /* Title */
+  .gdpr-popup .gdpr-title {
+	padding: 20px 20px 10px;
+	margin: 0;
+	font-size: 1.5rem;
 	font-weight: bold;
   }
   
-  .accept-button {
-	background-color: #4CAF50;
-	color: white;
+  /* scrollable content area */
+  .gdpr-popup .gdpr-content-scrollable {
+	padding: 0 20px;
+	overflow-y: auto; 
+	max-height: 400px;
+	flex: 1;
   }
   
-  .decline-button {
-	background-color: #f44336;
-	color: white;
+  /* button */
+  .gdpr-popup .gdpr-buttons {
+	display: flex;
+	justify-content: flex-end;
+	padding: 20px;
+	border-top: 1px solid #eee;
+	gap: 10px;
   }
+  
+  /* Button styling */
+  .gdpr-popup .accept-button, 
+  .gdpr-popup .decline-button {
+	padding: 10px 20px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: 500;
+	transition: background-color 0.2s;
+  }
+  
+  /* accept styling */
+  .gdpr-popup .accept-button {
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+  }
+  
+  .gdpr-popup .accept-button:hover {
+	background-color: #45a049;
+  }
+  /* decline styling */
+  .gdpr-popup .decline-button {
+	background-color: #be4e4e;
+	color: #ffffff;
+	border: 1px solid #ccc;
+  }
+  
+  .gdpr-popup .decline-button:hover {
+	background-color: #c05e5e;
+  }
+
+
+  
+  
+  
