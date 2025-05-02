@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    .titles {
+        @apply p-5 pb-2 m-0 text-4xl font-mono font-bold;
+    }
+    .texts {
+        @apply mb-6 font-mono text-lg;
+    }
+}
+
 /* General reset */
 * {
     margin: 0;

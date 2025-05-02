@@ -35,23 +35,22 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 
 	if (!visible) return null;
 
-
 	if (declinedMessage)
 		return (
 		  <div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-[9999]">
 			<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
-			  <h2 className="p-5 pb-2 m-0 text-2xl font-bold">GDPR Disclosure</h2>
+			  <h2 className="titles">GDPR Disclosure</h2>
 			  <div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
-				<p className="mb-6 fontFamily-Arial">
+				<p className="texts">
 				  Can't really do much without consent, can we?
 				</p>
-				<p className="mb-6">
+				<p className="texts">
 				  If you really don't want to play, just close the tab. 🗿
 				</p>
 			  </div>
 			  <div className="flex justify-end p-5 border-t border-gray-100">
 				<button 
-				  className="px-5 py-2 rounded bg-green-600 text-white font-medium transition-colors hover:bg-green-700" 
+				  className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
 				  onClick={handleAccept}
 				>
 				  Accept
@@ -64,9 +63,9 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 		return (
 			<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 			  <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
-				<h2 className="p-5 pb-2 m-0 text-2xl font-bold">GDPR Disclosure</h2>
+			  <h2 className="titles">GDPR Disclosure</h2>
 				<div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
-				  <p className="mb-6">
+				<p className="texts">
 					This website stores data locally in your computer using 
 					localStorage to enhance your gaming experience.
 					This includes user account information and game metrics.
@@ -75,20 +74,20 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 					to log into your account again after the browser is closed.
 				  </p>
 				  <p></p>
-				  <p className="mb-6">
+				  <p className="texts">
 					For any inquiries or questions, you can contact the data protection officer: 
 					Felipe Dessoy, fdessoy-@hive.student.fi
 				  </p>
 				</div>
 				<div className="flex justify-end p-5 border-t border-gray-100 gap-2">
 				  <button 
-					className="px-5 py-2 rounded bg-red-600 text-white font-medium transition-colors hover:bg-red-700" 
+					className="px-5 py-2 rounded bg-red-600 text-white font-sans transition-colors hover:bg-red-700" 
 					onClick={handleDecline}
 				  >
 					Decline
 				  </button>
 				  <button 
-					className="px-5 py-2 rounded bg-green-600 text-white font-medium transition-colors hover:bg-green-700" 
+					className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
 					onClick={handleAccept}
 				  >
 					Accept

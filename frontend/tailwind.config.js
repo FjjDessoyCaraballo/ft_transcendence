@@ -7,7 +7,6 @@ module.exports = {
 	  "./src/UI/**/*.{js,jsx,ts,tsx}",  // Specifically include your UI components
 	],
 	safelist: [
-	  // Add classes that might be generated dynamically or that you want to ensure are included
 	  'fixed',
 	  'inset-0',
 	  'z-50',
@@ -30,6 +29,7 @@ module.exports = {
 		fontFamily: {
 		  'arial': ['Arial', 'sans-serif'],
 		  'impact': ['Impact', 'sans-serif'],
+		  'mono': ['Mono','sans-serif']
 		},
 		zIndex: {
 		  '100': '100',
