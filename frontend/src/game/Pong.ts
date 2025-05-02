@@ -43,8 +43,8 @@ class Ball {
   constructor() { // This is the same as reset...
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
-    this.speedX = 12;
-    this.speedY = 5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
+    this.speedX = 7;
+    this.speedY = 3 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
   }
 
   move() {
@@ -102,8 +102,8 @@ class Ball {
     this.speedY = 0;
   
     setTimeout(() => {
-      this.speedX = 12 * (Math.random() > 0.5 ? 1 : -1);
-      this.speedY = 5 * (Math.random() > 0.5 ? 1 : -1);
+      this.speedX = 7 * (Math.random() > 0.5 ? 1 : -1);
+      this.speedY = 3 * (Math.random() > 0.5 ? 1 : -1);
     }, 1000); // 1000ms = 1 second delay
   }
 
