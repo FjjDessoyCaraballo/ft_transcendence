@@ -1,4 +1,4 @@
-import { MAX_HEALTH, HEALTH_WIDTH, HEALT_HEIGHT } from "./constants";
+import { MAX_HEALTH, HEALTH_WIDTH, HEALT_HEIGHT } from "./Constants";
 
 export class Health
 {

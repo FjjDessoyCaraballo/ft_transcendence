@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Install React and TypeScript definitions
+RUN npm install react react-dom @types/react @types/react-dom --save
+
 # Copy the rest of the application code
 COPY . .
 

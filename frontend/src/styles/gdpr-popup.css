@@ -1,0 +1,96 @@
+.gdpr-popup {
+	position: fixed !important;
+	top: 0 !important;
+	left: 0 !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex !important;
+	justify-content: center !important;
+	align-items: center !important;
+	z-index: 9999 !important;
+}
+  
+/* main popup container */
+.gdpr-popup .gdpr-content {
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	width: 600px;
+	max-width: 90%;
+	max-height: 80vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	margin: auto;
+	position: relative;
+}
+  
+/* Title */
+.gdpr-popup .gdpr-title {
+	padding: 20px 20px 10px;
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+  
+/* scrollable content area */
+.gdpr-popup .gdpr-content-scrollable {
+	padding: 0 50px;
+	overflow-y: auto;
+	max-height: 500px;
+	flex: 20;
+}
+  
+/* button */
+.gdpr-popup .gdpr-buttons {
+	display: flex;
+	justify-content: flex-end;
+	padding: 20px;
+	border-top: 1px solid #eee;
+	gap: 10px;
+}
+  
+/* Button styling */
+.gdpr-popup .accept-button, 
+.gdpr-popup .decline-button {
+	padding: 10px 20px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: 500;
+	transition: background-color 0.2s;
+}
+
+/* spacing between paragraphs */
+.gdpr-popup .gdpr-content-scrollable p {
+	margin-bottom: 1.5em;
+}
+
+/* accept styling */
+.gdpr-popup .accept-button {
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+}
+  
+.gdpr-popup .accept-button:hover {
+	background-color: #45a049;
+}
+
+/* decline styling */
+.gdpr-popup .decline-button {
+	background-color: #be4e4e;
+	color: #ffffff;
+	border: 1px solid #ccc;
+}
+  
+.gdpr-popup .decline-button:hover {
+	background-color: #c05e5e;
+}
+
+
+  
+  
+  

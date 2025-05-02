@@ -1,4 +1,4 @@
-import { PLATFORM_THICKNESS, PLATFORM_SPEED } from "./constants";
+import { PLATFORM_THICKNESS, PLATFORM_SPEED } from "./Constants";
 import { gameArea } from "./Environment";
 import { CollisionShape, collType} from "./CollisionShape";
 

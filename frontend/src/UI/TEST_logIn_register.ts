@@ -1,6 +1,6 @@
 import { User } from "./UserManager";
-import { USER_ARR_KEY, LOGIN_CHECK_KEY } from "./constants";
-import { updateCurUser } from "./index";
+import { USER_ARR_KEY, LOGIN_CHECK_KEY } from "../Game/Constants";
+import { updateCurUser } from "../components/index";
 
 /*
 	CHECK ERROR HANDLING LATER!!

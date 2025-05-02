@@ -1,7 +1,7 @@
 import { Player } from "./Player";
-import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER } from "./constants";
+import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER } from "./Constants";
 import { PlatformDir } from "./Platform";
-import { User } from "./UserManager";
+import { User } from "../UI/UserManager";
 
 export class Player2 extends Player {
 

@@ -19,6 +19,7 @@
 	  "strictBindCallApply": true,
 	  "noImplicitThis": true,
 	  "alwaysStrict": true,
+	  "jsx": "react-jsx",
 	  "lib": ["dom", "dom.iterable", "esnext"]
 	},
 	"include": ["src/**/*"],

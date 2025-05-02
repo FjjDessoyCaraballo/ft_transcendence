@@ -1,9 +1,9 @@
 import { GameStates, IGameState } from "./GameStates";
-import { Button } from "./Button";
-import { stateManager, canvas, ctx } from "./index";
-import { MainMenu } from "./MainMenu";
-import { TEXT_PADDING } from "./constants";
-import { UserManager, User } from "./UserManager";
+import { Button } from "../UI/Button";
+import { stateManager, canvas, ctx } from "../components/index";
+import { MainMenu } from "../UI/MainMenu";
+import { TEXT_PADDING } from "./Constants";
+import { UserManager, User } from "../UI/UserManager";
 import { InGame } from "./InGame";
 
 

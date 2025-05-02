@@ -1,4 +1,4 @@
-import { User } from "./UserManager";
+import { User } from "../UI/UserManager";
 
 
 // Uses the ELO ranking point system
