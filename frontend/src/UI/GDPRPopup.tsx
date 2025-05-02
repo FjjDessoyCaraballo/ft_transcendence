@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// TODO: scrollable menu and handle decline
-
-
 interface GDPRPopupProps {
 	onAccept: () => void;
 	onDecline: () => void;

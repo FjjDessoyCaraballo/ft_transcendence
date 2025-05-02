@@ -5,6 +5,7 @@ import { GameStateManager } from '../Game/GameStates';
 import { StartScreen } from '../Game/StartScreen';
 import { setupLogin } from '../UI/TEST_logIn_register';
 import { GDPRPopup } from '../UI/GDPRPopup'
+import { Header } from '../UI/Header'
 
 const canvas: HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
@@ -24,8 +25,11 @@ setupLogin();
 // GDPR WINDOW
 
 const gdprContainer = document.createElement('div');
+const headerContainer = document.createElement('header');
 gdprContainer.id = 'gdpr-container';
+headerContainer.id = 'header-container';
 document.body.appendChild(gdprContainer);
+document.body.appendChild(headerContainer);
 
 // RENDER
 
@@ -39,6 +43,7 @@ root.render(
 				alert('You must accept the GDPR terms to use this application.')
 			}}
 			/>
+		<Header onClick={() => console.log('Header clicked')} />
 	</React.StrictMode>
 );
 

@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* This is the part of tailwind where we can store our container
+    and we should be using this rather than regular css containers.
+    You can create any container that you want just by following the
+    same recipe from `.tiles` and `.texts` */
 @layer components {
     .titles {
         @apply p-5 pb-2 m-0 text-4xl font-mono font-bold;
@@ -24,9 +28,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Allow scrolling from the top */
-    min-height: 100vh; /* Ensure the body is at least the height of the viewport */
-    overflow-y: auto; /* Enable vertical scrolling if content exceeds the viewport */
+    justify-content: flex-start;
+    min-height: 100vh;
+    overflow-y: auto; 
     text-align: center;
 }
 
@@ -69,7 +73,7 @@ button:hover {
 
 /* Canvas styling */
 canvas {
-    border: 2px solid #FFFFF0; /* Yellow border */
+    border: 2px solid #FFFFF0;
     margin-top: 20px;
     max-width: 100%;
     max-height: 80vh;
@@ -116,16 +120,16 @@ canvas {
 
 /* Modal styling */
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-    z-index: 999; /* Make sure modal appears on top of other content */
+    z-index: 999;
 }
 
 .modal-content {
