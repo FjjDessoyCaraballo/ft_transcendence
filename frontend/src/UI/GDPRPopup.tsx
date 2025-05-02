@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/gdpr-popup.css'
+// //import '../styles/gdpr-popup.css'
 
 // TODO: scrollable menu and handle decline
 
@@ -39,48 +39,63 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 
 	if (declinedMessage)
 		return (
-			<div className="gdpr-popup">
-				<div className="gdpr-content">
-					<h2 className="gdpr-title">GDPR Disclosure</h2>
-					<div className="gdpr-content-scrollable">
-					<p>
-						Can't really do much without consent, can we?
-					</p>
-					<p>
-						If you really don't want to play, just close the tab. 🗿
-					</p>
-					</div>
-					<div className='gdpr-buttons'>
-						<button className="accept-button" onClick={handleAccept}>Accept</button>
-					</div>
-				</div>
+		  <div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+			<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
+			  <h2 className="p-5 pb-2 m-0 text-2xl font-bold">GDPR Disclosure</h2>
+			  <div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
+				<p className="mb-6">
+				  Can't really do much without consent, can we?
+				</p>
+				<p className="mb-6">
+				  If you really don't want to play, just close the tab. 🗿
+				</p>
+			  </div>
+			  <div className="flex justify-end p-5 border-t border-gray-100">
+				<button 
+				  className="px-5 py-2 rounded bg-green-600 text-white font-medium transition-colors hover:bg-green-700" 
+				  onClick={handleAccept}
+				>
+				  Accept
+				</button>
+			  </div>
 			</div>
+		  </div>
 		);
 
-	return (
-		<div className="gdpr-popup">
-			<div className="gdpr-content">
-				<h2 className="gdpr-title">GDPR Disclosure</h2>
-				<div className="gdpr-content-scrollable">
-				<p>
-				This website stores data locally in your computer using 
-					localStorage to enchance your gaming experience.
+		return (
+			<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+			  <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
+				<h2 className="p-5 pb-2 m-0 text-2xl font-bold">GDPR Disclosure</h2>
+				<div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
+				  <p className="mb-6">
+					This website stores data locally in your computer using 
+					localStorage to enhance your gaming experience.
 					This includes user account information and game metrics.
 					This information is saved in our servers for one day solely for the purpose
 					of displaying the gaming metrics for the player and making it possible for you
 					to log into your account again after the browser is closed.
-				</p>
-				<p></p>
-				<p>
+				  </p>
+				  <p></p>
+				  <p className="mb-6">
 					For any inquiries or questions, you can contact the data protection officer: 
 					Felipe Dessoy, fdessoy-@hive.student.fi
-				</p>
+				  </p>
 				</div>
-				<div className='gdpr-buttons'>
-					<button className="decline-button" onClick={handleDecline}>Decline</button>
-					<button className="accept-button" onClick={handleAccept}>Accept</button>
+				<div className="flex justify-end p-5 border-t border-gray-100 gap-2">
+				  <button 
+					className="px-5 py-2 rounded bg-red-600 text-white font-medium transition-colors hover:bg-red-700" 
+					onClick={handleDecline}
+				  >
+					Decline
+				  </button>
+				  <button 
+					className="px-5 py-2 rounded bg-green-600 text-white font-medium transition-colors hover:bg-green-700" 
+					onClick={handleAccept}
+				  >
+					Accept
+				  </button>
 				</div>
+			  </div>
 			</div>
-		</div>
-	);
+		);
 };

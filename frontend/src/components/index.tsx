@@ -1,5 +1,5 @@
 import '../styles/main.css';
-import '../styles/gdpr-popup.css'
+// //import '../styles/gdpr-popup.css'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { GameStateManager } from '../Game/GameStates'; 
