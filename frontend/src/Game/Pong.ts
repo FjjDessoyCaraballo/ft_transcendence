@@ -93,7 +93,7 @@ class Ball {
   }
 
   reset() {
-    console.log("Ball reset");
+    //console.log("Ball reset");
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
   
@@ -188,17 +188,9 @@ export class Game implements IGameState {
     this.player2.paddle.stayInBounds();
   }
 
-  enter()
-	{
-		// document.addEventListener('keydown', this.KeyDownBound);
-		// document.addEventListener('keyup', this.KeyUpBound);
-	}
+  enter(){}
 
-	exit()
-	{
-		// document.removeEventListener('keydown', this.KeyDownBound);
-		// document.removeEventListener('keyup', this.KeyUpBound);
-	}
+	exit(){}
 
   update() {
     this.updatePlayerPositions();
