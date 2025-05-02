@@ -93,7 +93,7 @@ class Ball {
   }
 
   reset() {
-    //console.log("Ball reset");
+    console.log("Ball reset");
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
   
@@ -188,9 +188,17 @@ export class Game implements IGameState {
     this.player2.paddle.stayInBounds();
   }
 
-  enter(){}
+  enter()
+	{
+		// document.addEventListener('keydown', this.KeyDownBound);
+		// document.addEventListener('keyup', this.KeyUpBound);
+	}
 
-	exit(){}
+	exit()
+	{
+		// document.removeEventListener('keydown', this.KeyDownBound);
+		// document.removeEventListener('keyup', this.KeyUpBound);
+	}
 
   update() {
     this.updatePlayerPositions();
@@ -243,9 +251,18 @@ export class Game implements IGameState {
     const text1Width = ctx.measureText(text1).width;
     const text2 = "vs human (Press '2')";
     const text2Width = ctx.measureText(text2).width;
+    
 
     ctx.fillText(text1, (canvasWidth * 0.5) - (text1Width / 2), canvasHeight / 2);
     ctx.fillText(text2, (canvasWidth * 0.5) - (text2Width / 2), canvasHeight / 2 + 50);
+
+    ctx.font = "20px 'Courier New', monospace";
+    const text3 = "Player 1:  up = 'q'  down = 's'";
+    const text3Width = ctx.measureText(text3).width;
+    const text4 = "Player 2:  up = 'o'  down = 'k'";
+    const text4Width = ctx.measureText(text4).width;
+    ctx.fillText(text3, (canvasWidth * 0.5) - (text3Width / 2), canvasHeight / 2 + 150);
+    ctx.fillText(text4, (canvasWidth * 0.5) - (text4Width / 2), canvasHeight / 2 + 200);
   }
 
   render(ctx: CanvasRenderingContext2D) {
