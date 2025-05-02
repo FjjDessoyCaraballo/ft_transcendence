@@ -1,10 +1,10 @@
 import { ctx, canvas, stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
 import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
-import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "../Game/Constants";
-import { StartScreen } from "../Game/StartScreen";
-import { GameStates } from "../Game/GameStates";
+import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "../game/Constants";
+import { StartScreen } from "../game/StartScreen";
+import { GameStates } from "../game/GameStates";
 import { Button } from "./Button";
-import { RankingHandler } from "../Game/RankingPoints";
+import { RankingHandler } from "../game/RankingPoints";
 
 
 export interface User {

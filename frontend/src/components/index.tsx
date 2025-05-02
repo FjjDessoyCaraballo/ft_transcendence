@@ -1,8 +1,8 @@
 import '../styles/main.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { GameStateManager } from '../Game/GameStates'; 
-import { StartScreen } from '../Game/StartScreen';
+import { GameStateManager } from '../game/GameStates'; 
+import { StartScreen } from '../game/StartScreen';
 import { setupLogin } from '../UI/TEST_logIn_register';
 import { GDPRPopup } from '../UI/GDPRPopup'
 import { Header } from '../UI/Header'

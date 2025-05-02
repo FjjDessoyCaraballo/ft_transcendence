@@ -23,8 +23,7 @@
 }
 
 body {
-    background-color: #845132;
-    font-family: 'Arial', sans-serif;
+    font-family: 'mono', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
