@@ -42,7 +42,7 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 			<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
 			  <h2 className="p-5 pb-2 m-0 text-2xl font-bold">GDPR Disclosure</h2>
 			  <div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
-				<p className="mb-6">
+				<p className="mb-6 fontFamily-Arial">
 				  Can't really do much without consent, can we?
 				</p>
 				<p className="mb-6">
