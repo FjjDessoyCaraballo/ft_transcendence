@@ -1,5 +1,5 @@
 import { FLOOR_THICKNESS, WALL_THICKNESS, PLATFORM_THICKNESS, PLATFORM_SPEED, } from "./Constants";
-import { canvas } from "../components/index";
+import { canvas } from "../components/Canvas";
 
 interface GameArea {
 	minX: number;

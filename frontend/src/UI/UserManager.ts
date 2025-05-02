@@ -1,4 +1,5 @@
-import { ctx, canvas, stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
+import { stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
+import { canvas, ctx } from "../components/Canvas";
 import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
 import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "../Game/Constants";
 import { StartScreen } from "../Game/StartScreen";
@@ -18,6 +19,20 @@ export interface User {
 }
 
 export class ChallengeButton extends Button
+{
+	user: User;
+
+	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	{
+		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.user = user;
+	}
+
+	clickAction(): void {
+	}
+}
+
+export class PongButton extends Button
 {
 	user: User;
 
@@ -187,7 +202,7 @@ export class UserManager {
 
 		// Draw challenge button
 
-		let text = 'CHALLENGE';
+		let text = 'BLOCK WARS';
 		const buttonX = boxX + boxPadding + infoWidth * 2;
 		const buttonY = infoHeight;
 		const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);

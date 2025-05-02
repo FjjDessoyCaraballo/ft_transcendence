@@ -1,11 +1,13 @@
 import { GameStateManager, GameStates, IGameState } from "../Game/GameStates";
 import { ReturnMainMenuButton } from "../Game/EndScreen";
-import { ctx, curUser, stateManager } from "../components/index";
+import { curUser, stateManager } from "../components/index";
+import { ctx } from "../components/Canvas";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../Game/Constants";
-import { ChallengeButton, User, UserManager } from "./UserManager";
+import { ChallengeButton, PongButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
 import { InGame } from "../Game/InGame";
 import { MatchIntro } from "../Game/MatchIntro";
+import { Game } from "../Game/Pong"
 
 export class NextPageButton extends Button
 {
@@ -40,10 +42,12 @@ export class UserHUB implements IGameState
 	nextPageButton: NextPageButton;
 	prevPageButton: PrevPageButton;
 	challengeBtnArr: ChallengeButton[];
+	pongBtnArr: PongButton[];
 	isNextActive: boolean;
 	isPrevActive: boolean;
 	needNewChallengeButtons: boolean;
 	opponent: User | null;
+	interactionType: "challenge" | "pong" | null;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 	submitPasswordBound: () => void;
@@ -59,6 +63,8 @@ export class UserHUB implements IGameState
 		this.isPrevActive = false;
 		this.needNewChallengeButtons = true;
 		this.opponent = null;
+		this.interactionType = null;
+
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
@@ -77,6 +83,7 @@ export class UserHUB implements IGameState
 		this.nextPageButton = new NextPageButton(button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial');
 		this.prevPageButton = new PrevPageButton(button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial');
 		this.challengeBtnArr = [];
+		this.pongBtnArr = [];
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -102,6 +109,11 @@ export class UserHUB implements IGameState
 		{
 			btn.checkMouse(x, y);
 		}
+
+		for (const btn of this.pongBtnArr)
+		{
+			btn.checkMouse(x, y);
+		}
 	}
 
 	mouseClickCallback()
@@ -119,6 +131,7 @@ export class UserHUB implements IGameState
 				if (curUser) 
 				{
 					this.opponent = btn.user;
+					this.interactionType = "challenge";
 
 					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
 					if (passwordHeader) 
@@ -133,6 +146,32 @@ export class UserHUB implements IGameState
 					submitPasswordBtn.addEventListener("click", this.submitPasswordBound);
 					cancelPasswordBtn.addEventListener("click", this.cancelPasswordBound);
 		
+				}
+			}
+		}
+
+		for (const btn of this.pongBtnArr)
+		{
+			if (btn.checkClick())
+			{
+				if (curUser) 
+				{
+					this.opponent = btn.user;
+					this.interactionType = "pong";
+	
+					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
+					if (passwordHeader) 
+						passwordHeader.innerHTML = `Hello ${this.opponent.username}!<br>Please type in your password to start the game`;
+	
+					const passwordModal = document.getElementById("passwordModal") as HTMLElement;
+					const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
+					const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
+				
+					// Show the password modal
+					passwordModal.style.display = "flex";
+					submitPasswordBtn.addEventListener("click", this.submitPasswordBound);
+					cancelPasswordBtn.addEventListener("click", this.cancelPasswordBound);
+			
 				}
 			}
 		}
@@ -163,7 +202,10 @@ export class UserHUB implements IGameState
 				const passwordModal = document.getElementById("passwordModal") as HTMLElement;
 				passwordModal.style.display = "none";
 				passwordInput.value = "";
-				stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent));
+				if (this.interactionType === "challenge")
+					stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent));
+				if (this.interactionType === "pong")
+					stateManager.changeState(new Game(curUserObj, this.opponent));
 			}
 			else
 			{
@@ -183,6 +225,7 @@ export class UserHUB implements IGameState
 		submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
 		cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
 		passwordInput.value = "";
+		this.interactionType = null;
 	}
 
 	enter()
@@ -229,7 +272,11 @@ export class UserHUB implements IGameState
 			const challengeBtn: ChallengeButton = UserManager.drawUserInfo(userArr[i], x, y);
 
 			if (this.needNewChallengeButtons && challengeBtn.user.username !== curUser)
+			{
 				this.challengeBtnArr.push(challengeBtn);
+				const pongButton = new PongButton(x + 660, y + 40, 'red', '#780202', 'PONG', 'white', '25px', 'arial', userArr[i]);
+				this.pongBtnArr.push(pongButton);
+			}
 			
 			y += 185;
 		}
@@ -258,6 +305,10 @@ export class UserHUB implements IGameState
 		
 		for (const btn of this.challengeBtnArr)
 			btn.draw(ctx);
+
+		for (const btn of this.pongBtnArr)
+			btn.draw(ctx);
+		
 
 	}
 
