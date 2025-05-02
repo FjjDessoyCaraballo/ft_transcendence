@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @import './gdpr-popup.css'; */
-
 /* General reset */
 * {
     margin: 0;

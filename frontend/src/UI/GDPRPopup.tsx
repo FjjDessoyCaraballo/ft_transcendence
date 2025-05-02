@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// //import '../styles/gdpr-popup.css'
 
 // TODO: scrollable menu and handle decline
 
@@ -39,7 +38,7 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 
 	if (declinedMessage)
 		return (
-		  <div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+		  <div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-[9999]">
 			<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
 			  <h2 className="p-5 pb-2 m-0 text-2xl font-bold">GDPR Disclosure</h2>
 			  <div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
