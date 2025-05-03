@@ -59,12 +59,12 @@ async function userRoutes(fastify, options) {
 
   // Register new user
   fastify.post('/register', async (request, reply) => {
-    const { username, email, password } = request.body;
+    const { username, password } = request.body;
     
     // Validate input
-    if (!username || !email || !password) {
+    if (!username || !password) {
       reply.code(400);
-      return { error: 'Username, email and password are required' };
+      return { error: 'Username and password are required' };
     }
     
     try {
@@ -77,26 +77,25 @@ async function userRoutes(fastify, options) {
       // Insert the user with additional fields
       const result = fastify.db.prepare(`
         INSERT INTO users (
-          username, email, password, avatar_url, 
+          username, password, avatar_url, 
           games_won, games_lost, elo_rank
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).run(username, email, hashedPassword, avatarUrl, 0, 0, 1000);
+      `).run(username, hashedPassword, avatarUrl, 0, 0, 1000);
       
       reply.code(201);
       return { 
         id: result.lastInsertRowid, 
         username, 
-        email, 
         avatar_url: avatarUrl,
         games_won: 0,
         games_lost: 0,
         elo_rank: 1000
       };
     } catch (err) {
-      // Handle duplicate username/email
+      // Handle duplicate username
       if (err.message.includes('UNIQUE constraint failed')) {
         reply.code(409);
-        return { error: 'Username or email already exists' };
+        return { error: 'Username already exists' };
       }
       
       fastify.log.error(err);
@@ -107,10 +106,10 @@ async function userRoutes(fastify, options) {
 
   // Login
   fastify.post('/login', async (request, reply) => {
-    const { email, password } = request.body;
+    const { password } = request.body;
     
     // Validate input
-    if (!email || !password) {
+    if ( !password) {
       reply.code(400);
       return { error: 'Email and password are required' };
     }
@@ -146,7 +145,6 @@ async function userRoutes(fastify, options) {
       user: {
         id: user.id,
         username: user.username,
-        email: user.email,
         avatar_url: user.avatar_url,
         games_won: user.games_won,
         games_lost: user.games_lost,

@@ -7,11 +7,11 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+# Install system dependencies including OpenSSL
+RUN apt-get update && apt-get install -y sqlite3 openssl
+
 # Install dependencies
 RUN npm install
-
-# Install SQLite CLI tool
-RUN apt-get update && apt-get install -y sqlite3
 
 # Install Fastify and other required packages
 RUN npm install fastify @fastify/cors @fastify/static @fastify/jwt
@@ -19,13 +19,10 @@ RUN npm install sqlite3 better-sqlite3
 RUN npm install fastify-socket.io
 RUN npm install bcrypt
 
-# Install bcrypt for password hashing
-RUN npm install bcrypt
-
 # Create https certs
-RUN mkdir -p /app/certs && \
-    openssl genrsa -out /app/certs/key.pem 2048 && \
-    openssl req -new -x509 -key /app/certs/key.pem -out /app/certs/cert.pem -days 365 -subj "/CN=localhost"
+# RUN mkdir -p /app/certs && \
+#     openssl genrsa -out /app/certs/key.pem 2048 && \
+#     openssl req -new -x509 -key /app/certs/key.pem -out /app/certs/cert.pem -days 365 -subj "/CN=localhost"
 
 # Create directory for the SQLite database
 RUN mkdir -p /app/data
@@ -39,4 +36,4 @@ RUN chmod +x /app/init_sqlite.sh
 EXPOSE 3443
 
 # Command to run the server
-CMD ["/bin/bash", "-c", "/app/init_sqlite.sh && node src/server.js"]
+CMD ["/bin/bash", "-c", "mkdir -p /app/certs && cd /app/certs && openssl genrsa -out key.pem 2048 && openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj '/CN=localhost' && cd /app && /app/init_sqlite.sh && node src/server.js"]

@@ -1,9 +1,16 @@
 const path = require('path');
-const fastify = require('fastify')({ logger: true });
+const fs = require('fs');
 const config = require('../config');
 const socketManager = require('./utils/socketManager');
 const FriendRepository = require('./repositories/friendRepository');
 let friendRepo;
+const fastify = require('fastify')({
+	logger: true,
+	https: {
+	  key: fs.readFileSync('/app/certs/key.pem'),
+	  cert: fs.readFileSync('/app/certs/cert.pem')
+	}
+  });
 
 // Register plugins
 fastify.register(require('@fastify/cors'), {

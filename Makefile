@@ -20,8 +20,8 @@ start:
 	@echo "$(GREEN)Starting containers...$(RESET)"
 	docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)Services are running:$(RESET)"
-	@echo "$(GREEN)- Frontend: http://localhost:$$(grep FRONTEND_PORT $(ENV_FILE) | cut -d '=' -f2 || echo 8080)$(RESET)"
-	@echo "$(GREEN)- Backend API: http://localhost:$$(grep BACKEND_PORT $(ENV_FILE) | cut -d '=' -f2 || echo 3443)$(RESET)"
+	@echo "$(GREEN)- Frontend: https://localhost:$$(grep FRONTEND_PORT $(ENV_FILE) | cut -d '=' -f2 || echo 8080)$(RESET)"
+	@echo "$(GREEN)- Backend API: https://localhost:$$(grep BACKEND_PORT $(ENV_FILE) | cut -d '=' -f2 || echo 3443)$(RESET)"
 
 # Start containers in development mode with logs visible
 dev:
