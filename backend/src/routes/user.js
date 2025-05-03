@@ -66,12 +66,6 @@ async function userRoutes(fastify, options) {
       reply.code(400);
       return { error: 'Username, email and password are required' };
     }
-
-	// Validate input
-	if (!username || !email || !password) {
-	reply.code(400);
-	return { error: 'Username, email and password are required' };
-	}
     
     try {
       // Hash the password
