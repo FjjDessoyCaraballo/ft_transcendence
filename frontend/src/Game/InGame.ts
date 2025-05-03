@@ -7,26 +7,33 @@ import { stateManager } from '../components/index';
 import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
 import { User, UserManager } from '../UI/UserManager';
+import { TournamentPlayer } from '../UI/Tournament';
+
 
 export class InGame implements IGameState
 {
 	name: GameStates
 	player1: Player;
 	player2: Player2;
+	tournamentData1: TournamentPlayer | null;
+	tournamentData2: TournamentPlayer | null;
+	isStateReady: boolean;
 	keys: { [key: string]: boolean };
 	platforms: Platform[];
 	canvas: HTMLCanvasElement;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, user1: User, user2: User)
+	constructor(canvas: HTMLCanvasElement, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
 	{
 		this.name = GameStates.IN_GAME;
-		
-		// Check that if players have same color, use some default ones
+		this.isStateReady = false;
+		this.tournamentData1 = tData1;
+		this.tournamentData2 = tData2;
 		
 		this.player1 = new Player(100, 745, user1.color, user1); // Maybe in enter() ?
 		this.player2 = new Player2(1100, 745, user2.color, user2); // Maybe in enter() ?
+
 		this.keys = {}; // Maybe in enter() ?
 
 		this.platforms = [
@@ -117,15 +124,35 @@ export class InGame implements IGameState
 
 		// VICTORY CONDITION CHECK
 
-		if (this.player1.userData && this.player2.userData)
+		if (this.player1.userData && this.player2.userData
+			&& (this.player1.health.amount === 0 || this.player2.health.amount === 0)
+			&& !this.isStateReady)
 		{
+			// Tournament ending
+			if (this.tournamentData1 && this.tournamentData2)
+			{
+				if (this.player1.health.amount === 0)
+				{
+					this.tournamentData2.tournamentPoints++;
+					this.tournamentData2.isWinner = true;
+				}
+				else if (this.player2.health.amount === 0)
+				{
+					this.tournamentData1.tournamentPoints++;
+					this.tournamentData1.isWinner = true;
+				}				
+				this.isStateReady = true;
+				return ;
+			}
+
+			// Regular ending
 			const p1 = UserManager.cloneUser(this.player1.userData);
 			const p2 = UserManager.cloneUser(this.player2.userData);
 
 			if (this.player1.health.amount === 0)
-				stateManager.changeState(new EndScreen(this.canvas, p2, p1));
+				stateManager.changeState(new EndScreen(this.canvas, p2, p1, null, null));
 			else if (this.player2.health.amount === 0)
-				stateManager.changeState(new EndScreen(this.canvas, p1, p2));
+				stateManager.changeState(new EndScreen(this.canvas, p1, p2, null, null));
 		}
 
 	}

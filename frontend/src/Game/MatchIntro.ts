@@ -6,6 +6,7 @@ import { MainMenu } from "../UI/MainMenu";
 import { TEXT_PADDING } from "./Constants";
 import { UserManager, User } from "../UI/UserManager";
 import { InGame } from "./InGame";
+import { TournamentPlayer } from "../UI/Tournament";
 
 
 export class MatchIntro implements IGameState
@@ -13,6 +14,9 @@ export class MatchIntro implements IGameState
 	name: GameStates;
 	player1: User;
 	player2: User;
+	tournamentData1: TournamentPlayer | null;
+	tournamentData2: TournamentPlayer | null;
+	isStateReady: boolean;
 	p1IsReady: boolean;
 	p2IsReady: boolean;
 	keys: { [key: string]: boolean };
@@ -20,7 +24,7 @@ export class MatchIntro implements IGameState
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, player1: User, player2: User)
+	constructor(canvas: HTMLCanvasElement, player1: User, player2: User , tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
 	{
 		this.name = GameStates.MATCH_INTRO;
 
@@ -30,6 +34,9 @@ export class MatchIntro implements IGameState
 		this.keys = {}; // Maybe in enter() ?
 		this.p1IsReady = false;
 		this.p2IsReady = false;
+		this.tournamentData1 = tData1;
+		this.tournamentData2 = tData2;
+		this.isStateReady = false;
 
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
@@ -67,7 +74,12 @@ export class MatchIntro implements IGameState
 			this.p2IsReady = true;
 
 		if (this.p1IsReady && this.p2IsReady)
-			stateManager.changeState(new InGame(this.canvas, this.player1, this.player2));
+		{
+			if (!this.tournamentData1)
+				stateManager.changeState(new InGame(this.canvas, this.player1, this.player2, null, null));
+			else
+				this.isStateReady = true;
+		}
 	}
 
 	render(ctx: CanvasRenderingContext2D)
@@ -92,10 +104,17 @@ export class MatchIntro implements IGameState
 		const p1Text = this.player1.username;
 		ctx.font = '55px arial';
 		ctx.fillStyle = p1FillColor;
-		const p1X = 100;
+		const p1X = 140;
 		ctx.fillText(p1Text, p1X, 440);
 
-		const p1Rank = `(${this.player1.rankingPoint.toFixed(2)})`;
+		let p1Rank;
+		if (!this.tournamentData1)
+			p1Rank = `Ranking points: ${this.player1.rankingPoint.toFixed(2)}`;
+		else
+		{
+			p1Rank = `Place: ${this.tournamentData1.place}
+			Points: ${this.tournamentData1.tournamentPoints}`;
+		}
 		const halfOfP1Text = ctx.measureText(p1Text).width / 2;
 		ctx.font = '30px arial';
 		ctx.fillStyle = 'white';
@@ -109,10 +128,17 @@ export class MatchIntro implements IGameState
 		const p2Text = this.player2.username;
 		ctx.font = '55px arial';
 		ctx.fillStyle = p2FillColor;
-		const p2X = this.canvas.width - ctx.measureText(p2Text).width - 100;
+		const p2X = this.canvas.width - ctx.measureText(p2Text).width - 140;
 		ctx.fillText(p2Text, p2X, 440);
 
-		const p2Rank = `(${this.player2.rankingPoint.toFixed(2)})`;
+		let p2Rank;
+		if (!this.tournamentData2)
+			p2Rank = `Ranking points: ${this.player2.rankingPoint.toFixed(2)}`;
+		else
+		{
+			p2Rank = `Place: ${this.tournamentData2.place}
+			Points: ${this.tournamentData2.tournamentPoints}`;
+		}
 		const halfOfP2Text = ctx.measureText(p2Text).width / 2;
 		ctx.font = '30px arial';
 		ctx.fillStyle = 'white';

@@ -48,6 +48,7 @@ export class GameStateManager {
 		else
 			return this.currentState.name;
 	}
+
 }
 
 

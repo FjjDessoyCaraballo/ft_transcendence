@@ -2,7 +2,7 @@ import '../styles/main.css';
 import '../styles/gdpr-popup.css'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { GameStateManager } from '../Game/GameStates'; 
+import { GameStateManager, GameStates } from '../Game/GameStates'; 
 import { StartScreen } from '../Game/StartScreen';
 import { setupLogin } from '../UI/TEST_logIn_register';
 import { GDPRPopup } from '../UI/GDPRPopup'
@@ -42,6 +42,9 @@ function gameLoop(timeStamp: number) {
 
 	const deltaTime = (timeStamp - prevTimeStamp) / 1000; // convert from ms to seconds
 	prevTimeStamp = timeStamp;
+
+	if (!curUser && stateManager.getStateName() !== GameStates.START_SCREEN)
+		stateManager.changeState(new StartScreen(canvas));
 
 	updateGame(deltaTime);
 

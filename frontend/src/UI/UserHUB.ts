@@ -50,6 +50,7 @@ export class UserHUB implements IGameState
 	opponent: User | null;
 	interactionType: "challenge" | "pong" | null;
 	tournamentArr: User [];
+	userArr: User [];
 	state: UserHubState;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
@@ -69,6 +70,22 @@ export class UserHUB implements IGameState
 		this.interactionType = null;
 		this.state = state;
 		this.tournamentArr = [];
+		this.userArr = UserManager.getAllUserData();
+
+		// Sort userArr based on rankingPoint difference
+		if (curUser)
+		{
+			const curUserObj = UserManager.getUserData(curUser);
+			if (curUserObj)
+			{
+				const curUserRank = curUserObj.rankingPoint;
+				this.userArr.sort((a, b) => {
+					const diffA = Math.abs(a.rankingPoint - curUserRank);
+					const diffB = Math.abs(b.rankingPoint - curUserRank);
+					return diffA - diffB;
+				  });
+			}
+		}
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
@@ -218,7 +235,7 @@ export class UserHUB implements IGameState
 				if (this.state === UserHubState.SINGLE_GAME)
 				{
 					if (this.interactionType === "challenge")
-						stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent));
+						stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent, null, null));
 					if (this.interactionType === "pong")
 						stateManager.changeState(new Game(curUserObj, this.opponent));
 				}
@@ -286,30 +303,28 @@ export class UserHUB implements IGameState
 
 		UserManager.drawCurUser();
 
-		const userArr: User [] = UserManager.getAllUserData();
 		let x = 130; // check this proprely later
 		let y = 150;
 
 		for (let i = this.userStartIdx; i < this.userStartIdx + 3; ++i)
 		{
-			if (i >= userArr.length)
+			if (i >= this.userArr.length)
 				break ;
 
-			const isInTournament = this.tournamentArr.some(player => player.username === userArr[i].username);
+			const isInTournament = this.tournamentArr.some(player => player.username === this.userArr[i].username);
 
-			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(userArr[i], x, y, this.state, isInTournament);
+			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(this.userArr[i], x, y, this.state, isInTournament);
 
 			if (this.needNewChallengeButtons && btn.user.username !== curUser
 				&& this.state !== UserHubState.INFO)
 			{
 				this.challengeBtnArr.push(btn);
-				const pongButton = new PongButton(x + 660, y + 40, 'red', '#780202', 'PONG', 'white', '25px', 'arial', userArr[i]);
+				const pongButton = new PongButton(x + 660, y + 40, 'red', '#780202', 'PONG', 'white', '25px', 'arial', this.userArr[i]);
 				this.pongBtnArr.push(pongButton);
 			}
 
 			// Check if we need to update the tournament button
-
-			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === userArr[i].username);
+			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === this.userArr[i].username);
 
 			if ((isInTournament && tournamentBtn && tournamentBtn.text === 'ADD TO TOURNAMENT')
 				|| (!isInTournament && tournamentBtn && tournamentBtn.text === 'REMOVE')
@@ -328,7 +343,7 @@ export class UserHUB implements IGameState
 
 		this.returnMenuButton.draw(ctx);
 
-		if (this.userStartIdx < userArr.length - 3)
+		if (this.userStartIdx < this.userArr.length - 3)
 		{
 			this.nextPageButton.draw(ctx);
 			this.isNextActive = true;
