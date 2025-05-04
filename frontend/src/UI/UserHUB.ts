@@ -8,7 +8,7 @@ import { Button } from "./Button";
 import { UserHubState } from "./Types";
 import { MatchIntro } from "../Game/MatchIntro";
 import { Game } from "../Game/Pong"
-import { Tournament } from "./Tournament";
+import { Tournament } from "../Game/Tournament";
 
 export class NextPageButton extends Button
 {

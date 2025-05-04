@@ -7,7 +7,7 @@ import { stateManager } from '../components/index';
 import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
 import { User, UserManager } from '../UI/UserManager';
-import { TournamentPlayer } from '../UI/Tournament';
+import { TournamentPlayer } from './Tournament';
 
 
 export class InGame implements IGameState

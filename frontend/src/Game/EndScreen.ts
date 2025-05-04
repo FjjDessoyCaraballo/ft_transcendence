@@ -5,7 +5,7 @@ import { canvas, ctx } from "../components/Canvas";
 import { MainMenu } from "../UI/MainMenu";
 import { TEXT_PADDING } from "./Constants";
 import { UserManager, User } from "../UI/UserManager";
-import { TournamentPlayer } from "../UI/Tournament";
+import { TournamentPlayer } from "./Tournament";
 
 export class ReturnMainMenuButton extends Button
 {

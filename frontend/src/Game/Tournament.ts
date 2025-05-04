@@ -1,12 +1,14 @@
-import { ctx } from "../components/Canvas"; // Sort of weird to use this globally here to pass it to InGame...
-import { GameStates, IGameState, } from "../Game/GameStates";
-import { TEXT_PADDING } from "../Game/Constants";
-import { User } from "./UserManager";
-import { ReturnMainMenuButton } from "../Game/EndScreen";
-import { InGame } from "../Game/InGame";
-import { Button } from "./Button";
-import { MatchIntro } from "../Game/MatchIntro";
-import { EndScreen } from "../Game/EndScreen";
+
+import { ctx } from "../components/Canvas";
+import { GameStates, IGameState, } from "./GameStates";
+import { TEXT_PADDING } from "./Constants";
+import { User } from "../UI/UserManager";
+import { ReturnMainMenuButton } from "./EndScreen";
+import { InGame } from "./InGame";
+import { Button } from "../UI/Button";
+import { MatchIntro } from "./MatchIntro";
+import { MainMenu } from "../UI/MainMenu";
+import { EndScreen } from "./EndScreen";
 
 export interface TournamentPlayer
 {
