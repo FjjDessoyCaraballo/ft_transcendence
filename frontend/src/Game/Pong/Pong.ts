@@ -157,7 +157,10 @@ export class Game implements IGameState {
 
     const seconds = (this.duration / 1000).toFixed(2);
     const durationText = `Game Duration: ${seconds} seconds`;
-    ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 50);
+    ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 100);
+
+    const longestRally = "Longest rally: " + this.ball.longestRally;
+    ctx.fillText(longestRally, (canvasWidth * 0.5) - (ctx.measureText(longestRally).width / 2), canvasHeight / 4 + 150);
   }
 
   drawMenu() {
@@ -220,6 +223,7 @@ export class Game implements IGameState {
   resetGame() {
     this.player1.paddle.y = (canvasHeight - paddleHeight) / 2;
     this.player2.paddle.y = (canvasHeight - paddleHeight) / 2;
+    this.ball.longestRally = 0;
     this.ball.reset();
     this.player1.score = 0;
     this.player2.score = 0;
