@@ -48,10 +48,7 @@ export class Game implements IGameState {
      // Bind once
     this.gameLoop = this.gameLoop.bind(this);
     
-    // Listen for key events
-    document.addEventListener('keydown', this.handleKeyDown.bind(this));
-    document.addEventListener('keyup', this.handleKeyUp.bind(this));
-
+    this.enter();
     this.gameLoop();
   }
 
@@ -103,19 +100,21 @@ export class Game implements IGameState {
 
   enter()
 	{
-		// document.addEventListener('keydown', this.KeyDownBound);
-		// document.addEventListener('keyup', this.KeyUpBound);
+		// Listen for key events
+    document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    document.addEventListener('keyup', this.handleKeyUp.bind(this));
 	}
 
 	exit()
 	{
-		// document.removeEventListener('keydown', this.KeyDownBound);
-		// document.removeEventListener('keyup', this.KeyUpBound);
+    document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    document.removeEventListener('keyup', this.handleKeyUp.bind(this));
 	}
 
   update() {
-    if (this.gameState !== 'playing') return; // Shouldn't have to do this!!
-    console.log('Current gameState:', this.gameState);
+    if (this.gameState !== 'playing') 
+      return ; // Shouldn't have to do this!!
+    //console.log('Current gameState:', this.gameState);
     this.updatePlayerPositions();
     this.ball.move();
     this.ball.checkCollisions(this.player1.paddle, this.player2.paddle);
@@ -217,7 +216,7 @@ export class Game implements IGameState {
   }
 
   gameLoop() {
-    console.log('In gameLoop, gameState =', this.gameState);
+    //console.log('In gameLoop, gameState =', this.gameState);
     if (this.gameState === 'menu') {
       this.drawMenu();
     } else if (this.gameState === 'result') {
