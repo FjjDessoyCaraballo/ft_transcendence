@@ -6,18 +6,16 @@ import { GameStateManager } from '../Game/GameStates';
 import { StartScreen } from '../Game/StartScreen';
 import { setupLogin } from '../UI/TEST_logIn_register';
 import { GDPRPopup } from '../UI/GDPRPopup'
+import { canvas, ctx } from "../components/Canvas";
 
-const canvas: HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
-const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
+
+
 export const stateManager = new GameStateManager();
 
 export let curUser: string | null = null;
 export function updateCurUser(newUser: string | null) { curUser = newUser; }
 
 let prevTimeStamp = 0;
-
-export { canvas }; // To ensure correct init order
-export { ctx }; // To ensure correct init order
 
 stateManager.changeState(new StartScreen(canvas));
 setupLogin();

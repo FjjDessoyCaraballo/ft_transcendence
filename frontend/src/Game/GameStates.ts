@@ -7,6 +7,7 @@ export enum GameStates
 	USER_HUB,
 	MATCH_INTRO,
 	IN_GAME,
+    PONG,
 	END_SCREEN
 };
 
