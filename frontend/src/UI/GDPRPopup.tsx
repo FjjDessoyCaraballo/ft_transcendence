@@ -24,7 +24,6 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 	};
 
 	const handleDecline = () => {
-		// setVisible(false);
 		localStorage.setItem('gdpr-accepted', 'false')
 		setShowDeclined(true);
 		onDecline();

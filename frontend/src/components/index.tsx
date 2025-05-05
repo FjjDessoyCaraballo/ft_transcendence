@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { GameStateManager } from '../game/GameStates'; 
 import { StartScreen } from '../game/StartScreen';
 import { setupLogin } from '../UI/TEST_logIn_register';
-import { GDPRPopup } from '../UI/GDPRPopup'
+// import { GDPRPopup } from '../UI/GDPRPopup'
 import { Header } from '../UI/Header'
 
 const canvas: HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -36,43 +36,33 @@ document.body.appendChild(headerContainer);
 const root = ReactDOM.createRoot(gdprContainer);
 root.render(
 	<React.StrictMode>
-		<GDPRPopup
+		{/* <GDPRPopup
 			onAccept={() => console.log('GDPR accepted')}
 			onDecline={() => {
 				console.log('GDPR declined');
-				alert('You must accept the GDPR terms to use this application.')
 			}}
-			/>
+			/> */}
 		<Header onClick={() => console.log('Header clicked')} />
 	</React.StrictMode>
 );
 
 function updateGame(deltaTime: number) {
-
 	stateManager.update(deltaTime);
-
 }
 
 function renderGame() {
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 	stateManager.render(ctx);
-
 }
 
-
 // MAIN LOOP
-
 function gameLoop(timeStamp: number) {
 
 	const deltaTime = (timeStamp - prevTimeStamp) / 1000; // convert from ms to seconds
 	prevTimeStamp = timeStamp;
-
+	
 	updateGame(deltaTime);
-
 	renderGame();
-
     requestAnimationFrame(gameLoop);
 }
 
