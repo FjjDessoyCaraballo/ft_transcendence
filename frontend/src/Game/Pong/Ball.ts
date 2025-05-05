@@ -7,8 +7,10 @@ export class Ball {
   y: number;
   speedX: number;
   speedY: number;
-  rallyLen: number = 0;
+  currentRallyLen: number = 0;
+  totalHits: number = 0;
   longestRally: number = 0;
+  pointsPlayed: number = 0;
 
   constructor() { // This is the same as reset...
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
@@ -32,8 +34,8 @@ export class Ball {
     if (this.x <= paddleWidth + 15 &&
       this.y + ballSize >= player1.y &&
       this.y <= player1.y + paddleHeight) {
-        this.rallyLen++;
-        console.log('rallyLen =', this.rallyLen);
+        this.currentRallyLen++;
+        console.log('currentRallyLen =', this.currentRallyLen);
         const hitPos = (this.y + ballSize / 2) - (player1.y + paddleHeight / 2);
         const normalized = hitPos / (paddleHeight / 2); // -1 (top) to 1 (bottom)
       
@@ -52,8 +54,8 @@ export class Ball {
     if (this.x + ballSize >= canvasWidth - paddleWidth - 15 &&
       this.y + ballSize >= player2.y &&
       this.y <= player2.y + paddleHeight) {
-        this.rallyLen++;
-        console.log('rallyLen =', this.rallyLen);
+        this.currentRallyLen++;
+        console.log('currentRallyLen =', this.currentRallyLen);
         const hitPos = (this.y + ballSize / 2) - (player2.y + paddleHeight / 2);
         const normalized = hitPos / (paddleHeight / 2);
       
@@ -70,10 +72,14 @@ export class Ball {
 
   reset() {
     //console.log("Ball reset");
-    if (this.rallyLen > this.longestRally)
-      this.longestRally = this.rallyLen;
+    if (this.currentRallyLen > this.longestRally)
+      this.longestRally = this.currentRallyLen;
     console.log('longestRally =', this.longestRally);
-    this.rallyLen = 0;
+    this.totalHits += this.currentRallyLen;
+    console.log('totalHits =', this.totalHits);
+    this.pointsPlayed++;
+    console.log('pointsPlayed =', this.pointsPlayed);
+    this.currentRallyLen = 0;
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
   

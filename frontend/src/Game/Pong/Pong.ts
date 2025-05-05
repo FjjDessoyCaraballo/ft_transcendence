@@ -32,6 +32,7 @@ export class Game implements IGameState {
   gameState: 'menu' | 'playing' | 'result' = 'menu';
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
+  averageRally: number = 0;
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
@@ -128,6 +129,7 @@ export class Game implements IGameState {
       this.player2.score++;
       if (this.player2.score === 5) {
         this.gameState = 'result';
+        this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player2;
         this.duration = performance.now() - this.startTime;
       }
@@ -138,6 +140,7 @@ export class Game implements IGameState {
       this.player1.score++;
       if (this.player1.score === 5) {
         this.gameState = 'result';
+        this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player1;
         this.duration = performance.now() - this.startTime;
       }
@@ -161,6 +164,9 @@ export class Game implements IGameState {
 
     const longestRally = "Longest rally: " + this.ball.longestRally;
     ctx.fillText(longestRally, (canvasWidth * 0.5) - (ctx.measureText(longestRally).width / 2), canvasHeight / 4 + 150);
+
+    const avgText = `Average Rally: ${this.averageRally.toFixed(2)} hits`;
+    ctx.fillText(avgText, (canvasWidth * 0.5) - (ctx.measureText(avgText).width / 2), canvasHeight / 4 + 200);
   }
 
   drawMenu() {
