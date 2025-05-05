@@ -30,19 +30,21 @@ export const canvasHeight = canvas.height;
 export class Game implements IGameState {
   name: GameStates
   gameState: 'menu' | 'playing' | 'result' = 'menu';
+  startTime: number = 0;
+  duration: number = 0; // In milliseconds, can convert later //STAT
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
   private storedOpponentName: string;
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
-  winner: Player | null = null;
+  winner: Player | null = null; //STAT
 
   constructor(user1: User, user2: User) {
-    this.name = GameStates.PONG;
+    this.name = GameStates.PONG; //STAT
     this.storedOpponentName = user2.username;
-    this.player1 = new Player(user1, new Paddle(15));
-    this.player2 = new Player(user2, new Paddle(canvasWidth - paddleWidth - 15));
+    this.player1 = new Player(user1, new Paddle(15)); //STAT
+    this.player2 = new Player(user2, new Paddle(canvasWidth - paddleWidth - 15)); //STAT
     this.ball = new Ball();
 
      // Bind once
@@ -57,11 +59,13 @@ export class Game implements IGameState {
       if (e.key === '1') {
         this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
         this.player2.user.username = "Computer";
+        this.startTime = performance.now();
         this.gameState = 'playing';
         this.resetGame();
       } else if (e.key === '2') {
         this.twoPlayerMode = true; // Two-player mode
         this.player2.user.username = this.storedOpponentName;
+        this.startTime = performance.now();
         this.gameState = 'playing';
         this.resetGame();
       }
@@ -125,6 +129,7 @@ export class Game implements IGameState {
       if (this.player2.score === 5) {
         this.gameState = 'result';
         this.winner = this.player2;
+        this.duration = performance.now() - this.startTime;
       }
       this.ball.reset();
     }
@@ -134,6 +139,7 @@ export class Game implements IGameState {
       if (this.player1.score === 5) {
         this.gameState = 'result';
         this.winner = this.player1;
+        this.duration = performance.now() - this.startTime;
       }
       this.ball.reset();
     }
@@ -148,6 +154,10 @@ export class Game implements IGameState {
     const pong = this.winner?.user.username + " is the winner!";
     const pongWidth = ctx.measureText(pong).width;
     ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
+
+    const seconds = (this.duration / 1000).toFixed(2);
+    const durationText = `Game Duration: ${seconds} seconds`;
+    ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 50);
   }
 
   drawMenu() {
