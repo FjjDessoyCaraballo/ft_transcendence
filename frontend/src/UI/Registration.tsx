@@ -32,7 +32,7 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 	const handleDecline = () => {
 		localStorage.setItem('gdpr-accepted', 'false')
 		setShowDeclined(true);
-		onDecline();
+		// onDecline();
 	};
 
 	if (!visible) return null;
@@ -50,7 +50,13 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 				  If you really don't want to play, just close the tab. 🗿
 				</p>
 			  </div>
-			  <div className="flex justify-end p-5 border-t border-gray-100">
+			  <div className="flex justify-end p-5 border-t border-gray-100 gap-2">
+			  	<button 
+						className="px-5 py-2 rounded bg-red-600 text-white font-sans transition-colors hover:bg-red-700" 
+						onClick={handleCancel}
+						>
+						Cancel
+					</button>
 				<button 
 				  className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
 				  onClick={handleAccept}
