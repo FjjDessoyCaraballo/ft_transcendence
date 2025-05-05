@@ -1,3 +1,4 @@
+// In Header.tsx
 import React, { useState, useEffect } from 'react';
 import { GDPRPopup } from './Registration';
 import { LoginPopup } from './Login'
