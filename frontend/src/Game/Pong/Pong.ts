@@ -17,6 +17,8 @@ import { Ball } from "./Ball";
 // - Points scored by Player1
 // - Points scored by Player2
 
+// Game starts already at first menu
+
 // Game Constants
 export const paddleWidth = 15; 
 export const paddleHeight = 100;
@@ -42,6 +44,9 @@ export class Game implements IGameState {
     this.player1 = new Player(user1, new Paddle(15));
     this.player2 = new Player(user2, new Paddle(canvasWidth - paddleWidth - 15));
     this.ball = new Ball();
+
+     // Bind once
+    this.gameLoop = this.gameLoop.bind(this);
     
     // Listen for key events
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
@@ -56,12 +61,12 @@ export class Game implements IGameState {
         this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
         this.player2.user.username = "Computer";
         this.gameState = 'playing';
-        //this.resetGame(); I don't think we have to reset here
+        this.resetGame();
       } else if (e.key === '2') {
         this.twoPlayerMode = true; // Two-player mode
         this.player2.user.username = this.storedOpponentName;
         this.gameState = 'playing';
-        //this.resetGame();
+        this.resetGame();
       }
     } else {
       if (e.key === 'Escape') {
@@ -214,10 +219,10 @@ export class Game implements IGameState {
       this.drawMenu();
     } else if (this.gameState === 'result') {
       this.drawResult();
-    } else {
+    } else if (this.gameState === 'playing') {
       this.update();
       this.render(ctx);
     }
-    requestAnimationFrame(this.gameLoop.bind(this));
+    requestAnimationFrame(this.gameLoop);
   }
 }
