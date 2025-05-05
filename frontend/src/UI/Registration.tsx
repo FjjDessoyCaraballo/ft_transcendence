@@ -17,10 +17,40 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 
 	}, []);
 
+	const handleCancel = () => {
+		localStorage.setItem('gdpr-accepted', 'false');
+		onDecline();
+	}
+
 	const handleAccept = () => {
 		localStorage.setItem('gdpr-accepted', 'true')
 		setVisible(false);
-		onAccept();
+		return (
+			<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+			  <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
+			  <h2 className="titles">Registration</h2>
+				<div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
+				<p className="texts">
+					this part will have the registration soon enough
+				  </p>
+				</div>
+				<div className="flex justify-end p-5 border-t border-gray-100 gap-2">
+				  <button 
+					className="px-5 py-2 rounded bg-red-600 text-white font-sans transition-colors hover:bg-red-700" 
+					onClick={handleCancel}
+					>
+					Cancel
+				  </button>
+				  <button 
+					className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
+					onClick={handleAccept}
+					>
+					Register
+				  </button>
+				</div>
+			  </div>
+			</div>
+		);
 	};
 
 	const handleDecline = () => {
@@ -35,7 +65,7 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 		return (
 		  <div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-[9999]">
 			<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
-			  <h2 className="titles">GDPR Disclosure</h2>
+			  <h2 className="titles">Privacy notice</h2>
 			  <div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
 				<p className="texts">
 				  Can't really do much without consent, can we?
@@ -59,7 +89,7 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 		return (
 			<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 			  <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
-			  <h2 className="titles">GDPR Disclosure</h2>
+			  <h2 className="titles">Privacy notice</h2>
 				<div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
 				<p className="texts">
 					This website stores data locally in your computer using 

@@ -20,28 +20,22 @@ export { canvas }; // To ensure correct init order
 export { ctx }; // To ensure correct init order
 
 stateManager.changeState(new StartScreen(canvas));
-setupLogin();
+// setupLogin();
 
 // GDPR WINDOW
 
-const gdprContainer = document.createElement('div');
+// const gdprContainer = document.createElement('div');
 const headerContainer = document.createElement('header');
-gdprContainer.id = 'gdpr-container';
+// gdprContainer.id = 'gdpr-container';
 headerContainer.id = 'header-container';
-document.body.appendChild(gdprContainer);
+// document.body.appendChild(gdprContainer);
 document.body.appendChild(headerContainer);
 
 // RENDER
 
-const root = ReactDOM.createRoot(gdprContainer);
+const root = ReactDOM.createRoot(headerContainer);
 root.render(
 	<React.StrictMode>
-		{/* <GDPRPopup
-			onAccept={() => console.log('GDPR accepted')}
-			onDecline={() => {
-				console.log('GDPR declined');
-			}}
-			/> */}
 		<Header onClick={() => console.log('Header clicked')} />
 	</React.StrictMode>
 );
@@ -58,7 +52,7 @@ function renderGame() {
 // MAIN LOOP
 function gameLoop(timeStamp: number) {
 
-	const deltaTime = (timeStamp - prevTimeStamp) / 1000; // convert from ms to seconds
+	const deltaTime = (timeStamp - prevTimeStamp) / 1000;
 	prevTimeStamp = timeStamp;
 	
 	updateGame(deltaTime);
