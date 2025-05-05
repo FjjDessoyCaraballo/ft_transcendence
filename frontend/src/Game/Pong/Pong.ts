@@ -4,6 +4,19 @@ import { User } from "../../UI/UserManager";
 import { Paddle, Player } from "./Paddle";
 import { Ball } from "./Ball";
 
+// BOTH GAMES
+// - Player1
+// - Player2
+// - Winner
+// - Game duration
+// - Game type
+
+// PONG
+// - Longest ball rally
+// - Avg ball rally
+// - Points scored by Player1
+// - Points scored by Player2
+
 // Game Constants
 export const paddleWidth = 15; 
 export const paddleHeight = 100;
