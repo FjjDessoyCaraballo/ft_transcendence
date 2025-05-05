@@ -1,121 +1,16 @@
-import { GameStates, IGameState } from "./GameStates";
-import { canvas, ctx } from "../components/Canvas";
-import { User } from "../UI/UserManager";
+import { GameStates, IGameState } from "../GameStates";
+import { canvas, ctx } from "../../components/Canvas";
+import { User } from "../../UI/UserManager";
+import { Paddle, Player } from "./Paddle";
+import { Ball } from "./Ball";
 
 // Game Constants
-const paddleWidth = 15, paddleHeight = 100;
-const ballSize = 15;
-const canvasWidth = canvas.width;
-const canvasHeight = canvas.height;
+export const paddleWidth = 15; 
+export const paddleHeight = 100;
+export const ballSize = 15;
+export const canvasWidth = canvas.width;
+export const canvasHeight = canvas.height;
 
-class Paddle {
-  y: number;
-  speed: number = 8;
-
-  constructor(public x: number) {
-    this.y = (canvasHeight - paddleHeight) / 2;
-  }
-
-  moveUp() {
-    this.y -= this.speed;
-  }
-
-  moveDown() {
-    this.y += this.speed;
-  }
-
-  stayInBounds() {
-    this.y = Math.max(0, Math.min(canvasHeight - paddleHeight, this.y));
-  }
-
-  draw() {
-    ctx.fillStyle = 'white';
-    ctx.fillRect(this.x, this.y, paddleWidth, paddleHeight);
-  }
-}
-
-class Ball {
-  x: number;
-  y: number;
-  speedX: number;
-  speedY: number;
-
-  constructor() { // This is the same as reset...
-    this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
-    this.y = canvasHeight / 2;
-    this.speedX = 7;
-    this.speedY = 3 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
-  }
-
-  move() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-  }
-
-  checkCollisions(player1: Paddle, player2: Paddle) {
-    // Ball collision with top and bottom
-    if (this.y <= 0 || this.y + ballSize >= canvasHeight) {
-      this.speedY *= -1;
-    }
-
-    // Player 1 paddle collision
-    if (this.x <= paddleWidth + 15 &&
-      this.y + ballSize >= player1.y &&
-      this.y <= player1.y + paddleHeight) {
-        const hitPos = (this.y + ballSize / 2) - (player1.y + paddleHeight / 2);
-        const normalized = hitPos / (paddleHeight / 2); // -1 (top) to 1 (bottom)
-      
-        const bounceAngle = normalized * Math.PI / 4; // Max 45 degree angle
-        const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2); // keep same speed
-      
-        this.speedX = Math.cos(bounceAngle) * speed;
-        this.speedY = Math.sin(bounceAngle) * speed;
-      
-        // Make sure ball is moving right
-        if (this.speedX < 0) this.speedX *= -1;
-    }
-
-    // Player 2 paddle collision
-    if (this.x + ballSize >= canvasWidth - paddleWidth - 15 &&
-      this.y + ballSize >= player2.y &&
-      this.y <= player2.y + paddleHeight) {
-        const hitPos = (this.y + ballSize / 2) - (player2.y + paddleHeight / 2);
-        const normalized = hitPos / (paddleHeight / 2);
-      
-        const bounceAngle = normalized * Math.PI / 4;
-        const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2);
-      
-        this.speedX = -Math.cos(bounceAngle) * speed; // reflected to left
-        this.speedY = Math.sin(bounceAngle) * speed;
-      
-        if (this.speedX > 0) this.speedX *= -1;
-    }
-  }
-
-  reset() {
-    console.log("Ball reset");
-    this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
-    this.y = canvasHeight / 2;
-  
-    // Pause the ball temporarily
-    this.speedX = 0;
-    this.speedY = 0;
-  
-    setTimeout(() => {
-      this.speedX = 7 * (Math.random() > 0.5 ? 1 : -1);
-      this.speedY = 3 * (Math.random() > 0.5 ? 1 : -1);
-    }, 1000); // 1000ms = 1 second delay
-  }
-
-  draw() {
-    ctx.fillStyle = 'white';
-    ctx.fillRect(this.x, this.y, ballSize, ballSize);
-  }
-}
-
-class Player {
-  constructor(public user: User, public paddle: Paddle, public score: number = 0) {}
-}
 
 export class Game implements IGameState {
   name: GameStates
@@ -313,5 +208,3 @@ export class Game implements IGameState {
     requestAnimationFrame(this.gameLoop.bind(this));
   }
 }
-
-//const game = new Game();

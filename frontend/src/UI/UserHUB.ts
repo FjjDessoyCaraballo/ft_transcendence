@@ -7,7 +7,7 @@ import { ChallengeButton, PongButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
 import { InGame } from "../Game/InGame";
 import { MatchIntro } from "../Game/MatchIntro";
-import { Game } from "../Game/Pong"
+import { Game } from "../Game/Pong/Pong"
 
 export class NextPageButton extends Button
 {
