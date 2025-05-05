@@ -114,6 +114,8 @@ export class Game implements IGameState {
 	}
 
   update() {
+    if (this.gameState !== 'playing') return; // Shouldn't have to do this!!
+    console.log('Current gameState:', this.gameState);
     this.updatePlayerPositions();
     this.ball.move();
     this.ball.checkCollisions(this.player1.paddle, this.player2.paddle);
@@ -215,6 +217,7 @@ export class Game implements IGameState {
   }
 
   gameLoop() {
+    console.log('In gameLoop, gameState =', this.gameState);
     if (this.gameState === 'menu') {
       this.drawMenu();
     } else if (this.gameState === 'result') {
