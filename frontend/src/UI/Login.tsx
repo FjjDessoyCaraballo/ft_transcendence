@@ -1,57 +1,126 @@
-import React, {useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { WindowManager } from './Header';
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
-	const [showLogin, setShowLogin] = useState(false);
+  // State for form inputs
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-	const HandleCancel = () => {
-		localStorage.setItem('logged-in', 'false');
-		onDecline();
-	}
+  const HandleCancel = () => {
+    // Clear form data and close the popup
+    setUsername('');
+    setPassword('');
+    setErrorMessage('');
+    localStorage.setItem('logged-in', 'false');
+    onDecline();
+  };
 
-	// Handle API communication through here
-	const HandleLogin = () => {
-		localStorage.setItem('logged-in', 'true');
-		onAccept();
-	}
+  // Handle API communication through here
+  const HandleLogin = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent form default submission
 
-	return (
-		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-		<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
-		<form className="titles">Login</form>
-			<div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
-				<label className="username p-5">Username</label>
-				<input type="text"
-				placeholder="Username"
-				id="username"/>
-			</div>
-			<div className="px-12 overflow-y-auto max-h-[500px] flex-grow">
-				<label className="password p-5">Password</label>
-				<input type="password" 
-				placeholder="Password" 
-				id="password"/>
-			</div>
-			<div className="flex justify-end p-5 border-t border-gray-100 gap-2">
-			<button 
-				className="px-5 py-2 rounded bg-red-600 text-white font-sans transition-colors hover:bg-red-700" 
-				onClick={HandleCancel}
-				>
-				Cancel
-			</button>
-			<button 
-				className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
-				onClick={HandleLogin}
-				>
-				Continue
-			</button>
-			</div>
-		</div>
-		</div>
-	);
-}
+    // Basic validation
+    if (!username || !password) {
+      setErrorMessage('Please enter both username and password');
+      return;
+    }
 
+    // Here you would typically make an API call to validate credentials
+    // For now, using localStorage as a simple auth mechanism
+    const userData = localStorage.getItem(username);
+    
+    if (!userData) {
+      setErrorMessage('Invalid username or password');
+      return;
+    }
+    
+    try {
+      // Parse the user data
+      const user = JSON.parse(userData);
+      
+      if (user.password !== password) {
+        setErrorMessage('Invalid username or password');
+        return;
+      }
+      
+      // Success - store login state and notify parent
+      localStorage.setItem('logged-in', 'true');
+      // Also store the username of the logged-in user
+      localStorage.setItem('LoggedIn', JSON.stringify(username));
+      onAccept();
+      
+    } catch (error) {
+      setErrorMessage('An error occurred during login');
+      console.error('Login error:', error);
+    }
+  };
 
-// value={password}
-// onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-// value={username}
-// onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} 
+  return (
+    <div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg shadow-lg w-[400px] max-w-[90%] overflow-hidden mx-auto">
+        <div className="p-6 bg-[#4B0082] text-white">
+          <h2 className="text-2xl font-bold font-mono">Login</h2>
+        </div>
+        
+        <form onSubmit={HandleLogin} className="p-6">
+          {errorMessage && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+              {errorMessage}
+            </div>
+          )}
+          
+          <div className="mb-4">
+            <label 
+              htmlFor="username" 
+              className="block text-gray-700 font-mono mb-2"
+            >
+              Username
+            </label>
+            <input 
+              type="text"
+              id="username"
+              placeholder="Enter your username"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label 
+              htmlFor="password" 
+              className="block text-gray-700 font-mono mb-2"
+            >
+              Password
+            </label>
+            <input 
+              type="password"
+              id="password"
+              placeholder="Enter your password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <button 
+              type="button"
+              className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300" 
+              onClick={HandleCancel}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]" 
+            >
+              Login
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};

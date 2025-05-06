@@ -4,9 +4,11 @@ This guide explains how to connect your frontend application to the backend API 
 
 ## Table of Contents
 
-1. [Setting Up the API Service](#setting-up-the-api-service)
-2. [Authentication](#authentication)
-3. [User Endpoints](#user-endpoints)
+- [Frontend Guide: Connecting to the Backend API](#frontend-guide-connecting-to-the-backend-api)
+  - [Table of Contents](#table-of-contents)
+  - [Setting Up the API Service](#setting-up-the-api-service)
+  - [Authentication](#authentication)
+  - [User Endpoints](#user-endpoints)
     - [User Registration](#user-registration)
     - [User Login](#user-login)
     - [Get User Profile](#get-user-profile)
@@ -16,8 +18,8 @@ This guide explains how to connect your frontend application to the backend API 
     - [Get User Statistics](#get-user-statistics)
     - [GDPR: Export User Data](#gdpr-export-user-data)
     - [GDPR: Delete Account](#gdpr-delete-account)
-4. [Error Handling](#error-handling)
-5. [Complete Example: User Registration and Login](#complete-example-user-registration-and-login)
+  - [Error Handling](#error-handling)
+  - [Complete Example: User Registration and Login](#complete-example-user-registration-and-login)
 
 ## Setting Up the API Service
 
@@ -41,7 +43,7 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
   
   // Add authorization header if token exists
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
   
   try {
@@ -178,7 +180,7 @@ This was covered in the auth service above, but here's how to use it in a compon
 import { login } from '../services/auth';
 
 // Inside your component
-const handleLogin = async (event: React.FormEvent) => {
+const HandleLogin = async (event: React.FormEvent) => {
   event.preventDefault();
   
   try {
