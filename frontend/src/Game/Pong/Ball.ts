@@ -15,7 +15,7 @@ export class Ball {
   constructor() { // This is the same as reset...
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
-    this.speedX = 10;
+    this.speedX = 10 * -1;
     this.speedY = 1 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
   }
 
@@ -70,7 +70,7 @@ export class Ball {
     }
   }
 
-  reset() {
+  reset(twoPlayerMode: boolean) {
     //console.log("Ball reset");
     if (this.currentRallyLen > this.longestRally)
       this.longestRally = this.currentRallyLen;
@@ -88,8 +88,14 @@ export class Ball {
     this.speedY = 0;
   
     setTimeout(() => {
-      this.speedX = 10 * (Math.random() > 0.5 ? 1 : -1);
-      this.speedY = 1 * (Math.random() > 0.5 ? 1 : -1);
+      if (twoPlayerMode) {
+        this.speedX = 10 * (Math.random() > 0.5 ? 1 : -1);
+        this.speedY = 1 * (Math.random() > 0.5 ? 1 : -1);
+      }
+      else {
+        this.speedX = 10 * -1;
+        this.speedY = 1 * (Math.random() > 0.5 ? 1 : -1);
+      }
     }, 1000); // 1000ms = 1 second delay
   }
 

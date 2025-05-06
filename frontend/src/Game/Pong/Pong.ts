@@ -169,7 +169,7 @@ export class Game implements IGameState {
         this.winner = this.player2;
         this.duration = performance.now() - this.startTime;
       }
-      this.ball.reset();
+      this.ball.reset(this.twoPlayerMode);
     }
 
     if (this.ball.x > canvasWidth) {
@@ -180,7 +180,7 @@ export class Game implements IGameState {
         this.winner = this.player1;
         this.duration = performance.now() - this.startTime;
       }
-      this.ball.reset();
+      this.ball.reset(this.twoPlayerMode);
     }
   }
 
@@ -272,7 +272,7 @@ export class Game implements IGameState {
     this.player1.paddle.y = (canvasHeight - paddleHeight) / 2;
     this.player2.paddle.y = (canvasHeight - paddleHeight) / 2;
     this.ball.longestRally = 0;
-    this.ball.reset();
+    this.ball.reset(this.twoPlayerMode);
     this.player1.score = 0;
     this.player2.score = 0;
   }
