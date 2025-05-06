@@ -18,6 +18,9 @@ export const FLOOR_THICKNESS = 30;
 export const WALL_THICKNESS = 20;
 export const GRAVITY = 1200;
 
+// COINS
+export const COIN_RADIUS = 10;
+
 // PLATFORM
 export const PLATFORM_SPEED = 150;
 export const PLATFORM_THICKNESS = 10;

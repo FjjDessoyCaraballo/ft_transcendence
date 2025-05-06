@@ -1,4 +1,3 @@
-
 import { ctx } from "../components/Canvas";
 import { GameStates, IGameState, } from "./GameStates";
 import { TEXT_PADDING } from "./Constants";
@@ -7,7 +6,6 @@ import { ReturnMainMenuButton } from "./EndScreen";
 import { InGame } from "./InGame";
 import { Button } from "../UI/Button";
 import { MatchIntro } from "./MatchIntro";
-import { MainMenu } from "../UI/MainMenu";
 import { EndScreen } from "./EndScreen";
 
 export interface TournamentPlayer
@@ -317,7 +315,7 @@ export class Tournament implements IGameState
 			if (!this.isFinished)
 			{
 				this.nextGameBtn.draw(ctx);
-				const nextGameNum = `Game no. ${(this.matchCounter + 1).toString()}`;
+				const nextGameNum = `Game no. ${(this.matchCounter + 1).toString()}/6`;
 				ctx.font = '25px arial';
 				ctx.fillStyle = 'white';
 				const gameNumX = this.nextGameBtn.x;
