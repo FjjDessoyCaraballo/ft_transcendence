@@ -3,8 +3,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { GameStateManager } from '../game/GameStates'; 
 import { StartScreen } from '../game/StartScreen';
-import { setupLogin } from '../UI/TEST_logIn_register';
-// import { GDPRPopup } from '../UI/GDPRPopup'
 import { Header } from '../UI/Header'
 
 const canvas: HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -20,15 +18,9 @@ export { canvas }; // To ensure correct init order
 export { ctx }; // To ensure correct init order
 
 stateManager.changeState(new StartScreen(canvas));
-// setupLogin();
 
-// GDPR WINDOW
-
-// const gdprContainer = document.createElement('div');
 const headerContainer = document.createElement('header');
-// gdprContainer.id = 'gdpr-container';
 headerContainer.id = 'header-container';
-// document.body.appendChild(gdprContainer);
 document.body.appendChild(headerContainer);
 
 // RENDER
