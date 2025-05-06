@@ -27,6 +27,6 @@ export class Paddle {
     }
   }
   
-  export class Player { //Doesn't make sense to have player class...
+  export class Player {
     constructor(public user: User, public paddle: Paddle, public score: number = 0) {}
   }

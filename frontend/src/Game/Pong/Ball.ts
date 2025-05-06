@@ -3,21 +3,14 @@ import { Paddle } from "./Paddle";
 import { ctx } from "../../components/Canvas";
 
 export class Ball {
-  x: number;
-  y: number;
-  speedX: number;
-  speedY: number;
+  x: number = canvasWidth / 2 - ballSize / 2 + 1.5;
+  y: number = canvasHeight / 2;
+  speedX: number = 10 * -1;
+  speedY: number = 0.5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative;
   currentRallyLen: number = 0;
   totalHits: number = 0;
   longestRally: number = 0;
   pointsPlayed: number = 0;
-
-  constructor() {
-    this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
-    this.y = canvasHeight / 2;
-    this.speedX = 10 * -1;
-    this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
-  }
 
   move() {
     this.x += this.speedX;
