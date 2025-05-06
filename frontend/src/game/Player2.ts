@@ -2,7 +2,6 @@ import { Player } from "./Player";
 import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER, HEALTH_WIDTH, HEALT_HEIGHT, BB_RIGHT_2, BB_LEFT_2, BB_UP_2, BB_SHOOT_2 } from "./Constants";
 import { PlatformDir } from "./Platform";
 import { User } from "../UI/UserManager";
-import { canvas } from "../components/Canvas";
 
 export class Player2 extends Player {
 
