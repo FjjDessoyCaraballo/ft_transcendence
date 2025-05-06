@@ -16,7 +16,7 @@ export class Ball {
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
     this.speedX = 10 * -1;
-    this.speedY = 1 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
+    this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
   }
 
   move() {
@@ -25,7 +25,6 @@ export class Ball {
   }
 
   checkCollisions(player1: Paddle, player2: Paddle) {
-    // Ball collision with top and bottom
     // Ball collision with top and bottom
     if (this.y <= 0) {
       this.y = 0; // Push ball back inside. Fixes wall "hugging"
@@ -48,7 +47,7 @@ export class Ball {
         const bounceAngle = normalized * Math.PI / 4; // Max 45 degree angle
         const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2); // keep same speed
       
-        this.speedX = Math.cos(bounceAngle) * speed;
+        this.speedX = Math.cos(bounceAngle) * speed; // reflected to right
         this.speedY = Math.sin(bounceAngle) * speed;
       
         // Make sure ball is moving right
@@ -80,11 +79,11 @@ export class Ball {
     //console.log("Ball reset");
     if (this.currentRallyLen > this.longestRally)
       this.longestRally = this.currentRallyLen;
-    console.log('longestRally =', this.longestRally);
+    //console.log('longestRally =', this.longestRally);
     this.totalHits += this.currentRallyLen;
-    console.log('totalHits =', this.totalHits);
+    //console.log('totalHits =', this.totalHits);
     this.pointsPlayed++;
-    console.log('pointsPlayed =', this.pointsPlayed);
+    //console.log('pointsPlayed =', this.pointsPlayed);
     this.currentRallyLen = 0;
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
@@ -96,11 +95,11 @@ export class Ball {
     setTimeout(() => {
       if (twoPlayerMode) {
         this.speedX = 10 * (Math.random() > 0.5 ? 1 : -1);
-        this.speedY = 1 * (Math.random() > 0.5 ? 1 : -1);
+        this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
       }
       else {
         this.speedX = 10 * -1;
-        this.speedY = 1 * (Math.random() > 0.5 ? 1 : -1);
+        this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
       }
     }, 1000); // 1000ms = 1 second delay
   }
