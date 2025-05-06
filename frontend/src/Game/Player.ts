@@ -22,6 +22,7 @@ export class Player {
 	cShapeSize : number;
 	cShapeOffset : number;
 	health: Health;
+	coinCount: number;
 	userData: User | null;
 
 	onPlatform?: Platform;
@@ -43,6 +44,7 @@ export class Player {
 		this.cShapeOffset = 2;
 		this.cShape = new CollisionShape(this.x + this.cShapeOffset, this.y + this.cShapeOffset, this.cShapeSize, this.cShapeSize, collType.PLAYER, this);
 		this.health = new Health();
+		this.coinCount = 0;
 		this.userData = user;
     }
 
@@ -206,6 +208,12 @@ export class Player {
         for (const projectile of this.projectiles) {
             projectile.draw(ctx);
         }
+
+		// Should coin count be like this on the front layer...?
+
+		ctx.font = '30px arial';
+		const coinText = `${this.coinCount}`;
+		ctx.fillText(coinText, 40, 40);
 
 //		this.cShape.draw(ctx); // --> For debug
     }

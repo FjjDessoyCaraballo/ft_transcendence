@@ -8,6 +8,8 @@ import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
 import { User, UserManager } from '../UI/UserManager';
 import { TournamentPlayer } from './Tournament';
+import { CoinHandler } from './CoinHandler';
+import { COIN_SPAWN_TIME } from './Constants';
 
 
 export class InGame implements IGameState
@@ -21,6 +23,7 @@ export class InGame implements IGameState
 	keys: { [key: string]: boolean };
 	platforms: Platform[];
 	canvas: HTMLCanvasElement;
+	coinHandler: CoinHandler;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
@@ -43,6 +46,9 @@ export class InGame implements IGameState
 			new Platform(500, 700, 200, PlatformDir.STILL, 100), // mid long
 			new Platform(600, 300, 100, PlatformDir.LEFT_RIGHT, 200)
 		]
+
+		this.coinHandler = new CoinHandler(COIN_SPAWN_TIME, this.platforms);
+		this.coinHandler.start();
 
 		this.canvas = canvas;
 
@@ -70,6 +76,7 @@ export class InGame implements IGameState
 	{
 		document.removeEventListener('keydown', this.KeyDownBound);
 		document.removeEventListener('keyup', this.KeyUpBound);
+		this.coinHandler.stop();
 	}
 
 	update(deltaTime: number)
@@ -121,6 +128,13 @@ export class InGame implements IGameState
 		this.player1.projectiles = this.player1.projectiles.filter(projectile => projectile.isValid);
 		this.player2.projectiles = this.player2.projectiles.filter(projectile => projectile.isValid);
 
+		// COINS
+
+		if (this.coinHandler.platformsFull && this.coinHandler.intervalId)
+			this.coinHandler.stop();
+		else if (!this.coinHandler.platformsFull && !this.coinHandler.intervalId)
+			this.coinHandler.start();
+
 
 		// VICTORY CONDITION CHECK
 
@@ -165,9 +179,12 @@ export class InGame implements IGameState
 		for (const platform of this.platforms) {
 			platform.draw(ctx);
 		}
+		
+		this.coinHandler.renderCoins(ctx);
 
 		this.player1.draw(ctx);
 		this.player2.draw(ctx);
+
 	}
 
 }
