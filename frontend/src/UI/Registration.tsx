@@ -2,47 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { WindowManager } from './Header';
 
 export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
+	// State management
 	const [visible, setVisible] = useState(true);
+	const [declinedMessage, setShowDeclined] = useState(false);
 	const [showRegistration, setShowRegistration] = useState(false);
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
-
+  
 	const HandleCancel = () => {
-		// Clear form and close popup
-		setUsername('');
-		setPassword('');
-		setConfirmPassword('');
-		setErrorMessage('');
-		localStorage.setItem('gdpr-accepted', 'false');
-		onDecline();
+	  setUsername('');
+	  setPassword('');
+	  setConfirmPassword('');
+	  setErrorMessage('');
+	  localStorage.setItem('gdpr-accepted', 'false');
+	  onDecline();
 	};
-
-	const HandleAccept = () => {
-		localStorage.setItem('gdpr-accepted', 'true');
-		setShowRegistration(true);
+  
+	const HandleGDPRAccept = () => {
+	  localStorage.setItem('gdpr-accepted', 'true');
+	  setShowRegistration(true);
 	};
-
+  
+	const HandleGDPRDecline = () => {
+	  localStorage.setItem('gdpr-accepted', 'false');
+	  setShowDeclined(true);
+	};
+  
 	const HandleRegistration = (e: React.FormEvent) => {
-	e.preventDefault();
-    
-	if (!username || !password || !confirmPassword) {
+	  e.preventDefault();
+	  
+	  if (!username || !password || !confirmPassword) {
 		setErrorMessage('All fields are required');
 		return;
-	}
-	
-	if (password !== confirmPassword) {
+	  }
+	  
+	  if (password !== confirmPassword) {
 		setErrorMessage('Passwords do not match');
 		return;
-	}
-	
-	if (localStorage.getItem(username)) {
+	  }
+
+	  if (localStorage.getItem(username)) {
 		setErrorMessage('Username already exists');
 		return;
-	}
-    
-    try {
+	  }
+	  
+	  try {
 		const userData = {
 		  username: username,
 		  password: password,
@@ -52,31 +58,31 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 		};
 		
 		localStorage.setItem(username, JSON.stringify(userData));
-
+		
 		const userArrKey = 'registeredUsers';
 		const userArrData = localStorage.getItem(userArrKey);
-
+		
 		if (!userArrData) {
 		  let userArr: string[] = [username];
 		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
-		} 
-		else {
+		} else {
 		  let userArr: string[] = JSON.parse(userArrData);
 		  userArr.push(username);
 		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
 		}
-		
+
 		localStorage.setItem('username', username);
 		localStorage.setItem('password', password);
 		setVisible(false);
 		onAccept();
-	} catch (error) {
+		
+	  } catch (error) {
 		setErrorMessage('Registration failed. Please try again.');
 		console.error('Registration error:', error);
-	}
-  };
-
-  if (!visible) return null;
+	  }
+	};
+  
+	if (!visible) return null;
 
 	if (showRegistration) {
 		return (
@@ -208,13 +214,13 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 			<div className="flex justify-end p-5 border-t border-gray-200 gap-2">
 			  <button 
 				className="px-5 py-2 rounded bg-red-600 text-white font-mono transition-colors hover:bg-red-700" 
-				onClick={HandleCancel}
+				onClick={HandleGDPRDecline}
 			  >
 				Decline
 			  </button>
 			  <button 
 				className="px-5 py-2 rounded bg-green-600 text-white font-mono transition-colors hover:bg-green-700" 
-				onClick={HandleAccept}
+				onClick={HandleGDPRAccept}
 			  >
 				Accept
 			  </button>
