@@ -14,8 +14,8 @@ import { Ball } from "./Ball";
 // PONG
 // - Longest ball rally
 // - Avg ball rally
-// - Points scored by Player1
-// - Points scored by Player2
+// - Points scored by Player1 //NEED THIS
+// - Points scored by Player2 //NEED THIS
 
 // Game starts already at first menu
 
@@ -158,15 +158,21 @@ export class Game implements IGameState {
     const pongWidth = ctx.measureText(pong).width;
     ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
 
+    //add player points here
+    const p1 = this.player1.user.username + ": " + this.player1.score + " points";
+    ctx.fillText(p1, (canvasWidth * 0.5) - (ctx.measureText(p1).width / 2), canvasHeight / 4 + 100);
+    const p2 = this.player2.user.username + ": " + this.player2.score + " points";
+    ctx.fillText(p2, (canvasWidth * 0.5) - (ctx.measureText(p2).width / 2), canvasHeight / 4 + 150);
+
     const seconds = (this.duration / 1000).toFixed(2);
     const durationText = `Game Duration: ${seconds} seconds`;
-    ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 100);
+    ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 200);
 
-    const longestRally = "Longest rally: " + this.ball.longestRally;
-    ctx.fillText(longestRally, (canvasWidth * 0.5) - (ctx.measureText(longestRally).width / 2), canvasHeight / 4 + 150);
+    const longestRally = "Longest rally: " + this.ball.longestRally + "hits";
+    ctx.fillText(longestRally, (canvasWidth * 0.5) - (ctx.measureText(longestRally).width / 2), canvasHeight / 4 + 250);
 
     const avgText = `Average Rally: ${this.averageRally.toFixed(2)} hits`;
-    ctx.fillText(avgText, (canvasWidth * 0.5) - (ctx.measureText(avgText).width / 2), canvasHeight / 4 + 200);
+    ctx.fillText(avgText, (canvasWidth * 0.5) - (ctx.measureText(avgText).width / 2), canvasHeight / 4 + 300);
   }
 
   drawMenu() {
