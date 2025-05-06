@@ -14,8 +14,8 @@ import { Ball } from "./Ball";
 // PONG
 // - Longest ball rally
 // - Avg ball rally
-// - Points scored by Player1 //NEED THIS
-// - Points scored by Player2 //NEED THIS
+// - Points scored by Player1
+// - Points scored by Player2
 
 // Game starts already at first menu
 
