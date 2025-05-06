@@ -17,8 +17,6 @@ import { Ball } from "./Ball";
 // - Points scored by Player1
 // - Points scored by Player2
 
-// Game starts already at first menu
-
 // Game Constants
 export const paddleWidth = 15; 
 export const paddleHeight = 100;
