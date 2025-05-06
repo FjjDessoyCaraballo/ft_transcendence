@@ -1,5 +1,7 @@
 import { Platform } from "./Platform";
 import { COIN_RADIUS } from "./Constants";
+import { Player } from "./Player";
+import { Player2 } from "./Player2";
 
 export interface Coin
 {
@@ -8,6 +10,7 @@ export interface Coin
 	radius: number;
 	color: string;
 	platform: Platform;
+	isCollected: boolean;
 }
 
 export class CoinHandler {
@@ -33,16 +36,15 @@ export class CoinHandler {
 		this.platformsFull = this.platforms.every(obj => obj.hasCoin);
 		if (this.platformsFull)
 		{
-			console.log("Platforms are full");
+			console.log("Platforms are full"); // REMOVE THIS LATER
 			return ;
 		}
 
 
-		let coinPlatform: Platform = this.platforms[0];
+		let coinPlatform = this.platforms[0];
 
 		while (1)
 		{
-			// We also need to check if all of the platforms are unavailable
 			coinPlatform = this.platforms[Math.floor(Math.random() * this.platforms.length)];
 
 			if (!coinPlatform.hasCoin)
@@ -58,8 +60,9 @@ export class CoinHandler {
 			y: coinPlatform.y - COIN_RADIUS,
 			radius: COIN_RADIUS,
 			color: 'gold',
-			platform: coinPlatform
-		}
+			platform: coinPlatform,
+			isCollected: false
+		};
 
 		this.coinArr.push(newCoin);
 
@@ -80,10 +83,31 @@ export class CoinHandler {
 		}
 	}
 
-	checkCoinCollision()
+	checkCoinCollision(player: Player)
 	{
-		// Check this 
+		const playerMidX = player.x + (player.width / 2);
+		const playerMidY = player.y + (player.height / 2);
+		const maxDist = COIN_RADIUS + player.width; // NOT ACCURATE, need to add corner points for the final check
 
+		for (const coin of this.coinArr)
+		{
+			// Count the distance
+			const dx = coin.x - playerMidX;
+			const dy = coin.y - playerMidY;
+			const curDist = Math.sqrt(dx * dx + dy * dy);
+
+			if (curDist <= maxDist)
+			{
+				player.coinCount++;
+				coin.isCollected = true;
+				coin.platform.hasCoin = false;
+			}
+		}
+
+		this.coinArr = this.coinArr.filter(coin => !coin.isCollected);
+
+		if (this.coinArr.length != this.platforms.length && this.platformsFull)
+			this.platformsFull = false;
 	}
   
 	start() {

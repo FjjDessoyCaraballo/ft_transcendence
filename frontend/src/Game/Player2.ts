@@ -2,6 +2,7 @@ import { Player } from "./Player";
 import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER, HEALTH_WIDTH, HEALT_HEIGHT } from "./Constants";
 import { PlatformDir } from "./Platform";
 import { User } from "../UI/UserManager";
+import { canvas } from "../components";
 
 export class Player2 extends Player {
 
@@ -67,24 +68,24 @@ export class Player2 extends Player {
     }
 
 	draw(ctx: CanvasRenderingContext2D) {
-		ctx.fillStyle = this.color;
-		ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
 
 		let offsetX = this.x + PLAYER_SIZE / 2 - HEALTH_WIDTH / 2;
 		let offsetY = this.y - HEALT_HEIGHT - 10; // random 10 :D
 		this.health.draw(ctx, offsetX, offsetY);
 
-		for (const projectile of this.projectiles) {
-			projectile.draw(ctx);
-		}
+        for (const projectile of this.projectiles) {
+            projectile.draw(ctx);
+        }
 
 		// Should coin count be like this on the front layer...?
 
 		ctx.font = '30px arial';
+		ctx.fillStyle = this.color;
 		const coinText = `${this.coinCount}`;
-	//	ctx.fillText(coinText, this.canvas, 40); 
-	// NOT DONE !!
+		ctx.fillText(coinText, canvas.width - ctx.measureText(coinText).width - 40, 40);
 
 //		this.cShape.draw(ctx); // --> For debug
-	}
+    }
 }

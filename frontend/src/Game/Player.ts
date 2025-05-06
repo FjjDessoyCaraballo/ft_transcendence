@@ -212,6 +212,7 @@ export class Player {
 		// Should coin count be like this on the front layer...?
 
 		ctx.font = '30px arial';
+		ctx.fillStyle = this.color;
 		const coinText = `${this.coinCount}`;
 		ctx.fillText(coinText, 40, 40);
 

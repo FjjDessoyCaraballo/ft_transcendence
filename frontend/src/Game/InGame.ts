@@ -135,6 +135,8 @@ export class InGame implements IGameState
 		else if (!this.coinHandler.platformsFull && !this.coinHandler.intervalId)
 			this.coinHandler.start();
 
+		this.coinHandler.checkCoinCollision(this.player1);
+		this.coinHandler.checkCoinCollision(this.player2);
 
 		// VICTORY CONDITION CHECK
 
