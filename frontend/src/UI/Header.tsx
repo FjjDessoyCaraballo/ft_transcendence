@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { GDPRPopup } from './Registration';
+import { LoginPopup } from './Login'
 
 interface HeaderProps {
   onClick: () => void;
 }
 
+export interface WindowManager {
+  onAccept: () => void;
+  onDecline: () => void;
+}
+
 export const Header: React.FC<HeaderProps> = ({ onClick }) => {
   const [showGDPR, setShowGDPR] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
-  const handleRegistrationClick = () => {
+  const HandleRegistrationClick = () => {
     setShowGDPR(true);
   };
+
+  const HandleLoginClick = () => {
+    setShowLogin(true);
+  }
 
   return (
     <>
@@ -20,13 +31,13 @@ export const Header: React.FC<HeaderProps> = ({ onClick }) => {
             Transcendence
           </h1>
           <div className="space-x-8 place-items-right flex">
-            <button className="px-4 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors">
+            <button className="px-4 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors"
+            onClick={HandleLoginClick}>
               Login
             </button>
             <button 
               className="px-1 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors"
-              onClick={handleRegistrationClick}
-            >
+              onClick={HandleRegistrationClick}>
               Registration
             </button>
             <button className="px-4 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors">
@@ -36,18 +47,32 @@ export const Header: React.FC<HeaderProps> = ({ onClick }) => {
         </div>
       </header>
       
-      {showGDPR && (
-        <GDPRPopup
-          onAccept={() => {
-            console.log('GDPR accepted');
-            setShowGDPR(false);
-          }}
-          onDecline={() => {
-            console.log('GDPR declined');
-            setShowGDPR(false);
-          }}
-        />
-      )}
+      {
+        showGDPR && (
+          <GDPRPopup
+            onAccept={() => {
+              console.log('GDPR accepted');
+              setShowGDPR(false);
+            }}
+              onDecline={() => {
+              console.log('GDPR declined');
+              setShowGDPR(false);
+            }}
+          />
+        )}
+      {
+        showLogin && (
+          <LoginPopup
+            onAccept={() => {
+              console.log('Login successful');
+              setShowLogin(false);
+            }}
+              onDecline={() => {
+              console.log('Login failed/canceled');
+              setShowLogin(false);
+            }}
+          />
+        )}
     </>
   );
 };

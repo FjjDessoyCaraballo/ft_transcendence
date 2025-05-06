@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { WindowManager } from './Header'
 
-interface GDPRPopupProps {
-	onAccept: () => void;
-	onDecline: () => void;
-}
-
-export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => {
+export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	const [visible, setVisible] = useState(true);
 	const [declinedMessage, setShowDeclined] = useState(false);
 	const [showRegistration, setShowRegistration] = useState(false);
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 
-	const handleCancel = () => {
+	const HandleCancel = () => {
 		localStorage.setItem('gdpr-accepted', 'false');
 		onDecline();
 	}
 
-	const handleAccept = () => {
+	const HandleAccept = () => {
 		localStorage.setItem('gdpr-accepted', 'true')
 		localStorage.setItem('username', username);
 		localStorage.setItem('password', password);
@@ -29,10 +25,9 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 		}
 	};
 
-	const handleDecline = () => {
+	const HandleDecline = () => {
 		localStorage.setItem('gdpr-accepted', 'false')
 		setShowDeclined(true);
-		// onDecline();
 	};
 
 	if (!visible) return null;
@@ -53,13 +48,13 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 			  <div className="flex justify-end p-5 border-t border-gray-100 gap-2">
 			  	<button 
 						className="px-5 py-2 rounded bg-red-600 text-white font-sans transition-colors hover:bg-red-700" 
-						onClick={handleCancel}
+						onClick={HandleCancel}
 						>
 						Cancel
 					</button>
 				<button 
 				  className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
-				  onClick={handleAccept}
+				  onClick={HandleAccept}
 				>
 				  Accept
 				</button>
@@ -92,13 +87,13 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 					<div className="flex justify-end p-5 border-t border-gray-100 gap-2">
 					<button 
 						className="px-5 py-2 rounded bg-red-600 text-white font-sans transition-colors hover:bg-red-700" 
-						onClick={handleCancel}
+						onClick={HandleCancel}
 						>
 						Cancel
 					</button>
 					<button 
 						className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
-						onClick={handleAccept}
+						onClick={HandleAccept}
 						>
 						Register
 					</button>
@@ -130,12 +125,12 @@ export const GDPRPopup: React.FC<GDPRPopupProps> = ({ onAccept, onDecline }) => 
 				<div className="flex justify-end p-5 border-t border-gray-100 gap-2">
 					<button 
 					className="px-5 py-2 rounded bg-red-600 text-white font-sans transition-colors hover:bg-red-700" 
-					onClick={handleDecline}>
+					onClick={HandleDecline}>
 						Decline
 					</button>
 					<button 
 					className="px-5 py-2 rounded bg-green-600 text-white font-sans transition-colors hover:bg-green-700" 
-					onClick={handleAccept}>
+					onClick={HandleAccept}>
 						Accept
 					</button>
 				</div>
