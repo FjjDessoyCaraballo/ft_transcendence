@@ -169,6 +169,8 @@ export class Game implements IGameState {
         this.winner = this.player2;
         this.duration = performance.now() - this.startTime;
       }
+      this.player1.paddle.y = (canvasHeight - paddleHeight) / 2;
+      this.player2.paddle.y = (canvasHeight - paddleHeight) / 2;
       this.ball.reset();
     }
 
@@ -180,6 +182,8 @@ export class Game implements IGameState {
         this.winner = this.player1;
         this.duration = performance.now() - this.startTime;
       }
+      this.player1.paddle.y = (canvasHeight - paddleHeight) / 2;
+      this.player2.paddle.y = (canvasHeight - paddleHeight) / 2;
       this.ball.reset();
     }
   }
