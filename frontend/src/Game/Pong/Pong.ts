@@ -194,6 +194,7 @@ export class Game implements IGameState {
     const pongWidth = ctx.measureText(pong).width;
     ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
 
+    ctx.font = "30px 'Courier New', monospace";
     //add player points here
     const p1 = this.player1.user.username + ": " + this.player1.score + " points";
     ctx.fillText(p1, (canvasWidth * 0.5) - (ctx.measureText(p1).width / 2), canvasHeight / 4 + 100);
