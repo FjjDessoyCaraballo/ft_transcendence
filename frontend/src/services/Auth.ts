@@ -1,16 +1,5 @@
 import { apiRequest } from './Api';
-
-// Interface for user type
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  avatar_url: string;
-  color: string;
-  games_won: number;
-  games_lost: number;
-  elo_rank: number;
-}
+import { User } from "../UI/UserManager"
 
 // Login and get token
 export const login = async (email: string, password: string) => {

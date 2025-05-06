@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WindowManager } from './Header'
+import { registerUser } from '../services/userService'
 
 export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	const [visible, setVisible] = useState(true);
@@ -13,12 +14,19 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 		onDecline();
 	}
 
-	const HandleAccept = () => {
-		localStorage.setItem('gdpr-accepted', 'true')
-		localStorage.setItem('username', username);
-		localStorage.setItem('password', password);
+	const HandleAccept = async (event: React.FormEvent) => {
+		event.preventDefault();
 		if (!showRegistration) {
 			setShowRegistration(true);
+			try {
+				await registerUser({
+					username,
+					password,
+				});
+			} catch (error) {
+				alert("404 Failure")
+				onAccept();	
+			}
 		} else {
 			setVisible(false);
 			onAccept();
