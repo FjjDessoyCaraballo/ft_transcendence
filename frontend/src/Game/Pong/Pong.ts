@@ -20,6 +20,7 @@ import { Ball } from "./Ball";
 // Game Constants
 export const paddleWidth = 15; 
 export const paddleHeight = 100;
+export const paddleSpeed = 8;
 export const ballSize = 15;
 export const canvasWidth = canvas.width;
 export const canvasHeight = canvas.height;
@@ -83,6 +84,7 @@ export class Game implements IGameState {
     this.keysPressed[e.key] = false;
   }
 
+  // Predict where the ball will go along the Y-axis when it reaches the target X (AI's paddle)
   predictBallY(ballX: number, ballY: number, ballVX: number, ballVY: number, targetX: number): number {
     while (ballX < targetX) {
       const timeToWallY = ballVY > 0 
@@ -94,26 +96,32 @@ export class Game implements IGameState {
       if (timeToWallY < timeToTargetX) {
         ballX += ballVX * timeToWallY;
         ballY += ballVY * timeToWallY;
-        ballVY *= -1; // bounce
-      } else {
+        ballVY *= -1; // Ball bounces when it hits the wall
+      } 
+      else {
         ballX += ballVX * timeToTargetX;
         ballY += ballVY * timeToTargetX;
-        break;
+        break ;
       }
     }
-    return ballY;
+    return ballY; // Return the predicted Y position of the ball
   }
 
   updatePlayerPositions() {
-    // Player 1 movement (W and S keys)
-    if (this.keysPressed['q']) this.player1.paddle.moveUp();
-    if (this.keysPressed['s']) this.player1.paddle.moveDown();
+    // Player 1 movement
+    if (this.keysPressed['q']) 
+      this.player1.paddle.moveUp();
+    if (this.keysPressed['s']) 
+      this.player1.paddle.moveDown();
 
     if (this.twoPlayerMode) {
-      // Player 2 movement (ArrowUp and ArrowDown keys)
-      if (this.keysPressed['o']) this.player2.paddle.moveUp();
-      if (this.keysPressed['k']) this.player2.paddle.moveDown();
-    } else {
+      // Player 2 movement
+      if (this.keysPressed['o']) 
+        this.player2.paddle.moveUp();
+      if (this.keysPressed['k']) 
+        this.player2.paddle.moveDown();
+    } 
+    else {
       const now = performance.now();
       if (now - this.aiLastUpdateTime >= 1000) { // Only update AI's target once per second
         this.aiTargetY = this.predictBallY(this.ball.x, this.ball.y, this.ball.speedX, this.ball.speedY, this.player2.paddle.x);
@@ -123,9 +131,10 @@ export class Game implements IGameState {
       // AI movement toward target using same speed as human
       const paddleCenter = this.player2.paddle.y + paddleHeight / 2;
 
-      if (paddleCenter < this.aiTargetY - this.player2.paddle.speed) {
+      if (paddleCenter < this.aiTargetY - paddleSpeed) {
         this.player2.paddle.moveDown();
-      } else if (paddleCenter > this.aiTargetY + this.player2.paddle.speed) {
+      } 
+      else if (paddleCenter > this.aiTargetY + paddleSpeed) {
         this.player2.paddle.moveUp();
       }
 

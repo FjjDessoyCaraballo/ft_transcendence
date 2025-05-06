@@ -1,21 +1,20 @@
 import { User } from "../../UI/UserManager";
 import { ctx } from "../../components/Canvas";
-import { canvasHeight, paddleHeight, paddleWidth } from "./Pong";
+import { canvasHeight, paddleHeight, paddleWidth, paddleSpeed } from "./Pong";
 
 export class Paddle {
     y: number;
-    speed: number = 8;
   
     constructor(public x: number) {
       this.y = (canvasHeight - paddleHeight) / 2;
     }
   
     moveUp() {
-      this.y -= this.speed;
+      this.y -= paddleSpeed;
     }
   
     moveDown() {
-      this.y += this.speed;
+      this.y += paddleSpeed;
     }
   
     stayInBounds() {
@@ -28,6 +27,6 @@ export class Paddle {
     }
   }
   
-  export class Player {
+  export class Player { //Doesn't make sense to have player class...
     constructor(public user: User, public paddle: Paddle, public score: number = 0) {}
   }
