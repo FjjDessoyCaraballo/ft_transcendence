@@ -86,22 +86,26 @@ export class Game implements IGameState {
 
   // Predict where the ball will go along the Y-axis when it reaches the target X (AI's paddle)
   predictBallY(ballX: number, ballY: number, ballVX: number, ballVY: number, targetX: number): number {
-    while (ballX < targetX) {
+    while (ballX < targetX) { // as long as the ball hasn't passed the target X position
+
+      // calculates the time it takes for the ball to hit either the top or bottom wall of the canvas
       const timeToWallY = ballVY > 0 
         ? (canvasHeight - ballY - ballSize) / ballVY 
         : -ballY / ballVY;
-  
+
+      // calculates the time it will take for the ball to travel horizontally to the target X position
       const timeToTargetX = (targetX - ballX) / ballVX;
   
-      if (timeToWallY < timeToTargetX) {
+      // simulates ball movement
+      if (timeToWallY < timeToTargetX) { // the ball will hit the wall before it reaches the target
         ballX += ballVX * timeToWallY;
         ballY += ballVY * timeToWallY;
         ballVY *= -1; // Ball bounces when it hits the wall
       } 
-      else {
+      else { // the ball will reach the target X before hitting any wall
         ballX += ballVX * timeToTargetX;
         ballY += ballVY * timeToTargetX;
-        break ;
+        break ; // ball reaches target
       }
     }
     return ballY; // Return the predicted Y position of the ball
@@ -130,14 +134,12 @@ export class Game implements IGameState {
 
       // AI movement toward target using same speed as human
       const paddleCenter = this.player2.paddle.y + paddleHeight / 2;
-
       if (paddleCenter < this.aiTargetY - paddleSpeed) {
         this.player2.paddle.moveDown();
       } 
       else if (paddleCenter > this.aiTargetY + paddleSpeed) {
         this.player2.paddle.moveUp();
       }
-
     }
     this.player1.paddle.stayInBounds();
     this.player2.paddle.stayInBounds();
@@ -150,7 +152,7 @@ export class Game implements IGameState {
     document.addEventListener('keyup', this.handleKeyUp.bind(this));
 	}
 
-	exit()
+	exit() //Not using this...
 	{
     document.removeEventListener('keydown', this.handleKeyDown.bind(this));
     document.removeEventListener('keyup', this.handleKeyUp.bind(this));
