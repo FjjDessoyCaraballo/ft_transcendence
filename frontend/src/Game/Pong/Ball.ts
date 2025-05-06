@@ -33,11 +33,11 @@ export class Ball {
     if (this.x <= paddleWidth + buffer && this.y + ballSize >= player1.y && this.y <= player1.y + paddleHeight) {
         this.currentRallyLen++;
         //console.log('currentRallyLen =', this.currentRallyLen);
-        const hitPos = (this.y + ballSize / 2) - (player1.y + paddleHeight / 2);
+        const hitPos = (this.y + ballSize / 2) - (player1.y + paddleHeight / 2); // calculates the difference between the centres of the ball and the paddle
         const normalized = hitPos / (paddleHeight / 2); // -1 (top) to 1 (bottom)
       
-        const bounceAngle = normalized * Math.PI / 4; // Max 45 degree angle
-        const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2); // keep same speed
+        const bounceAngle = normalized * Math.PI / 4; // -1 (-45 degrees) to 1 (+45 degrees)
+        const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2); // keep same speed after bounce (pythagoras)
       
         this.speedX = Math.cos(bounceAngle) * speed; // reflected to right
         this.speedY = Math.sin(bounceAngle) * speed;
