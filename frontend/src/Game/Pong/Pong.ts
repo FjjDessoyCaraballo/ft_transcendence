@@ -24,6 +24,7 @@ export const paddleSpeed = 8;
 export const ballSize = 15;
 export const canvasWidth = canvas.width;
 export const canvasHeight = canvas.height;
+export const buffer = 15;
 
 
 export class Game implements IGameState {

@@ -1,4 +1,4 @@
-import { canvasWidth, canvasHeight, paddleHeight, paddleWidth, ballSize } from "./Pong";
+import { canvasWidth, canvasHeight, paddleHeight, paddleWidth, ballSize, buffer } from "./Pong";
 import { Paddle } from "./Paddle";
 import { ctx } from "../../components/Canvas";
 
@@ -22,18 +22,17 @@ export class Ball {
     if (this.y <= 0) {
       this.y = 0; // Push ball back inside. Fixes wall "hugging"
       this.speedY *= -1;
-    } else if (this.y + ballSize >= canvasHeight) {
+    } 
+    else if (this.y + ballSize >= canvasHeight) {
       this.y = canvasHeight - ballSize; // Push ball back inside. Fixes wall "hugging"
       this.speedY *= -1;
     }
 
 
     // Player 1 paddle collision
-    if (this.x <= paddleWidth + 15 &&
-      this.y + ballSize >= player1.y &&
-      this.y <= player1.y + paddleHeight) {
+    if (this.x <= paddleWidth + buffer && this.y + ballSize >= player1.y && this.y <= player1.y + paddleHeight) {
         this.currentRallyLen++;
-        console.log('currentRallyLen =', this.currentRallyLen);
+        //console.log('currentRallyLen =', this.currentRallyLen);
         const hitPos = (this.y + ballSize / 2) - (player1.y + paddleHeight / 2);
         const normalized = hitPos / (paddleHeight / 2); // -1 (top) to 1 (bottom)
       
@@ -49,11 +48,9 @@ export class Ball {
     }
 
     // Player 2 paddle collision
-    if (this.x + ballSize >= canvasWidth - paddleWidth - 15 &&
-      this.y + ballSize >= player2.y &&
-      this.y <= player2.y + paddleHeight) {
+    if (this.x + ballSize >= canvasWidth - paddleWidth - buffer && this.y + ballSize >= player2.y && this.y <= player2.y + paddleHeight) {
         this.currentRallyLen++;
-        console.log('currentRallyLen =', this.currentRallyLen);
+        //console.log('currentRallyLen =', this.currentRallyLen);
         const hitPos = (this.y + ballSize / 2) - (player2.y + paddleHeight / 2);
         const normalized = hitPos / (paddleHeight / 2);
       
