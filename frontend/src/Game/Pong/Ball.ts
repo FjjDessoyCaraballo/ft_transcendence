@@ -12,7 +12,7 @@ export class Ball {
   longestRally: number = 0;
   pointsPlayed: number = 0;
 
-  constructor() { // This is the same as reset...
+  constructor() {
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
     this.speedX = 10 * -1;
@@ -26,9 +26,15 @@ export class Ball {
 
   checkCollisions(player1: Paddle, player2: Paddle) {
     // Ball collision with top and bottom
-    if (this.y <= 0 || this.y + ballSize >= canvasHeight) {
+    // Ball collision with top and bottom
+    if (this.y <= 0) {
+      this.y = 0; // Push ball back inside. Fixes wall "hugging"
+      this.speedY *= -1;
+    } else if (this.y + ballSize >= canvasHeight) {
+      this.y = canvasHeight - ballSize; // Push ball back inside. Fixes wall "hugging"
       this.speedY *= -1;
     }
+
 
     // Player 1 paddle collision
     if (this.x <= paddleWidth + 15 &&
