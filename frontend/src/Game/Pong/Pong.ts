@@ -201,13 +201,13 @@ export class Game implements IGameState {
     ctx.fillText(p2, (canvasWidth * 0.5) - (ctx.measureText(p2).width / 2), canvasHeight / 4 + 150);
 
     const seconds = (this.duration / 1000).toFixed(2);
-    const durationText = `Game Duration: ${seconds} seconds`;
+    const durationText = `Game duration: ${seconds} seconds`;
     ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 200);
 
     const longestRally = "Longest rally: " + this.ball.longestRally + " hits";
     ctx.fillText(longestRally, (canvasWidth * 0.5) - (ctx.measureText(longestRally).width / 2), canvasHeight / 4 + 250);
 
-    const avgText = `Average Rally: ${this.averageRally.toFixed(2)} hits`;
+    const avgText = `Average rally: ${this.averageRally.toFixed(2)} hits`;
     ctx.fillText(avgText, (canvasWidth * 0.5) - (ctx.measureText(avgText).width / 2), canvasHeight / 4 + 300);
   }
 
