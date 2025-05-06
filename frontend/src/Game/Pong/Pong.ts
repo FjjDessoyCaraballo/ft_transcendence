@@ -189,7 +189,7 @@ export class Game implements IGameState {
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     ctx.fillStyle = 'white';
-    ctx.font = "30px 'Courier New', monospace";
+    ctx.font = "50px 'Courier New', monospace";
     const pong = this.winner?.user.username + " is the winner!";
     const pongWidth = ctx.measureText(pong).width;
     ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
