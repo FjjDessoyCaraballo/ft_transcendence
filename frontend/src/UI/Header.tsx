@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GDPRPopup } from './Registration';
 import { LoginPopup } from './Login'
+import { SettingsPopup } from './Settings'
 
 interface HeaderProps {
   onClick: () => void;
@@ -10,10 +11,11 @@ export interface WindowManager {
   onAccept: () => void;
   onDecline: () => void;
 }
-
-export const Header: React.FC<HeaderProps> = ({ onClick }) => {
+//{ onClick }
+export const Header: React.FC<HeaderProps> = () => {
   const [showGDPR, setShowGDPR] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const HandleRegistrationClick = () => {
     setShowGDPR(true);
@@ -21,6 +23,10 @@ export const Header: React.FC<HeaderProps> = ({ onClick }) => {
 
   const HandleLoginClick = () => {
     setShowLogin(true);
+  }
+
+  const HandleSettingsClick = () => {
+    setShowSettings(true);
   }
 
   return (
@@ -40,7 +46,9 @@ export const Header: React.FC<HeaderProps> = ({ onClick }) => {
               onClick={HandleRegistrationClick}>
               Registration
             </button>
-            <button className="px-4 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors">
+            <button
+            className="px-4 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors"
+            onClick={HandleSettingsClick}>
               Settings
             </button>
           </div>
@@ -70,6 +78,19 @@ export const Header: React.FC<HeaderProps> = ({ onClick }) => {
               onDecline={() => {
               console.log('Login failed/canceled');
               setShowLogin(false);
+            }}
+          />
+        )}
+      {
+        showSettings && (
+          <SettingsPopup
+            onAccept={() => {
+              console.log('Login successful');
+              setShowSettings(false);
+            }}
+              onClose={() => {
+              console.log('Settings closed');
+              setShowSettings(false);
             }}
           />
         )}

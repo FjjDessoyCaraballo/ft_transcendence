@@ -4,7 +4,6 @@ import { WindowManager } from './Header';
 export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	// State management
 	const [visible, setVisible] = useState(true);
-	const [declinedMessage, setShowDeclined] = useState(false);
 	const [showRegistration, setShowRegistration] = useState(false);
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
@@ -27,7 +26,7 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   
 	const HandleGDPRDecline = () => {
 	  localStorage.setItem('gdpr-accepted', 'false');
-	  setShowDeclined(true);
+	  onDecline();
 	};
   
 	const HandleRegistration = (e: React.FormEvent) => {
