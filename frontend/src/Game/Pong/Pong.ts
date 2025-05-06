@@ -4,13 +4,13 @@ import { User } from "../../UI/UserManager";
 import { Paddle, Player } from "./Paddle";
 import { Ball } from "./Ball";
 
+// STATS
 // BOTH GAMES
 // - Player1
 // - Player2
 // - Winner
 // - Game duration
 // - Game type
-
 // PONG
 // - Longest ball rally
 // - Avg ball rally
@@ -38,7 +38,7 @@ export class Game implements IGameState {
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
-  private storedOpponentName: string;
+  storedOpponentName: string;
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
