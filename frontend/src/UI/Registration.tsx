@@ -133,8 +133,8 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 				  <p className="texts">- Friends;</p>
 				  <p className="texts">- MATCH HISTORY (an array of MATCHES). </p>
 				  <p className="texts"> REQUESTS FOR DATA DELETION: requests for data deletion can be made directly through the settings by end-user.</p>
-				  <p className="texts"> REQUESTS FOR OWN DATA: End-users that want to download all their data that is contained within Dads and Coders Inc. 
-					servers, it is possible to download the data directly from the settings section by pressing the "Download data" button.</p>
+				  <p className="texts"> REQUESTS FOR OWN DATA: End-users who want to download all their data that is contained within Dads and Coders Inc. 
+					servers can do so by directly downloading the data from the settings section by pressing the "Download data" button.</p>
 				  <p className="texts">
 				  If said end-user finds difficulties in deleting their data, they may contact data protection officer. For any inquiries or questions, you can contact the data protection officer: Felipe Dessoy, fdessoy-@hive.student.fi</p>
 				</div>
