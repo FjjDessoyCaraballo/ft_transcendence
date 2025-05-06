@@ -33,10 +33,14 @@ export class Game implements IGameState {
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
   averageRally: number = 0;
+
+  aiLastUpdateTime: number = 0;
+  aiTargetY: number = (canvasHeight - paddleHeight) / 2; // AI's current target
+
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
-  private storedOpponentName: string;
+  storedOpponentName: string;
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
@@ -94,11 +98,22 @@ export class Game implements IGameState {
       if (this.keysPressed['o']) this.player2.paddle.moveUp();
       if (this.keysPressed['k']) this.player2.paddle.moveDown();
     } else {
-      // AI movement for Player 2
-      const lerpSpeed = 0.1; // Smooth movement
-      this.player2.paddle.y += (this.ball.y - (this.player2.paddle.y + paddleHeight / 2)) * lerpSpeed;
-    }
+      const now = performance.now();
+      if (now - this.aiLastUpdateTime >= 1000) { // Only update AI's target once per second
+        this.aiTargetY = this.ball.y;
+        this.aiLastUpdateTime = now;
+      }
 
+      // AI movement toward target using same speed as human
+      const paddleCenter = this.player2.paddle.y + paddleHeight / 2;
+
+      if (paddleCenter < this.aiTargetY - this.player2.paddle.speed) {
+        this.player2.paddle.moveDown();
+      } else if (paddleCenter > this.aiTargetY + this.player2.paddle.speed) {
+        this.player2.paddle.moveUp();
+      }
+
+    }
     this.player1.paddle.stayInBounds();
     this.player2.paddle.stayInBounds();
   }
