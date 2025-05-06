@@ -26,7 +26,7 @@ export const canvasHeight = canvas.height;
 
 
 export class Game implements IGameState {
-  name: GameStates
+  name: GameStates = GameStates.PONG; //STAT
   gameState: 'menu' | 'playing' | 'result' = 'menu';
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
@@ -39,20 +39,15 @@ export class Game implements IGameState {
   player1: Player;
   player2: Player;
   storedOpponentName: string;
-  ball: Ball;
+  ball: Ball = new Ball();
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
 
   constructor(user1: User, user2: User) {
-    this.name = GameStates.PONG; //STAT
     this.storedOpponentName = user2.username;
     this.player1 = new Player(user1, new Paddle(15)); //STAT
     this.player2 = new Player(user2, new Paddle(canvasWidth - paddleWidth - 15)); //STAT
-    this.ball = new Ball();
-
-     // Bind once
     this.gameLoop = this.gameLoop.bind(this);
-    
     this.enter();
     this.gameLoop();
   }
@@ -72,11 +67,13 @@ export class Game implements IGameState {
         this.gameState = 'playing';
         this.resetGame();
       }
-    } else {
+    } 
+    else {
       if (e.key === 'Escape') {
         this.gameState = 'menu';
         this.resetGame();
-      } else {
+      } 
+      else {
         this.keysPressed[e.key] = true;
       }
     }
