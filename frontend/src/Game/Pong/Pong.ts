@@ -40,7 +40,7 @@ export class Game implements IGameState {
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
-  storedOpponentName: string;
+  private storedOpponentName: string;
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
@@ -88,6 +88,27 @@ export class Game implements IGameState {
     this.keysPressed[e.key] = false;
   }
 
+  predictBallY(ballX: number, ballY: number, ballVX: number, ballVY: number, targetX: number): number {
+    while (ballX < targetX) {
+      const timeToWallY = ballVY > 0 
+        ? (canvasHeight - ballY - ballSize) / ballVY 
+        : -ballY / ballVY;
+  
+      const timeToTargetX = (targetX - ballX) / ballVX;
+  
+      if (timeToWallY < timeToTargetX) {
+        ballX += ballVX * timeToWallY;
+        ballY += ballVY * timeToWallY;
+        ballVY *= -1; // bounce
+      } else {
+        ballX += ballVX * timeToTargetX;
+        ballY += ballVY * timeToTargetX;
+        break;
+      }
+    }
+    return ballY;
+  }
+
   updatePlayerPositions() {
     // Player 1 movement (W and S keys)
     if (this.keysPressed['q']) this.player1.paddle.moveUp();
@@ -100,7 +121,7 @@ export class Game implements IGameState {
     } else {
       const now = performance.now();
       if (now - this.aiLastUpdateTime >= 1000) { // Only update AI's target once per second
-        this.aiTargetY = this.ball.y;
+        this.aiTargetY = this.predictBallY(this.ball.x, this.ball.y, this.ball.speedX, this.ball.speedY, this.player2.paddle.x);
         this.aiLastUpdateTime = now;
       }
 
@@ -183,7 +204,7 @@ export class Game implements IGameState {
     const durationText = `Game Duration: ${seconds} seconds`;
     ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 200);
 
-    const longestRally = "Longest rally: " + this.ball.longestRally + "hits";
+    const longestRally = "Longest rally: " + this.ball.longestRally + " hits";
     ctx.fillText(longestRally, (canvasWidth * 0.5) - (ctx.measureText(longestRally).width / 2), canvasHeight / 4 + 250);
 
     const avgText = `Average Rally: ${this.averageRally.toFixed(2)} hits`;
