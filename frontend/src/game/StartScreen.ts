@@ -3,7 +3,7 @@ import { stateManager, curUser } from "../components/index";
 import { MainMenu } from "../UI/MainMenu";
 import { canvas, ctx } from "../components/Canvas"; // Sort of weird to use this globally here to pass it to BlockBattle...
 import { GameStates, IGameState, } from "./GameStates";
-import { DEEP_PURPLE, LIGHT_PURPLE, PURPLE, TEXT_PADDING } from "./Constants";
+import { DEEP_PURPLE, PURPLE, TEXT_PADDING } from "./Constants";
 import { UserManager } from "../UI/UserManager";
 import { GameType } from "../UI/Types";
 
