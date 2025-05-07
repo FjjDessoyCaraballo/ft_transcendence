@@ -1,7 +1,7 @@
 import { GameStates, IGameState } from "./GameStates";
 import { stateManager } from "../components/index";
 import { User } from "../UI/UserManager";
-import { InGame } from "./InGame";
+import { BlockBattle } from "./BlockBattle";
 import { TournamentPlayer } from "./Tournament";
 
 
@@ -72,7 +72,7 @@ export class MatchIntro implements IGameState
 		if (this.p1IsReady && this.p2IsReady)
 		{
 			if (!this.tournamentData1)
-				stateManager.changeState(new InGame(this.canvas, this.player1, this.player2, null, null));
+				stateManager.changeState(new BlockBattle(this.canvas, this.player1, this.player2, null, null));
 			else
 				this.isStateReady = true;
 		}

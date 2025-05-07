@@ -1,7 +1,7 @@
 import { Button } from "../UI/Button";
 import { stateManager, curUser } from "../components/index";
 import { MainMenu } from "../UI/MainMenu";
-import { canvas, ctx } from "../components/Canvas"; // Sort of weird to use this globally here to pass it to InGame...
+import { canvas, ctx } from "../components/Canvas"; // Sort of weird to use this globally here to pass it to BlockBattle...
 import { GameStates, IGameState, } from "./GameStates";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LOGIN_CHECK_KEY } from "./Constants";
 import { UserManager } from "../UI/UserManager";
@@ -88,7 +88,7 @@ export class StartScreen implements IGameState
 	{
 		UserManager.drawCurUser();
 		
-		let mainTitle = 'Block Wars';
+		let mainTitle = 'Block Battle';
 		ctx.font = '140px Impact';
 		ctx.fillStyle = '#0a42ab';
 		const titleX = (this.canvas.width / 2) - (ctx.measureText(mainTitle).width / 2);

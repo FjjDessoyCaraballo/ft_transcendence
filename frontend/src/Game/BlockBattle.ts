@@ -12,7 +12,7 @@ import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 
 
-export class InGame implements IGameState
+export class BlockBattle implements IGameState
 {
 	name: GameStates
 	player1: Player;

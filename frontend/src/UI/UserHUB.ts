@@ -7,7 +7,7 @@ import { ChallengeButton, TournamentButton, PongButton, User, UserManager } from
 import { Button } from "./Button";
 import { UserHubState } from "./Types";
 import { MatchIntro } from "../Game/MatchIntro";
-import { Game } from "../Game/Pong"
+import { Pong } from "../Game/Pong"
 import { Tournament } from "../Game/Tournament";
 
 export class NextPageButton extends Button
@@ -237,7 +237,7 @@ export class UserHUB implements IGameState
 					if (this.interactionType === "challenge")
 						stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent, null, null));
 					if (this.interactionType === "pong")
-						stateManager.changeState(new Game(curUserObj, this.opponent));
+						stateManager.changeState(new Pong(curUserObj, this.opponent, 'playing'));
 				}
 				else
 				{
@@ -299,6 +299,7 @@ export class UserHUB implements IGameState
 			this.needNewChallengeButtons = true;
 			this.prevUserStartIdx = this.userStartIdx;
 			this.challengeBtnArr.length = 0;
+			this.pongBtnArr.length = 0;
 		}
 
 		UserManager.drawCurUser();
@@ -319,8 +320,12 @@ export class UserHUB implements IGameState
 				&& this.state !== UserHubState.INFO)
 			{
 				this.challengeBtnArr.push(btn);
-				const pongButton = new PongButton(x + 660, y + 40, 'red', '#780202', 'PONG', 'white', '25px', 'arial', this.userArr[i]);
-				this.pongBtnArr.push(pongButton);
+
+				if (this.state === UserHubState.SINGLE_GAME)
+				{
+					const pongButton = new PongButton(btn.x, y + 40, 'red', '#780202', 'PONG', 'white', '25px', 'arial', this.userArr[i]);
+					this.pongBtnArr.push(pongButton);
+				}
 			}
 
 			// Check if we need to update the tournament button

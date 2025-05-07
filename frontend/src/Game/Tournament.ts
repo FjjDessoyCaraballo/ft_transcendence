@@ -3,7 +3,7 @@ import { GameStates, IGameState, } from "./GameStates";
 import { TEXT_PADDING } from "./Constants";
 import { User } from "../UI/UserManager";
 import { ReturnMainMenuButton } from "./EndScreen";
-import { InGame } from "./InGame";
+import { BlockBattle } from "./BlockBattle";
 import { Button } from "../UI/Button";
 import { MatchIntro } from "./MatchIntro";
 import { EndScreen } from "./EndScreen";
@@ -45,7 +45,7 @@ export class Tournament implements IGameState
 	name: GameStates;
 	canvas: HTMLCanvasElement;
 	playerArr: TournamentPlayer [];
-	curMatch: MatchIntro | InGame | EndScreen | null;
+	curMatch: MatchIntro | BlockBattle | EndScreen | null;
 	matchCounter: number;
 	isFinished: boolean;
 	tournamentWinner: TournamentPlayer [];
@@ -159,7 +159,7 @@ export class Tournament implements IGameState
 				
 				if (this.curMatch.name === GameStates.MATCH_INTRO && player1 && player2)
 				{	
-					this.curMatch = new InGame(this.canvas, player1.user, player2.user, player1, player2);
+					this.curMatch = new BlockBattle(this.canvas, player1.user, player2.user, player1, player2);
 					this.curMatch.enter();
 				}
 				else if (this.curMatch.name === GameStates.IN_GAME && player1 && player2)
