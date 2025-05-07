@@ -220,7 +220,7 @@ export class UserManager {
 			let text = 'CHALLENGE';
 			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
 			const buttonY = infoHeight - buttonOffset;
-			const challengeButton = new ChallengeButton(buttonX, buttonY, '#0426bd', '#023075', text, 'white', '25px', 'arial', user);
+			const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
 			return challengeButton;
 		}
 		else

@@ -54,7 +54,6 @@ export class MatchIntro implements IGameState
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		this.isStateReady = false;
-		this.gameType = type;
 
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
