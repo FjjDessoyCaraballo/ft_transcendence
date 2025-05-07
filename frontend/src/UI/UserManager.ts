@@ -6,7 +6,7 @@ import { GameStates } from "../game/GameStates";
 import { Button } from "./Button";
 import { RankingHandler } from "../game/RankingPoints";
 
-
+// interface already present in /frontend/src/services/Auth.ts
 export interface User {
     username: string;
 	password: string;
