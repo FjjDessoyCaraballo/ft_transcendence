@@ -20,6 +20,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
   const HandleLogin = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent form default submission
 
+	  console.log('Attempting login for:', username); // debug
     // Basic validation
     if (!username || !password) {
       setErrorMessage('Please enter both username and password');
@@ -29,14 +30,13 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     // Here you would typically make an API call to validate credentials
     // For now, using localStorage as a simple auth mechanism
     const userData = localStorage.getItem(username);
-    
+    console.log('User data from localStorage:', userData); // debug
     if (!userData) {
       setErrorMessage('Invalid username or password');
       return;
     }
     
     try {
-      // Parse the user data
       const user = JSON.parse(userData);
       
       if (user.password !== password) {
@@ -44,9 +44,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
         return;
       }
       
-      // Success - store login state and notify parent
       localStorage.setItem('logged-in', 'true');
-      // Also store the username of the logged-in user
       localStorage.setItem('LoggedIn', JSON.stringify(username));
       onAccept();
       
