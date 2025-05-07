@@ -1,7 +1,6 @@
 import { Platform } from "./Platform";
-import { COIN_RADIUS } from "./Constants";
+import { COIN_LIMIT, COIN_RADIUS } from "./Constants";
 import { Player } from "./Player";
-import { Player2 } from "./Player2";
 
 export interface Coin
 {
@@ -32,8 +31,6 @@ export class CoinHandler {
 
 	spawnCoin()
 	{
-
-		this.platformsFull = this.platforms.every(obj => obj.hasCoin);
 		if (this.platformsFull)
 		{
 			console.log("Platforms are full"); // REMOVE THIS LATER
@@ -66,6 +63,7 @@ export class CoinHandler {
 
 		this.coinArr.push(newCoin);
 
+		this.platformsFull = this.platforms.every(obj => obj.hasCoin);
 	}
 
 	renderCoins(ctx: CanvasRenderingContext2D)
@@ -101,6 +99,8 @@ export class CoinHandler {
 				player.coinCount++;
 				coin.isCollected = true;
 				coin.platform.hasCoin = false;
+				if (player.coinCount === COIN_LIMIT)
+					player.hasWon = true;
 			}
 		}
 

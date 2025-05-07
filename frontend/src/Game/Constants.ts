@@ -20,7 +20,8 @@ export const GRAVITY = 1200;
 
 // COINS
 export const COIN_RADIUS = 10;
-export const COIN_SPAWN_TIME = 5000; // in milliseconds
+export const COIN_SPAWN_TIME = 3000; // in milliseconds
+export const COIN_LIMIT = 5;
 
 // PLATFORM
 export const PLATFORM_SPEED = 150;

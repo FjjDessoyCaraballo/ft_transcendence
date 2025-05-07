@@ -22,6 +22,8 @@ export class Player {
 	cShapeSize : number;
 	cShapeOffset : number;
 	health: Health;
+	isDead: boolean;
+	hasWon: boolean;
 	coinCount: number;
 	userData: User | null;
 
@@ -44,7 +46,9 @@ export class Player {
 		this.cShapeOffset = 2;
 		this.cShape = new CollisionShape(this.x + this.cShapeOffset, this.y + this.cShapeOffset, this.cShapeSize, this.cShapeSize, collType.PLAYER, this);
 		this.health = new Health();
+		this.isDead = false;
 		this.coinCount = 0;
+		this.hasWon = false;
 		this.userData = user;
     }
 

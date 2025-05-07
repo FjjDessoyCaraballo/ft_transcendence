@@ -216,7 +216,7 @@ export class Tournament implements IGameState
 
 	drawScoreBoard(ctx: CanvasRenderingContext2D)
 	{
-		const colW = 200;
+		const colW = 300;
 		const colH = 80;
 		let x = this.canvas.width / 2 - colW * 1.5;
 		let y = 170;

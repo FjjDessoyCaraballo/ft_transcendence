@@ -100,6 +100,8 @@ export class InGame implements IGameState
 				break ;
 			}
 		}
+		if (this.player1.health.amount === 0)
+			this.player1.isDead = true;
 
 		// PLAYER 2
 		this.player2.checkKeyEvents(this.keys);
@@ -114,6 +116,8 @@ export class InGame implements IGameState
 				break ;
 			}
 		}
+		if (this.player2.health.amount === 0)
+			this.player2.isDead = true;
 
 		// PROJECTILES
 		for (const projectile of this.player1.projectiles) {
@@ -129,7 +133,6 @@ export class InGame implements IGameState
 		this.player2.projectiles = this.player2.projectiles.filter(projectile => projectile.isValid);
 
 		// COINS
-
 		if (this.coinHandler.platformsFull && this.coinHandler.intervalId)
 			this.coinHandler.stop();
 		else if (!this.coinHandler.platformsFull && !this.coinHandler.intervalId)
@@ -139,36 +142,41 @@ export class InGame implements IGameState
 		this.coinHandler.checkCoinCollision(this.player2);
 
 		// VICTORY CONDITION CHECK
-
-		if (this.player1.userData && this.player2.userData
-			&& (this.player1.health.amount === 0 || this.player2.health.amount === 0)
+		if ((this.player1.isDead || this.player2.isDead || this.player1.hasWon || this.player2.hasWon) 
 			&& !this.isStateReady)
 		{
 			// Tournament ending
 			if (this.tournamentData1 && this.tournamentData2)
 			{
-				if (this.player1.health.amount === 0)
+				if (this.player1.health.amount === 0 || this.player2.hasWon)
 				{
 					this.tournamentData2.tournamentPoints++;
+					this.tournamentData2.coinsCollected += this.player2.coinCount;
+					this.tournamentData1.coinsCollected += this.player1.coinCount;
 					this.tournamentData2.isWinner = true;
 				}
-				else if (this.player2.health.amount === 0)
+				else if (this.player2.health.amount === 0 || this.player1.hasWon)
 				{
 					this.tournamentData1.tournamentPoints++;
+					this.tournamentData1.coinsCollected += this.player1.coinCount;
+					this.tournamentData2.coinsCollected += this.player2.coinCount;
 					this.tournamentData1.isWinner = true;
 				}				
 				this.isStateReady = true;
 				return ;
 			}
 
-			// Regular ending
-			const p1 = UserManager.cloneUser(this.player1.userData);
-			const p2 = UserManager.cloneUser(this.player2.userData);
-
-			if (this.player1.health.amount === 0)
-				stateManager.changeState(new EndScreen(this.canvas, p2, p1, null, null));
-			else if (this.player2.health.amount === 0)
-				stateManager.changeState(new EndScreen(this.canvas, p1, p2, null, null));
+			if (this.player1.userData && this.player2.userData)
+			{
+				// Regular ending
+				const p1 = UserManager.cloneUser(this.player1.userData); // this might not be needed...
+				const p2 = UserManager.cloneUser(this.player2.userData); // this might not be needed...
+	
+				if (this.player1.health.amount === 0 || this.player2.hasWon)
+					stateManager.changeState(new EndScreen(this.canvas, p2, p1, null, null));
+				else if (this.player2.health.amount === 0 || this.player1.hasWon)
+					stateManager.changeState(new EndScreen(this.canvas, p1, p2, null, null));
+			}
 		}
 
 	}
