@@ -2,7 +2,7 @@ import { stateManager } from "../components/index"; // GLOBAL USE OF ctx and can
 import { canvas, ctx } from "../components/Canvas";
 import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
 import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "../Game/Constants";
-import { StartScreen } from "../Game/StartScreen";
+import { drawCenteredText, StartScreen } from "../Game/StartScreen";
 import { GameStates } from "../Game/GameStates";
 import { Button } from "./Button";
 import { RankingHandler } from "../Game/RankingPoints";
@@ -218,10 +218,10 @@ export class UserManager {
 		// Create challenge button
 		if (state === UserHubState.SINGLE_GAME)
 		{
-			let text = 'BLOCK BATTLE';
+			let text = 'CHALLENGE';
 			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
 			const buttonY = infoHeight - buttonOffset;
-			const challengeButton = new ChallengeButton(buttonX, buttonY, '#0426bd', '#023075', text, 'white', '25px', 'arial', user);
+			const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
 			return challengeButton;
 		}
 		else
@@ -267,14 +267,8 @@ export class UserManager {
 		}
 		else
 		{
-			ctx.fillStyle = 'white';
-			ctx.font = '22px arial';
-			const text = "Currently logged in user: ";
-			ctx.fillText(text, canvas.width / 2 - ctx.measureText(text).width / 2 , 20);
-	
-			ctx.fillStyle = 'red';
-			ctx.font = '28px arial';
-			ctx.fillText(curUser, canvas.width / 2 - ctx.measureText(curUser).width / 2, 50);
+			drawCenteredText('Currently logged in user: ', '22px arial', 'white', 30);
+			drawCenteredText(curUser, '28px arial', 'red', 60);
 		}
 	}
 }

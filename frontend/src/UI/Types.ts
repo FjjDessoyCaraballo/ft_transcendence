@@ -17,5 +17,6 @@ export enum UserHubState
 export enum GameType
 {
 	PONG,
+	PONG_AI,
 	BLOCK_BATTLE
 }

@@ -10,6 +10,7 @@ import { User, UserManager } from '../UI/UserManager';
 import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
+import { GameType } from '../UI/Types';
 
 
 export class BlockBattle implements IGameState
@@ -173,9 +174,9 @@ export class BlockBattle implements IGameState
 				const p2 = UserManager.cloneUser(this.player2.userData); // this might not be needed...
 	
 				if (this.player1.health.amount === 0 || this.player2.hasWon)
-					stateManager.changeState(new EndScreen(this.canvas, p2, p1, null, null));
+					stateManager.changeState(new EndScreen(this.canvas, p2, p1, null, null, GameType.BLOCK_BATTLE));
 				else if (this.player2.health.amount === 0 || this.player1.hasWon)
-					stateManager.changeState(new EndScreen(this.canvas, p1, p2, null, null));
+					stateManager.changeState(new EndScreen(this.canvas, p1, p2, null, null, GameType.BLOCK_BATTLE));
 			}
 		}
 

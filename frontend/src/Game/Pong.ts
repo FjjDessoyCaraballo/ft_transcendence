@@ -4,6 +4,7 @@ import { User, UserManager } from "../UI/UserManager";
 import { stateManager } from "../components";
 import { EndScreen } from "./EndScreen";
 import { TournamentPlayer } from "./Tournament";
+import { GameType } from "../UI/Types";
 
 // Game Constants
 const paddleWidth = 15, paddleHeight = 100;
@@ -46,7 +47,7 @@ class Ball {
   constructor() { // This is the same as reset...
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
-    this.speedX = 15; // FOR TESTING
+    this.speedX = 12; // FOR TESTING
     this.speedY = 3 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
   }
 
@@ -105,7 +106,7 @@ class Ball {
     this.speedY = 0;
   
     setTimeout(() => {
-      this.speedX = 7 * (Math.random() > 0.5 ? 1 : -1);
+      this.speedX = 12 * (Math.random() > 0.5 ? 1 : -1); // FOR TESTING
       this.speedY = 3 * (Math.random() > 0.5 ? 1 : -1);
     }, 1000); // 1000ms = 1 second delay
   }
@@ -122,7 +123,7 @@ class Player {
 
 export class Pong implements IGameState {
   name: GameStates
-  gameState: 'menu' | 'playing' | 'result';
+  gameState: 'menu' | 'playing' | 'result' | 'ai';
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
@@ -134,8 +135,9 @@ export class Pong implements IGameState {
   winner: Player | null = null;
   isStateReady: boolean;
 
-  constructor(user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'menu' | 'playing') {
+  constructor(user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
     this.name = GameStates.PONG;
+
     this.storedOpponentName = user2.username;
     this.player1 = new Player(user1, new Paddle(15));
     this.player2 = new Player(user2, new Paddle(canvasWidth - paddleWidth - 15));
@@ -144,22 +146,29 @@ export class Pong implements IGameState {
     this.ball = new Ball();
 	this.isStateReady = false;
 	this.gameState = state;
-	if (this.gameState == 'playing')
+
+	if (this.gameState === 'playing')
 	{
 		this.twoPlayerMode = true; // Two-player mode
         this.player2.user.username = this.storedOpponentName;
+	}
+	else if (this.gameState === 'ai')
+	{
+		this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
+        this.player2.user.username = "Computer";
+        this.gameState = 'playing';
 	}
     
     // Listen for key events
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
     document.addEventListener('keyup', this.handleKeyUp.bind(this));
 
-	// I removed the gameLoop call from here, because the stateManager takes care of that already - Panu
 
   }
 
 	handleKeyDown(e: KeyboardEvent) {
     if (this.gameState === 'menu') {
+		/*
       if (e.key === '1') {
         this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
         this.player2.user.username = "Computer";
@@ -171,6 +180,7 @@ export class Pong implements IGameState {
         this.gameState = 'playing';
         //this.resetGame();
       }
+		*/
     } else {
       if (e.key === 'Escape') {
         this.gameState = 'menu';
@@ -280,10 +290,20 @@ export class Pong implements IGameState {
 	const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
 	const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
 
-	if (this.winner === this.player1)
-		stateManager.changeState(new EndScreen(canvas, p1, p2, null, null));
-	else if (this.winner === this.player2)
-		stateManager.changeState(new EndScreen(canvas, p2, p1, null, null));
+	if (this.twoPlayerMode)
+	{
+		if (this.winner === this.player1)
+			stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG));
+		else if (this.winner === this.player2)
+			stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG));
+	}
+	else
+	{
+		if (this.winner === this.player1)
+			stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG_AI));
+		else if (this.winner === this.player2)
+			stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG_AI));
+	}
 
 
 	/*

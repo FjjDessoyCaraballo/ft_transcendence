@@ -9,6 +9,7 @@ import { MatchIntro } from "./MatchIntro";
 import { EndScreen } from "./EndScreen";
 import { GameType } from "../UI/Types";
 import { Pong } from "./Pong";
+import { drawCenteredText } from "./StartScreen";
 
 export interface TournamentPlayer
 {
@@ -89,7 +90,7 @@ export class Tournament implements IGameState
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = 20;
 		const button1Y = 20;
-		this.returnMenuButton = new ReturnMainMenuButton(button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
 
 		let text2 = 'NEXT GAME';
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
@@ -178,7 +179,7 @@ export class Tournament implements IGameState
 					const winner = player1.isWinner ? player1 : player2;
 					const loser = player1.isWinner ? player2 : player1;
 
-					this.curMatch = new EndScreen(this.canvas, winner.user, loser.user, winner, loser);
+					this.curMatch = new EndScreen(this.canvas, winner.user, loser.user, winner, loser, this.gameType);
 					this.curMatch.enter();
 					player1.isWinner = false;
 					player2.isWinner = false;
@@ -335,13 +336,8 @@ export class Tournament implements IGameState
 
 		if (!this.curMatch)
 		{
-			// Draw header
-			const headerText = "SCORE BOARD";
-			ctx.font = '50px Impact';
-			ctx.fillStyle = 'white';
-			const headerX = (this.canvas.width / 2) - (ctx.measureText(headerText).width / 2);
-			ctx.fillText(headerText, headerX, 100);
-			
+			// Draw Header & Score Board
+			drawCenteredText('SCORE BOARD', '50px Impact', 'white', 100);
 			this.drawScoreBoard(ctx);
 	
 			// Draw Return button
@@ -370,22 +366,15 @@ export class Tournament implements IGameState
 			}
 			else
 			{
-				const headerText = "TOURNAMENT WINNER(s):";
-				ctx.font = '50px Impact';
-				ctx.fillStyle = 'green';
-				const headerX = (this.canvas.width / 2) - (ctx.measureText(headerText).width / 2);
 				let y = (this.canvas.height / 2) - 20 - TEXT_PADDING + 270;
-				ctx.fillText(headerText, headerX, y);
+
+				drawCenteredText('TOURNAMENT WINNER(s):', '50px Impact', 'green', y);
 				y += 40
 
 				for (const player of this.tournamentWinner)
 				{
-					const playerText = player.user.username;
-					ctx.font = '30px arial';
-					ctx.fillStyle = 'white';
-					const playerX = (this.canvas.width / 2) - (ctx.measureText(playerText).width / 2);
-					ctx.fillText(playerText, playerX, y);
 
+					drawCenteredText(player.user.username, '30px arial', 'white', y);
 					y += 40;
 				}
 			}

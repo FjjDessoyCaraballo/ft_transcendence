@@ -3,60 +3,79 @@ import { Button } from "./Button";
 import { stateManager, curUser } from "../components/index"; // canvas again globally used... is it bad?
 import { canvas, ctx } from "../components/Canvas";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../Game/Constants";
-import { Instructions } from "../Game/Instructions";
 import { UserHUB } from "./UserHUB";
 import { UserManager, User } from "./UserManager";
-import { UserHubState } from "./Types";
-import { TournamenIntro } from "../Game/TournamentIntro";
+import { GameType, UserHubState } from "./Types";
+import { drawCenteredText, StartScreen } from "../Game/StartScreen";
+import { Pong } from "../Game/Pong";
+import { MatchIntro } from "../Game/MatchIntro";
 
 
 // BUTTONS
 
 export class SingleGameButton extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	private gameType: GameType;
+
+	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
 	{
 		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.gameType = gameType;
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new UserHUB(canvas, UserHubState.SINGLE_GAME, null)); // opponent will be chosen through UserHUB
+		stateManager.changeState(new UserHUB(canvas, UserHubState.SINGLE_GAME, this.gameType));
 	}
 }
 
 export class StartTournamentButton extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	private gameType: GameType;
+
+	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
 	{
 		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.gameType = gameType;
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new TournamenIntro());
+		stateManager.changeState(new UserHUB(canvas, UserHubState.TOURNAMENT, this.gameType));
 	}
 }
 
-export class InstructionsButton extends Button
+export class ChangeGameBtn extends Button
 {
+
 	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
 		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new Instructions(canvas));
+		stateManager.changeState(new StartScreen(canvas));
 	}
 }
 
-export class UserHubButton extends Button
+export class PongAiBtn extends Button
 {
+
 	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
 		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new UserHUB(canvas, UserHubState.INFO, null));
+
+		if (curUser)
+		{
+			const curUserData = localStorage.getItem(curUser);
+			if (curUserData)
+			{
+				const curUserObj = JSON.parse(curUserData);
+				stateManager.changeState(new MatchIntro(canvas, curUserObj, null, null, null, GameType.PONG_AI));
+			}
+		}
+
 	}
 }
 
@@ -68,18 +87,20 @@ export class MainMenu implements IGameState
 	name: GameStates;
 	singleGameButton: SingleGameButton;
 	startTournamentButton: StartTournamentButton;
-	userHubButton: UserHubButton;
-	instructionButton: InstructionsButton;
+	pongAiBtn: PongAiBtn;
+	changeGameBtn: ChangeGameBtn;
 	canvas: HTMLCanvasElement;
 	opponent: User | null;
+	gameType: GameType;
 	mouseMoveBound: (event: MouseEvent) => void;
 	mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement)
+	constructor(canvas: HTMLCanvasElement, gameType: GameType)
 	{		
 		this.name = GameStates.MAIN_MENU;
 		this.canvas = canvas;
 		this.opponent = null;
+		this.gameType = gameType;
 
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
 
@@ -88,7 +109,7 @@ export class MainMenu implements IGameState
 		const button1X = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
 		let text2 = 'START TOURNAMENT';
 		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
-		let text3 = 'USER HUB';
+		let text3 = 'PLAY PONG WITH AI';
 		const button3X = (canvas.width / 2) - (ctx.measureText(text3).width / 2) - TEXT_PADDING;
 
 		const buttonYCenter = (canvas.height / 2) - 20 - TEXT_PADDING; // 20 == 40px / 2
@@ -98,14 +119,14 @@ export class MainMenu implements IGameState
 
 		// Define instruction button
 		ctx.font = '30px arial' // GLOBAL USE OF CTX!!
-		let instructText = 'INSTRUCTIONS';
+		let instructText = 'CHANGE GAME';
 		const instructX = (canvas.width / 2) - (ctx.measureText(instructText).width / 2) - TEXT_PADDING;
 		const instructY = canvas.height - 100;
 
-		this.singleGameButton = new SingleGameButton(button1X, button1Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text1, 'white', '40px', 'arial');
-		this.startTournamentButton = new StartTournamentButton(button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '40px', 'arial');
-		this.userHubButton = new UserHubButton(button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '40px', 'arial');
-		this.instructionButton = new InstructionsButton(instructX, instructY, '#b0332a', '#780202', instructText, 'white', '30px', 'arial');
+		this.singleGameButton = new SingleGameButton(button1X, button1Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text1, 'white', '40px', 'arial', this.gameType);
+		this.startTournamentButton = new StartTournamentButton(button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '40px', 'arial', this.gameType);
+		this.pongAiBtn = new PongAiBtn(button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '40px', 'arial');
+		this.changeGameBtn = new ChangeGameBtn(instructX, instructY, '#b0332a', '#780202', instructText, 'white', '30px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
 		this.mouseClickBound = () => this.mouseClickCallback();
@@ -125,16 +146,20 @@ export class MainMenu implements IGameState
 
 		this.singleGameButton.checkMouse(x, y);
 		this.startTournamentButton.checkMouse(x, y);
-		this.userHubButton.checkMouse(x, y);
-		this.instructionButton.checkMouse(x, y);
+		this.changeGameBtn.checkMouse(x, y);
+
+		if (this.gameType === GameType.PONG)
+			this.pongAiBtn.checkMouse(x, y);
 	}
 
 	mouseClickCallback()
 	{
 		this.singleGameButton.checkClick();
 		this.startTournamentButton.checkClick();
-		this.userHubButton.checkClick();
-		this.instructionButton.checkClick();
+		this.changeGameBtn.checkClick();
+
+		if (this.gameType === GameType.PONG)
+			this.pongAiBtn.checkClick();
 	}
 
 	enter()
@@ -157,10 +182,21 @@ export class MainMenu implements IGameState
 	render(ctx: CanvasRenderingContext2D)
 	{
 		UserManager.drawCurUser();
+
+		drawCenteredText('You are playing:', '40px arial', 'white', 200);
+
+		if (this.gameType === GameType.BLOCK_BATTLE)
+			drawCenteredText('Block Battle', '40px impact', 'green', 250);
+		else
+			drawCenteredText('Pong', '40px impact', 'green', 250);
+
+
 		this.singleGameButton.draw(ctx);
 		this.startTournamentButton.draw(ctx);
-		this.userHubButton.draw(ctx);
-		this.instructionButton.draw(ctx);
-	}
+		this.changeGameBtn.draw(ctx);
 
+		if (this.gameType === GameType.PONG)
+			this.pongAiBtn.draw(ctx);
+	}
+	
 }

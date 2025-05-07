@@ -6,17 +6,24 @@ import { MainMenu } from "../UI/MainMenu";
 import { TEXT_PADDING } from "./Constants";
 import { UserManager, User } from "../UI/UserManager";
 import { TournamentPlayer } from "./Tournament";
+import { GameType } from "../UI/Types";
+import { drawCenteredText } from "./StartScreen";
 
 export class ReturnMainMenuButton extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	private gameType: GameType;
+
+	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
 	{
 		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.gameType = gameType;
 	}
 
 	clickAction(): void {
 		
-		stateManager.changeState(new MainMenu(canvas));
+		if (this.gameType === GameType.PONG_AI)
+			this.gameType = GameType.PONG;
+		stateManager.changeState(new MainMenu(canvas, this.gameType));
 
 	}
 }
@@ -45,10 +52,11 @@ export class EndScreen implements IGameState
 	returnMenuButton: ReturnMainMenuButton;
 	returnToTournamentBtn: ReturnToTournamentBtn;
 	isStateReady: boolean;
+	gameType: GameType;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
+	constructor(canvas: HTMLCanvasElement, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
 	{
 		this.name = GameStates.END_SCREEN;
 
@@ -58,6 +66,7 @@ export class EndScreen implements IGameState
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		this.isStateReady = false;
+		this.gameType = gameType;
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
@@ -68,13 +77,13 @@ export class EndScreen implements IGameState
 		const buttonX2 = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
 		const buttonY2 = (canvas.height / 2) + 200 - TEXT_PADDING;
 
-		this.returnMenuButton = new ReturnMainMenuButton(buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
 		this.returnToTournamentBtn = new ReturnToTournamentBtn(buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
 
-		if (!this.tournamentData1)
+		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
 			UserManager.updateUserStats(winner, loser);
 	}
 
@@ -125,22 +134,23 @@ export class EndScreen implements IGameState
 	render(ctx: CanvasRenderingContext2D)
 	{
 		const text = this.winner.username + ' wins the game!';
-		ctx.font = '40px arial';
-		ctx.fillStyle = '#1cc706';
-		const textX = (this.canvas.width / 2) - (ctx.measureText(text).width / 2);
-		ctx.fillText(text, textX, 200);
+		drawCenteredText(text, '40px arial', '#1cc706', 200);
 
-		if (!this.tournamentData1)
+		if (this.gameType === GameType.PONG_AI)
+		{
+			if (this.winner.username === 'Computer')
+				drawCenteredText('Computers will rule the world... yikes!!', '30px arial', 'white', 300);
+			else
+				drawCenteredText('Great job, humans ROCK!!', '30px arial', 'white', 300);
+
+		}
+		else if (!this.tournamentData1)
 		{
 			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.rankingPoint.toFixed(2)}.`;
-			ctx.font = '30px arial';
-			ctx.fillStyle = 'white';
-			const ranking1X = (this.canvas.width / 2) - (ctx.measureText(winnerRankText).width / 2);
-			ctx.fillText(winnerRankText, ranking1X, 300);
-	
+			drawCenteredText(winnerRankText, '30px arial', 'white', 300);
+			
 			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.rankingPoint.toFixed(2)}.`;
-			const ranking2X = (this.canvas.width / 2) - (ctx.measureText(loserRankText).width / 2);
-			ctx.fillText(loserRankText, ranking2X, 340);
+			drawCenteredText(loserRankText, '30px arial', 'white', 340);
 		}
 
 		if (!this.tournamentData1)

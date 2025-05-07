@@ -34,8 +34,6 @@ export class BBTournamentBtn extends Button
 }
 
 
-
-
 export class TournamenIntro implements IGameState
 {
 	name: GameStates;
@@ -64,7 +62,7 @@ export class TournamenIntro implements IGameState
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const buttonX = (canvas.width / 2) - (ctx.measureText(text).width / 2) - TEXT_PADDING;
 		const buttonY = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
-		this.returnMenuButton = new ReturnMainMenuButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', GameType.PONG); // IF YOU USE THIS CLASS, CHECK THIS LAST PARAMETER
 
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);

@@ -29,9 +29,6 @@ export class RankingHandler {
 		const winnerExpected = this.expectedScore(winner.rankingPoint, loser.rankingPoint);
         const loserExpected = 1 - winnerExpected;
 
-//		console.log('EXPECT: ', winnerExpected, loserExpected);
-//		console.log('RANK DIFF: ', this.K * (1 - winnerExpected), this.K * (0 - loserExpected));
-
         winner.rankingPoint = winner.rankingPoint + this.K * (1 - winnerExpected);
         loser.rankingPoint = loser.rankingPoint + this.K * (0 - loserExpected);
 
