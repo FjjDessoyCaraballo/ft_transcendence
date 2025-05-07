@@ -1,13 +1,12 @@
 import { GameStateManager, GameStates, IGameState } from "../Game/GameStates";
 import { ReturnMainMenuButton } from "../Game/EndScreen";
 import { curUser, stateManager } from "../components/index";
-import { ctx } from "../components/Canvas";
+import { ctx, canvas } from "../components/Canvas";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../Game/Constants";
 import { ChallengeButton, TournamentButton, PongButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
-import { UserHubState } from "./Types";
+import { GameType, UserHubState } from "./Types";
 import { MatchIntro } from "../Game/MatchIntro";
-import { Pong } from "../Game/Pong"
 import { Tournament } from "../Game/Tournament";
 
 export class NextPageButton extends Button
@@ -50,6 +49,7 @@ export class UserHUB implements IGameState
 	opponent: User | null;
 	interactionType: "challenge" | "pong" | null;
 	tournamentArr: User [];
+	tournamentGameType: GameType | null;
 	userArr: User [];
 	state: UserHubState;
 	mouseMoveBound: (event: MouseEvent) => void;
@@ -57,7 +57,7 @@ export class UserHUB implements IGameState
 	submitPasswordBound: () => void;
 	cancelPasswordBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, state: UserHubState)
+	constructor(canvas: HTMLCanvasElement, state: UserHubState, tournamentGameType: GameType | null)
 	{
 		this.name = GameStates.USER_HUB;
 		this.canvas = canvas;
@@ -70,7 +70,22 @@ export class UserHUB implements IGameState
 		this.interactionType = null;
 		this.state = state;
 		this.tournamentArr = [];
+		this.tournamentGameType = tournamentGameType;
 		this.userArr = UserManager.getAllUserData();
+
+		if (curUser)
+		{
+			const curUserData = localStorage.getItem(curUser);
+			if (curUserData)
+			{
+				const curUserObj = JSON.parse(curUserData);
+				this.tournamentArr.push(curUserObj);
+			}
+
+		}
+
+
+
 
 		// Sort userArr based on rankingPoint difference
 		if (curUser)
@@ -235,19 +250,17 @@ export class UserHUB implements IGameState
 				if (this.state === UserHubState.SINGLE_GAME)
 				{
 					if (this.interactionType === "challenge")
-						stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent, null, null));
+						stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent, null, null, GameType.BLOCK_BATTLE));
 					if (this.interactionType === "pong")
-						stateManager.changeState(new Pong(curUserObj, this.opponent, 'playing'));
+						stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent, null, null, GameType.PONG));
 				}
 				else
 				{
-					if (this.tournamentArr.length === 0)
-						this.tournamentArr.push(curUserObj);
-
 					this.tournamentArr.push(this.opponent);
 
-					if (this.tournamentArr.length === 4)
-						stateManager.changeState(new Tournament(this.canvas, this.tournamentArr));
+					if (this.tournamentArr.length === 4 && this.tournamentGameType !== null)
+						stateManager.changeState(new Tournament(this.canvas, this.tournamentArr, this.tournamentGameType));
+
 				}
 			}
 			else
@@ -303,6 +316,16 @@ export class UserHUB implements IGameState
 		}
 
 		UserManager.drawCurUser();
+
+		if (this.state === UserHubState.TOURNAMENT)
+		{
+			const playerCountText = `${this.tournamentArr.length}/4 players chosen`;
+			ctx.font = '40px impact';
+			ctx.fillStyle = 'white';
+			const playerTextX = (canvas.width / 2) - (ctx.measureText(playerCountText).width / 2);
+			const playerTextY = 120;
+			ctx.fillText(playerCountText, playerTextX, playerTextY);
+		}
 
 		let x = 130; // check this proprely later
 		let y = 150;

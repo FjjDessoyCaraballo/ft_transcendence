@@ -7,6 +7,8 @@ import { BlockBattle } from "./BlockBattle";
 import { Button } from "../UI/Button";
 import { MatchIntro } from "./MatchIntro";
 import { EndScreen } from "./EndScreen";
+import { GameType } from "../UI/Types";
+import { Pong } from "./Pong";
 
 export interface TournamentPlayer
 {
@@ -15,6 +17,7 @@ export interface TournamentPlayer
 	tournamentPoints: number;
 	place: number;
 	coinsCollected: number;
+	pongPointsScored: number;
 	isWinner: boolean;
 }
 
@@ -45,16 +48,17 @@ export class Tournament implements IGameState
 	name: GameStates;
 	canvas: HTMLCanvasElement;
 	playerArr: TournamentPlayer [];
-	curMatch: MatchIntro | BlockBattle | EndScreen | null;
+	curMatch: MatchIntro | BlockBattle | Pong | EndScreen | null;
 	matchCounter: number;
 	isFinished: boolean;
 	tournamentWinner: TournamentPlayer [];
 	returnMenuButton: ReturnMainMenuButton;
 	nextGameBtn: NextGameBtn;
+	gameType: GameType;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, players: User[])
+	constructor(canvas: HTMLCanvasElement, players: User[], type: GameType)
 	{
 		this.name = GameStates.TOURNAMENT;
 		this.canvas = canvas;
@@ -63,6 +67,7 @@ export class Tournament implements IGameState
 		this.matchCounter = 0;
 		this.isFinished = false;
 		this.tournamentWinner = [];
+		this.gameType = type;
 
 		// Create TournamentPlayer array
 		for (let i = 0; i < 4; i++)
@@ -73,6 +78,7 @@ export class Tournament implements IGameState
 				place: 0,
 				tournamentPoints: 0,
 				coinsCollected: 0,
+				pongPointsScored: 0,
 				isWinner: false
 			};
 
@@ -126,7 +132,7 @@ export class Tournament implements IGameState
 
 			if (player1 && player2)
 			{
-				this.curMatch = new MatchIntro(this.canvas, player1.user, player2.user, player1, player2);
+				this.curMatch = new MatchIntro(this.canvas, player1.user, player2.user, player1, player2, this.gameType);
 				this.curMatch.enter();
 			}
 		}
@@ -159,10 +165,15 @@ export class Tournament implements IGameState
 				
 				if (this.curMatch.name === GameStates.MATCH_INTRO && player1 && player2)
 				{	
-					this.curMatch = new BlockBattle(this.canvas, player1.user, player2.user, player1, player2);
+					if (this.gameType === GameType.BLOCK_BATTLE)
+						this.curMatch = new BlockBattle(this.canvas, player1.user, player2.user, player1, player2);
+					else if (this.gameType === GameType.PONG)
+						this.curMatch = new Pong(player1.user, player2.user, player1, player2, 'playing');
+
 					this.curMatch.enter();
 				}
-				else if (this.curMatch.name === GameStates.IN_GAME && player1 && player2)
+				else if ((this.curMatch.name === GameStates.BLOCK_BATTLE || this.curMatch.name === GameStates.PONG) 
+				&& player1 && player2)
 				{
 					const winner = player1.isWinner ? player1 : player2;
 					const loser = player1.isWinner ? player2 : player1;
@@ -172,11 +183,24 @@ export class Tournament implements IGameState
 					player1.isWinner = false;
 					player2.isWinner = false;
 
-					this.playerArr.sort((a, b) => {
-						if (b.tournamentPoints !== a.tournamentPoints)
-							return b.tournamentPoints - a.tournamentPoints;
-						return b.coinsCollected - a.coinsCollected;
-					})
+					// Sort players based on points
+					if (this.gameType === GameType.BLOCK_BATTLE)
+					{
+						this.playerArr.sort((a, b) => {
+							if (b.tournamentPoints !== a.tournamentPoints)
+								return b.tournamentPoints - a.tournamentPoints;
+							return b.coinsCollected - a.coinsCollected;
+						})
+					}
+					else if (this.gameType === GameType.PONG)
+					{
+						this.playerArr.sort((a, b) => {
+							if (b.tournamentPoints !== a.tournamentPoints)
+								return b.tournamentPoints - a.tournamentPoints;
+							return b.pongPointsScored - a.pongPointsScored;
+						})
+					}
+
 				}
 				else
 				{
@@ -194,21 +218,35 @@ export class Tournament implements IGameState
 
 	findWinner(): void
 	{
-		this.playerArr.sort((a, b) => {
-			if (b.tournamentPoints !== a.tournamentPoints)
-				return b.tournamentPoints - a.tournamentPoints;
-			return b.coinsCollected - a.coinsCollected;
-		})
+		// Sort players based on points
+		if (this.gameType === GameType.BLOCK_BATTLE)
+		{
+			this.playerArr.sort((a, b) => {
+				if (b.tournamentPoints !== a.tournamentPoints)
+					return b.tournamentPoints - a.tournamentPoints;
+				return b.coinsCollected - a.coinsCollected;
+			})
+		}
+		else if (this.gameType === GameType.PONG)
+		{
+			this.playerArr.sort((a, b) => {
+				if (b.tournamentPoints !== a.tournamentPoints)
+					return b.tournamentPoints - a.tournamentPoints;
+				return b.pongPointsScored - a.pongPointsScored;
+			})
+		}
 
 		this.tournamentWinner.push(this.playerArr[0]);
 
 		if (this.playerArr[0].tournamentPoints === this.playerArr[1].tournamentPoints
-			&& this.playerArr[0].coinsCollected === this.playerArr[1].coinsCollected)
+			&& this.playerArr[0].coinsCollected === this.playerArr[1].coinsCollected
+			&& this.playerArr[0].pongPointsScored === this.playerArr[1].pongPointsScored)
 		{
 			for (let i = 1; i < 4; i++)
 			{
 				if (this.playerArr[i].tournamentPoints === this.playerArr[0].tournamentPoints
-					&& this.playerArr[i].coinsCollected === this.playerArr[0].coinsCollected)
+					&& this.playerArr[i].coinsCollected === this.playerArr[0].coinsCollected
+					&& this.playerArr[i].pongPointsScored === this.playerArr[0].pongPointsScored)
 					this.tournamentWinner.push(this.playerArr[i]);
 			}
 		}
@@ -247,7 +285,11 @@ export class Tournament implements IGameState
 		ctx.fillText(pointsText, pointsX, y + padding + 5);
 
 		ctx.strokeRect(x + colW * 2, y, colW, colH);
-		const coinText = 'COINS';
+		let coinText = '';
+		if (this.gameType === GameType.BLOCK_BATTLE)
+			coinText = 'COINS';
+		else if (this.gameType === GameType.PONG)
+			coinText = 'PONG SCORE';
 		const coinX = x + (colW * 2) + (colW / 2) - (ctx.measureText(coinText).width / 2);
 		ctx.fillText(coinText, coinX, y + padding + 5);
 
@@ -276,7 +318,11 @@ export class Tournament implements IGameState
 			ctx.fillText(scoreText, scoreX, y + padding);
 
 			ctx.strokeRect(x + colW * 2, y, colW, colH);
-			const coinText = player.coinsCollected.toString();
+			let coinText = '';
+			if (this.gameType === GameType.BLOCK_BATTLE)
+				coinText = player.coinsCollected.toString();
+			else if (this.gameType === GameType.PONG)
+				coinText = player.pongPointsScored.toString();
 			const coinX = x + colW * 2 + (colW / 2) - (ctx.measureText(coinText).width / 2);
 			ctx.fillText(coinText, coinX, y + padding);
 

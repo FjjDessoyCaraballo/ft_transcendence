@@ -3,6 +3,7 @@ import { canvas, ctx } from "../components/Canvas";
 import { User, UserManager } from "../UI/UserManager";
 import { stateManager } from "../components";
 import { EndScreen } from "./EndScreen";
+import { TournamentPlayer } from "./Tournament";
 
 // Game Constants
 const paddleWidth = 15, paddleHeight = 100;
@@ -45,7 +46,7 @@ class Ball {
   constructor() { // This is the same as reset...
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
-    this.speedX = 7;
+    this.speedX = 15; // FOR TESTING
     this.speedY = 3 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative
   }
 
@@ -125,17 +126,23 @@ export class Pong implements IGameState {
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
+  tournamentData1: TournamentPlayer | null;
+  tournamentData2: TournamentPlayer | null;
   private storedOpponentName: string;
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null;
+  isStateReady: boolean;
 
-  constructor(user1: User, user2: User, state: 'menu' | 'playing') {
+  constructor(user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'menu' | 'playing') {
     this.name = GameStates.PONG;
     this.storedOpponentName = user2.username;
     this.player1 = new Player(user1, new Paddle(15));
     this.player2 = new Player(user2, new Paddle(canvasWidth - paddleWidth - 15));
+	this.tournamentData1 = tData1;
+	this.tournamentData2 = tData2;
     this.ball = new Ball();
+	this.isStateReady = false;
 	this.gameState = state;
 	if (this.gameState == 'playing')
 	{
@@ -246,6 +253,28 @@ export class Pong implements IGameState {
   }
 
   drawResult() {
+
+	// Tournament ending
+	if (this.tournamentData1 && this.tournamentData2)
+		{
+			if (this.winner === this.player1)
+			{
+				this.tournamentData1.tournamentPoints++;
+				this.tournamentData1.pongPointsScored += this.player1.score;
+				this.tournamentData2.pongPointsScored += this.player2.score;
+				this.tournamentData1.isWinner = true;
+			}	
+			else if (this.winner === this.player2)
+			{
+				this.tournamentData2.tournamentPoints++;
+				this.tournamentData1.pongPointsScored += this.player1.score;
+				this.tournamentData2.pongPointsScored += this.player2.score;
+				this.tournamentData2.isWinner = true;
+			}
+						
+			this.isStateReady = true;
+			return ;
+		}
 
 	// Regular ending
 	const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...

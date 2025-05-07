@@ -29,7 +29,7 @@ export class BlockBattle implements IGameState
 
 	constructor(canvas: HTMLCanvasElement, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
 	{
-		this.name = GameStates.IN_GAME;
+		this.name = GameStates.BLOCK_BATTLE;
 		this.isStateReady = false;
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;

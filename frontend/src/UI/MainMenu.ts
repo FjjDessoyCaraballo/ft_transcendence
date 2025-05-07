@@ -7,6 +7,7 @@ import { Instructions } from "../Game/Instructions";
 import { UserHUB } from "./UserHUB";
 import { UserManager, User } from "./UserManager";
 import { UserHubState } from "./Types";
+import { TournamenIntro } from "../Game/TournamentIntro";
 
 
 // BUTTONS
@@ -19,7 +20,7 @@ export class SingleGameButton extends Button
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new UserHUB(canvas, UserHubState.SINGLE_GAME)); // opponent will be chosen through UserHUB
+		stateManager.changeState(new UserHUB(canvas, UserHubState.SINGLE_GAME, null)); // opponent will be chosen through UserHUB
 	}
 }
 
@@ -31,7 +32,7 @@ export class StartTournamentButton extends Button
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new UserHUB(canvas, UserHubState.TOURNAMENT)); // opponents will be chosen through UserHUB
+		stateManager.changeState(new TournamenIntro());
 	}
 }
 
@@ -55,7 +56,7 @@ export class UserHubButton extends Button
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new UserHUB(canvas, UserHubState.INFO));
+		stateManager.changeState(new UserHUB(canvas, UserHubState.INFO, null));
 	}
 }
 

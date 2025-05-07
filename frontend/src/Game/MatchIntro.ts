@@ -3,6 +3,8 @@ import { stateManager } from "../components/index";
 import { User } from "../UI/UserManager";
 import { BlockBattle } from "./BlockBattle";
 import { TournamentPlayer } from "./Tournament";
+import { GameType } from "../UI/Types";
+import { Pong } from "./Pong";
 
 
 export class MatchIntro implements IGameState
@@ -17,10 +19,11 @@ export class MatchIntro implements IGameState
 	p2IsReady: boolean;
 	keys: { [key: string]: boolean };
 	canvas: HTMLCanvasElement;
+	gameType: GameType;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, player1: User, player2: User , tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
+	constructor(canvas: HTMLCanvasElement, player1: User, player2: User , tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, type: GameType)
 	{
 		this.name = GameStates.MATCH_INTRO;
 
@@ -33,6 +36,7 @@ export class MatchIntro implements IGameState
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		this.isStateReady = false;
+		this.gameType = type;
 
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
@@ -63,16 +67,26 @@ export class MatchIntro implements IGameState
 
 	update(deltaTime: number)
 	{
-		if (this.keys[' '])
+		if (this.keys[' '] && this.gameType === GameType.BLOCK_BATTLE)
+			this.p1IsReady = true;
+		else if (this.keys['q'] && this.gameType === GameType.PONG)
 			this.p1IsReady = true;
 
-		if (this.keys['u'])
+		if (this.keys['u'] && this.gameType === GameType.BLOCK_BATTLE)
+			this.p2IsReady = true;
+		else if (this.keys['o'] && this.gameType === GameType.PONG)
 			this.p2IsReady = true;
 
 		if (this.p1IsReady && this.p2IsReady)
 		{
 			if (!this.tournamentData1)
-				stateManager.changeState(new BlockBattle(this.canvas, this.player1, this.player2, null, null));
+			{
+				if (this.gameType === GameType.BLOCK_BATTLE)
+					stateManager.changeState(new BlockBattle(this.canvas, this.player1, this.player2, null, null));
+				else if (this.gameType === GameType.PONG)
+					stateManager.changeState(new Pong(this.player1, this.player2, null, null, 'playing'));
+
+			}
 			else
 				this.isStateReady = true;
 		}

@@ -13,3 +13,9 @@ export enum UserHubState
 	SINGLE_GAME,
 	TOURNAMENT
 }
+
+export enum GameType
+{
+	PONG,
+	BLOCK_BATTLE
+}
