@@ -17,6 +17,8 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	const HandleLogout = () => {
 		// reserved for API call
 		localStorage.setItem('logged-in', 'false');
+		window.dispatchEvent(new Event('loginStatusChanged'));
+		onClick();
 	}
 
 	const DeleteAccount = () => {
