@@ -1,33 +1,37 @@
 import { apiRequest } from './Api';
 import { User } from "../UI/UserManager"
 
-// Login and get token
-export const login = async (email: string, password: string) => {
-  const data = await apiRequest('/users/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password })
-  });
-  
-  // Store token and user data
-  localStorage.setItem('token', data.token);
-  localStorage.setItem('user', JSON.stringify(data.user));
-  
-  return data;
-};
+interface LoginData {
+  username: string;
+  password: string;
+}
 
-// Get current user from local storage
-export const getCurrentUser = (): User | null => {
-  const userString = localStorage.getItem('user');
-  return userString ? JSON.parse(userString) : null;
-};
+interface LoginResponse {
+  user: User;
+  token: string;
+  message?: string;
+}
 
-// Check if user is authenticated
-export const isAuthenticated = (): boolean => {
-  return localStorage.getItem('token') !== null;
-};
 
-// Logout - clear local storage
-export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+export const login = async (username: string, password: string): Promise<LoginResponse> => {
+  try {
+    const data = await apiRequest('/users/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
+
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('logged-in', 'true');
+    localStorage.setItem('LoggedIn', JSON.stringify(username));
+
+    window.dispatchEvent(new Event('loginStatusChanged'));
+
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Login failed. Please try again.');
+  }
 };
