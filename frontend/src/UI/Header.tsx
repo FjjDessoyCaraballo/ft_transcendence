@@ -59,27 +59,29 @@ export const Header: React.FC<HeaderProps> = () => {
           <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
             Transcendence
           </h1>
-          <div className="space-x-8 place-items-right flex">
+          <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
+              
               <button
-                className="px-4 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors"
-                onClick={HandleSettingsClick}>
-                Settings
+              className="buttonsStyle"
+              onClick={HandleSettingsClick}>
+              Settings
+            </button>
+          ) : (
+            <>
+              <button 
+                className="buttonsStyle"
+                onClick={HandleLoginClick}>
+                Login
               </button>
-            ) : (
-              <>
-                <button 
-                  className="px-4 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors"
-                  onClick={HandleLoginClick}>
-                  Login
-                </button>
-                <button 
-                  className="px-1 py-2 bg-[#4B0082] text-[#C8A2C8] font-mono rounded hover:bg-[#800080] transition-colors"
-                  onClick={HandleRegistrationClick}>
-                  Registration
-                </button>
-              </>
-            )}
+              <button 
+              /* I had to override the container px because string was too large */
+                className="buttonsStyle px-1"
+                onClick={HandleRegistrationClick}>
+                Registration
+              </button>
+            </>
+          )}
           </div>
         </div>
       </header>
