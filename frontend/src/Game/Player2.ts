@@ -1,5 +1,5 @@
 import { Player } from "./Player";
-import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER, HEALTH_WIDTH, HEALT_HEIGHT } from "./Constants";
+import { PLAYER_SPEED, PLAYER_SIZE, GRAVITY, JUMP_POWER, HEALTH_WIDTH, HEALT_HEIGHT, BB_RIGHT_2, BB_LEFT_2, BB_UP_2, BB_SHOOT_2 } from "./Constants";
 import { PlatformDir } from "./Platform";
 import { User } from "../UI/UserManager";
 import { canvas } from "../components/Canvas";
@@ -13,7 +13,7 @@ export class Player2 extends Player {
 
 	move(keys: { [key: string]: boolean }, deltaTime: number) {
 	
-			if (this.onPlatform && !keys['j'] && !keys['l'])
+			if (this.onPlatform && !keys[BB_LEFT_2] && !keys[BB_RIGHT_2])
 			{
 				this.x += this.onPlatform.velocity.x * deltaTime;
 				this.y += this.onPlatform.velocity.y * deltaTime;
@@ -48,20 +48,20 @@ export class Player2 extends Player {
     checkKeyEvents(keys: { [key: string]: boolean }) {
         this.velocity.x = 0;
 
-        if (keys['i'] && this.isOnGround) { 
+        if (keys[BB_UP_2] && this.isOnGround) { 
             this.velocity.y = JUMP_POWER;
             this.isOnGround = false;
             this.onPlatform = undefined;
         }
-        if (keys['j']) { 
+        if (keys[BB_LEFT_2]) { 
             this.velocity.x = -PLAYER_SPEED;
             this.direction = 'left';
         }
-        if (keys['l']) { 
+        if (keys[BB_RIGHT_2]) { 
             this.velocity.x = PLAYER_SPEED;
             this.direction = 'right';
         }
-        if (keys['u'] && this.canFire()) { 
+        if (keys[BB_SHOOT_2] && this.canFire()) { 
             this.fireProjectile();
         }
 
@@ -78,13 +78,6 @@ export class Player2 extends Player {
         for (const projectile of this.projectiles) {
             projectile.draw(ctx);
         }
-
-		// Should coin count be like this on the front layer...?
-
-		ctx.font = '30px arial';
-		ctx.fillStyle = this.color;
-		const coinText = `${this.coinCount}`;
-		ctx.fillText(coinText, canvas.width - ctx.measureText(coinText).width - 40, 40);
 
 //		this.cShape.draw(ctx); // --> For debug
     }

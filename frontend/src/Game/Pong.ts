@@ -5,6 +5,7 @@ import { stateManager } from "../components";
 import { EndScreen } from "./EndScreen";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
+import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "./Constants";
 
 // Game Constants
 const paddleWidth = 15, paddleHeight = 100;
@@ -182,6 +183,9 @@ export class Pong implements IGameState {
       }
 		*/
     } else {
+
+		// We should probably disable this...?
+
       if (e.key === 'Escape') {
         this.gameState = 'menu';
         this.resetGame();
@@ -197,13 +201,13 @@ export class Pong implements IGameState {
 
   updatePlayerPositions() {
     // Player 1 movement (W and S keys)
-    if (this.keysPressed['q']) this.player1.paddle.moveUp();
-    if (this.keysPressed['s']) this.player1.paddle.moveDown();
+    if (this.keysPressed[PONG_UP_1]) this.player1.paddle.moveUp();
+    if (this.keysPressed[PONG_DOWN_1]) this.player1.paddle.moveDown();
 
     if (this.twoPlayerMode) {
       // Player 2 movement (ArrowUp and ArrowDown keys)
-      if (this.keysPressed['o']) this.player2.paddle.moveUp();
-      if (this.keysPressed['k']) this.player2.paddle.moveDown();
+      if (this.keysPressed[PONG_UP_2]) this.player2.paddle.moveUp();
+      if (this.keysPressed[PONG_DOWN_2]) this.player2.paddle.moveDown();
     } else {
       // AI movement for Player 2
       const lerpSpeed = 0.1; // Smooth movement
@@ -341,9 +345,9 @@ export class Pong implements IGameState {
     ctx.fillText(text2, (canvasWidth * 0.5) - (text2Width / 2), canvasHeight / 2 + 50);
 
     ctx.font = "20px 'Courier New', monospace";
-    const text3 = "Player 1:  up = 'q'  down = 's'";
+    const text3 = `Player 1:  up = '${PONG_UP_1}'  down = '${PONG_DOWN_1}'`;
     const text3Width = ctx.measureText(text3).width;
-    const text4 = "Player 2:  up = 'o'  down = 'k'";
+    const text4 = `Player 2:  up = '${PONG_UP_2}'  down = '${PONG_DOWN_2}'`;
     const text4Width = ctx.measureText(text4).width;
     ctx.fillText(text3, (canvasWidth * 0.5) - (text3Width / 2), canvasHeight / 2 + 150);
     ctx.fillText(text4, (canvasWidth * 0.5) - (text4Width / 2), canvasHeight / 2 + 200);

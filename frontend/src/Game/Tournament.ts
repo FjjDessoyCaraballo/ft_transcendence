@@ -95,7 +95,7 @@ export class Tournament implements IGameState
 		let text2 = 'NEXT GAME';
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
 		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
-		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 270;
+		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 240;
 		this.nextGameBtn = new NextGameBtn(button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
@@ -166,6 +166,7 @@ export class Tournament implements IGameState
 				
 				if (this.curMatch.name === GameStates.MATCH_INTRO && player1 && player2)
 				{	
+
 					if (this.gameType === GameType.BLOCK_BATTLE)
 						this.curMatch = new BlockBattle(this.canvas, player1.user, player2.user, player1, player2);
 					else if (this.gameType === GameType.PONG)
@@ -176,10 +177,12 @@ export class Tournament implements IGameState
 				else if ((this.curMatch.name === GameStates.BLOCK_BATTLE || this.curMatch.name === GameStates.PONG) 
 				&& player1 && player2)
 				{
+
 					const winner = player1.isWinner ? player1 : player2;
 					const loser = player1.isWinner ? player2 : player1;
 
 					this.curMatch = new EndScreen(this.canvas, winner.user, loser.user, winner, loser, this.gameType);
+					
 					this.curMatch.enter();
 					player1.isWinner = false;
 					player2.isWinner = false;
@@ -344,7 +347,7 @@ export class Tournament implements IGameState
 			this.returnMenuButton.draw(ctx);
 			let exitWarning;
 			if (!this.isFinished)
-				exitWarning = `(Exit now == lose tournament progress)`;
+				exitWarning = `(and lose all tournament progress)`;
 			else
 				exitWarning = '(You can now safely exit the tournament)';
 			ctx.font = '20px arial';
@@ -357,12 +360,21 @@ export class Tournament implements IGameState
 			if (!this.isFinished)
 			{
 				this.nextGameBtn.draw(ctx);
+
 				const nextGameNum = `Game no. ${(this.matchCounter + 1).toString()}/6`;
-				ctx.font = '25px arial';
-				ctx.fillStyle = 'white';
-				const gameNumX = this.nextGameBtn.x;
-				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 20;
-				ctx.fillText(nextGameNum, gameNumX, gameNumY);
+				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 50;
+				drawCenteredText(nextGameNum, '30px arial', 'white', gameNumY);
+
+				const id1 = GameOrder[this.matchCounter][0];
+				const id2 = GameOrder[this.matchCounter][1];
+				const player1 = this.playerArr.find(player => player.id === id1);
+				const player2 = this.playerArr.find(player => player.id === id2);
+				let playerInfo = '';
+				if (player1 && player2)
+					playerInfo = `(${player1.user.username} vs ${player2.user.username})`;
+				const playerInfoY = gameNumY + 26;
+				drawCenteredText(playerInfo, '25px arial', 'red', playerInfoY);
+
 			}
 			else
 			{

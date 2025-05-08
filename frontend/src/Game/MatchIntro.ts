@@ -6,6 +6,7 @@ import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { Pong } from "./Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
+import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2 } from "./Constants";
 
 
 export class MatchIntro implements IGameState
@@ -84,14 +85,14 @@ export class MatchIntro implements IGameState
 
 	update(deltaTime: number)
 	{
-		if (this.keys[' '] && this.gameType === GameType.BLOCK_BATTLE)
+		if (this.keys[BB_SHOOT_1] && this.gameType === GameType.BLOCK_BATTLE)
 			this.p1IsReady = true;
-		else if (this.keys['q'] && (this.gameType === GameType.PONG || this.gameType === GameType.PONG_AI))
+		else if (this.keys[PONG_UP_1] && (this.gameType === GameType.PONG || this.gameType === GameType.PONG_AI))
 			this.p1IsReady = true;
 
-		if (this.keys['u'] && this.gameType === GameType.BLOCK_BATTLE)
+		if (this.keys[BB_SHOOT_2] && this.gameType === GameType.BLOCK_BATTLE)
 			this.p2IsReady = true;
-		else if (this.keys['o'] && this.gameType === GameType.PONG)
+		else if (this.keys[PONG_UP_2] && this.gameType === GameType.PONG)
 			this.p2IsReady = true;
 
 		if (this.p1IsReady && this.p2IsReady)
@@ -119,7 +120,13 @@ export class MatchIntro implements IGameState
 
 		drawCenteredText("GAME IS ABOUT TO START!", '70px Impact', '#0a42ab', 100);
 
-		let infoText = "(press the shoot key when you are ready to play)"; // Check this for Pong
+		let infoText = '';
+		if (this.gameType != GameType.BLOCK_BATTLE)
+		{
+			infoText = `(press the up key (${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play)`;
+		}
+		else
+			infoText = `(press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play)`; // Check this for Pong
 		drawCenteredText(infoText, '30px arial', 'white', 140);
 
 		let p1Text = this.player1.username;

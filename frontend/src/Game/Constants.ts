@@ -3,6 +3,25 @@ export const PLAYER_SPEED = 400;
 export const PLAYER_SIZE = 25;
 export const JUMP_POWER = -600;
 
+// CONTROLS
+export const BB_UP_1 = 'w';
+export const BB_LEFT_1 = 'a';
+export const BB_DOWN_1 = 's';
+export const BB_RIGHT_1 = 'd';
+export const BB_SHOOT_1 = 'e';
+
+export const BB_UP_2 = 'i';
+export const BB_LEFT_2 = 'j';
+export const BB_DOWN_2 = 'k';
+export const BB_RIGHT_2 = 'l';
+export const BB_SHOOT_2 = 'u';
+
+export const PONG_UP_1 = 'q';
+export const PONG_DOWN_1 = 's';
+
+export const PONG_UP_2 = 'o';
+export const PONG_DOWN_2 = 'k';
+
 // HEALTH
 export const MAX_HEALTH = 100;
 export const HEALTH_WIDTH = 80;

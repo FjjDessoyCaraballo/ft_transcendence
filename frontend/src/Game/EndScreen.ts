@@ -75,7 +75,7 @@ export class EndScreen implements IGameState
 
 		let text2 = 'RETURN TO TOURNAMENT';
 		const buttonX2 = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
-		const buttonY2 = (canvas.height / 2) + 200 - TEXT_PADDING;
+		const buttonY2 = (canvas.height / 2) - TEXT_PADDING;
 
 		this.returnMenuButton = new ReturnMainMenuButton(buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
 		this.returnToTournamentBtn = new ReturnToTournamentBtn(buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
@@ -110,7 +110,7 @@ export class EndScreen implements IGameState
 			this.returnMenuButton.checkClick();
 		else
 		{
-			if (this.returnToTournamentBtn)
+			if (this.returnToTournamentBtn.checkClick())
 				this.isStateReady = true;
 		}
 	}

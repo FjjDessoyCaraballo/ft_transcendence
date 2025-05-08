@@ -4,6 +4,7 @@ import { Platform, PlatformDir } from './Platform';
 import { collType } from './CollisionShape';
 import { drawGround, drawWalls} from './Environment';
 import { stateManager } from '../components/index';
+import { ctx } from '../components/Canvas';
 import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
 import { User, UserManager } from '../UI/UserManager';
@@ -78,6 +79,96 @@ export class BlockBattle implements IGameState
 		document.removeEventListener('keydown', this.KeyDownBound);
 		document.removeEventListener('keyup', this.KeyUpBound);
 		this.coinHandler.stop();
+	}
+
+	drawStatScreen()
+	{
+		const screenW = 400;
+		const screenH = 100;
+
+		// PLAYER 1
+
+		// Draw background
+		ctx.fillStyle = 'rgba(94, 114, 145, 0.75)';
+		ctx.fillRect(0, 0, screenW, screenH);
+
+		// Draw outlines
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.strokeRect(0, 0, screenW, screenH);
+
+		ctx.font = '20px arial';
+		ctx.fillStyle = 'white';
+		const name = `${this.player1.userData?.username}`;
+		const nameX = screenW / 2 - (ctx.measureText(name).width / 2);
+		ctx.fillText(name, nameX, 20);
+
+		// Draw coin count & Current weapon texts
+		ctx.font = '20px arial';
+		ctx.fillStyle = 'white';
+		const coinText = 'Coins collected:';
+		const coinTextW = ctx.measureText(coinText).width;
+		const coinTextX = 40;
+		ctx.fillText(coinText, coinTextX, 52);
+
+		const weaponText = 'Current weapon:';
+		const WeaponW = ctx.measureText(weaponText).width;
+		const WeaponX = coinTextX + coinTextW + 30;
+		ctx.fillText(weaponText, WeaponX, 52);
+
+		// Draw coin count & Current weapon values
+		ctx.font = '30px arial';
+		ctx.fillStyle = 'white';
+		const coinNum = `${this.player1.coinCount}`;
+		const coinNumX = coinTextX + (coinTextW / 2) - (ctx.measureText(coinNum).width / 2);
+		ctx.fillText(coinNum, coinNumX, 80);
+
+		const curWeapon = `Pistol`;
+		const curWeaponX = WeaponX + (WeaponW / 2) - (ctx.measureText(curWeapon).width / 2);
+		ctx.fillText(curWeapon, curWeaponX, 80);
+
+		// PLAYER 2
+		
+		// Draw background
+		ctx.fillStyle = 'rgba(94, 114, 145, 0.75)';
+		const screenX = this.canvas.width - screenW;
+		ctx.fillRect(screenX, 0, screenW, screenH);
+
+		// Draw outlines
+		ctx.strokeStyle = 'white'; // Can maybe be removed
+		ctx.lineWidth = 2; // Can maybe be removed
+		ctx.strokeRect(screenX, 0, screenW, screenH);
+
+		ctx.font = '20px arial';
+		ctx.fillStyle = 'white';
+		const name2 = `${this.player2.userData?.username}`;
+		const nameX2 = screenX + (screenW / 2) - (ctx.measureText(name2).width / 2);
+		ctx.fillText(name2, nameX2, 20);
+
+		// Draw coin count & Current weapon texts
+		ctx.font = '20px arial';
+		ctx.fillStyle = 'white';
+		const coinText2 = 'Coins collected:';
+		const coinTextW2 = ctx.measureText(coinText2).width;
+		const coinTextX2 = screenX + 40;
+		ctx.fillText(coinText2, coinTextX2, 52);
+
+		const weaponText2 = 'Current weapon:';
+		const WeaponW2 = ctx.measureText(weaponText2).width;
+		const WeaponX2 = coinTextX2 + coinTextW2 + 30;
+		ctx.fillText(weaponText2, WeaponX2, 52);
+
+		// Draw coin count & Current weapon values
+		ctx.font = '30px arial';
+		ctx.fillStyle = 'white';
+		const coinNum2 = `${this.player2.coinCount}`;
+		const coinNumX2 = coinTextX2 + (coinTextW2 / 2) - (ctx.measureText(coinNum2).width / 2);
+		ctx.fillText(coinNum2, coinNumX2, 80);
+
+		const curWeapon2 = `Pistol`;
+		const curWeaponX2 = WeaponX2 + (WeaponW2 / 2) - (ctx.measureText(curWeapon2).width / 2);
+		ctx.fillText(curWeapon2, curWeaponX2, 80);
+
 	}
 
 	update(deltaTime: number)
@@ -192,10 +283,12 @@ export class BlockBattle implements IGameState
 		}
 		
 		this.coinHandler.renderCoins(ctx);
-
+		
 		this.player1.draw(ctx);
 		this.player2.draw(ctx);
-
+		
+		this.drawStatScreen();
+		
 	}
 
 }
