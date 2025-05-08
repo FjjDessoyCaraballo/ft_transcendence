@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
+import { updateCurUser } from '../components';
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
@@ -46,6 +47,8 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
       
       localStorage.setItem('logged-in', 'true');
       localStorage.setItem('LoggedIn', JSON.stringify(username));
+		updateCurUser(user.username);
+	  
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
       

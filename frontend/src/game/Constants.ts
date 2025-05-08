@@ -39,7 +39,7 @@ export const GRAVITY = 1200;
 
 // COINS
 export const COIN_RADIUS = 10;
-export const COIN_SPAWN_TIME = 8000; // in milliseconds
+export const COIN_SPAWN_TIME = 6000; // in milliseconds
 export const COIN_WIN_LIMIT = 5;
 
 // PLATFORM
@@ -52,7 +52,7 @@ export const BUTTON_COLOR = '#800080'; // Purple theme (Same as DEEP_PURPLE)
 export const BUTTON_HOVER_COLOR = '#4B0082'; // Purple theme (Same as PURPLE)
 
 // Database test
-export const LOGIN_CHECK_KEY = 'logged-in';
+export const LOGIN_CHECK_KEY = 'LoggedIn';
 export const USER_ARR_KEY = 'registeredUsers';
 
 // COLOR PALETTE
