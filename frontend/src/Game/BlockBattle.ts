@@ -42,12 +42,20 @@ export class BlockBattle implements IGameState
 		this.keys = {}; // Maybe in enter() ?
 
 		this.platforms = [
+			new Platform(560, 600, 50, PlatformDir.STILL, 0),
+		]
+
+		/*
+		ORIGINAL TEST MAP
+
+		this.platforms = [
 			new Platform(800, 600, 80, PlatformDir.UP_DOWN, 200),
 			new Platform(300, 600, 80, PlatformDir.UP_DOWN, 200),
 			new Platform(600, 200, 50, PlatformDir.STILL, 100),
 			new Platform(500, 700, 200, PlatformDir.STILL, 100), // mid long
 			new Platform(600, 300, 100, PlatformDir.LEFT_RIGHT, 200)
 		]
+		*/
 
 		this.coinHandler = new CoinHandler(COIN_SPAWN_TIME, this.platforms);
 		this.coinHandler.start();
@@ -186,7 +194,7 @@ export class BlockBattle implements IGameState
 		{
 			let collisionType: collType = this.player1.cShape.checkCollision(platform.cShape, player1PrevPos);
 
-			if (collisionType != collType.NON)
+			if (collisionType !== collType.NON)
 			{
 				this.player1.resolveCollision(platform.cShape, collisionType, player1PrevPos.y, this.player1.y);
 				break ;

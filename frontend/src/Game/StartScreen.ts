@@ -68,7 +68,7 @@ export class StartScreen implements IGameState
 		ctx.font = '50px arial';
 		const pongX = (canvas.width / 2) - (ctx.measureText(pongText).width / 2) - TEXT_PADDING;
 		const pongY = 470;
-		this.pongBtn = new PongBtn(pongX, pongY, 'red', '#780202', pongText, 'white', '50px', 'arial');
+		this.pongBtn = new PongBtn(pongX, pongY, '#0426bd', '#023075', pongText, 'white', '50px', 'arial');
 
 		const bbText = 'BLOCK BATTLE';
 		const bbX = (canvas.width / 2) - (ctx.measureText(bbText).width / 2) - TEXT_PADDING;
