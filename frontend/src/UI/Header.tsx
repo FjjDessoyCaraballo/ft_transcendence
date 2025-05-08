@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Check login status when component mounts
+
   useEffect(() => {
     const loginStatus = localStorage.getItem('logged-in');
     setIsLoggedIn(loginStatus === 'true');

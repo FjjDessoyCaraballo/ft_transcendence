@@ -29,6 +29,10 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 		onClick();
 	}
 
+	const HandleContribute = () => {
+		window.open('https://www.github.com/fjjdessoycaraballo/ft_transcendence', '_blank', 'noopener,noreferrer');
+	}
+
 	return (
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 		  <div className="bg-white rounded-lg shadow-lg w-[400px] max-w-[90%] overflow-hidden mx-auto">
@@ -45,6 +49,16 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
       		Download Data
           	</button>
 		  	</div>
+			{/* ACCOUNT DELETION */}
+			<div className="buttonsDiv">
+			<button 
+              type="submit"
+              className="buttonsStyle"
+			  onClick={DeleteAccount}
+			>
+      		Delete Account
+          	</button>
+		  	</div>
 			{/* LOGOUT */}
 			<div className="buttonsDiv">
 			<button 
@@ -55,14 +69,14 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
       		Logout
           	</button>
 		  	</div>
-			{/* ACCOUNT DELETION */}
+			{/* CONTRIBUTE */}
 			<div className="buttonsDiv">
 			<button 
               type="submit"
               className="buttonsStyle"
-			  onClick={DeleteAccount}
+			  onClick={HandleContribute}
 			>
-      		Delete Account
+      		Contribute
           	</button>
 		  	</div>
 			{/* CLOSE BUTTON */}
