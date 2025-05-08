@@ -28,7 +28,7 @@ export const BUTTON_COLOR = '#303a4f'; // Blue/gray theme
 export const BUTTON_HOVER_COLOR = '#3e568a'; // Blue/gray theme
 
 // Database test
-export const LOGIN_CHECK_KEY = 'LoggedIn';
+export const LOGIN_CHECK_KEY = 'logged-in';
 export const USER_ARR_KEY = 'registeredUsers';
 
 // COLOR PALETTE

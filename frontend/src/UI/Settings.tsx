@@ -17,6 +17,8 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	const HandleLogout = () => {
 		// reserved for API call
 		localStorage.setItem('logged-in', 'false');
+		window.dispatchEvent(new Event('loginStatusChanged'));
+		onClick();
 	}
 
 	const DeleteAccount = () => {
@@ -25,6 +27,10 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 
 	const HandleClose = () => {
 		onClick();
+	}
+
+	const HandleContribute = () => {
+		window.open('https://www.github.com/fjjdessoycaraballo/ft_transcendence', '_blank', 'noopener,noreferrer');
 	}
 
 	return (
@@ -43,6 +49,16 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
       		Download Data
           	</button>
 		  	</div>
+			{/* ACCOUNT DELETION */}
+			<div className="buttonsDiv">
+			<button 
+              type="submit"
+              className="buttonsStyle"
+			  onClick={DeleteAccount}
+			>
+      		Delete Account
+          	</button>
+		  	</div>
 			{/* LOGOUT */}
 			<div className="buttonsDiv">
 			<button 
@@ -53,14 +69,14 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
       		Logout
           	</button>
 		  	</div>
-			{/* ACCOUNT DELETION */}
+			{/* CONTRIBUTE */}
 			<div className="buttonsDiv">
 			<button 
               type="submit"
               className="buttonsStyle"
-			  onClick={DeleteAccount}
+			  onClick={HandleContribute}
 			>
-      		Delete Account
+      		Contribute
           	</button>
 		  	</div>
 			{/* CLOSE BUTTON */}
