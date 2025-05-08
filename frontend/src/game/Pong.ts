@@ -1,5 +1,5 @@
 import { GameStates, IGameState } from "./GameStates";
-import { canvas, ctx } from "../components/Canvas";
+import { canvas, ctx } from "../components/index";
 import { User } from "../UI/UserManager";
 
 // Game Constants

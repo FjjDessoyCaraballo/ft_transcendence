@@ -5,12 +5,17 @@ import { GameStateManager } from '../game/GameStates';
 import { StartScreen } from '../game/StartScreen';
 import { Header } from '../UI/Header'
 
+const canvas: HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
+const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
 export const stateManager = new GameStateManager();
 
 export let curUser: string | null = null;
 export function updateCurUser(newUser: string | null) { curUser = newUser; }
 
 let prevTimeStamp = 0;
+
+export { canvas }; // To ensure correct init order
+export { ctx }; // To ensure correct init order
 
 stateManager.changeState(new StartScreen(canvas));
 
