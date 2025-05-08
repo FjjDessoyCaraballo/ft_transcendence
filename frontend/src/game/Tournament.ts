@@ -166,6 +166,7 @@ export class Tournament implements IGameState
 				
 				if (this.curMatch.name === GameStates.MATCH_INTRO && player1 && player2)
 				{	
+
 					if (this.gameType === GameType.BLOCK_BATTLE)
 						this.curMatch = new BlockBattle(this.canvas, player1.user, player2.user, player1, player2);
 					else if (this.gameType === GameType.PONG)
