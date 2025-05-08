@@ -1,5 +1,5 @@
+import { TEXT_PADDING } from "../game/Constants";
 import { ctx } from "../components/Canvas"; // is this bad...? Using global variable?
-import { TEXT_PADDING } from "../Game/Constants";
 
 export abstract class Button
 {
