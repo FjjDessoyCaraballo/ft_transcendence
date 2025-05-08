@@ -1,14 +1,13 @@
-import { GameStates, IGameState } from "../Game/GameStates";
+import { GameStates, IGameState } from "../game/GameStates";
 import { Button } from "./Button";
+import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LIGHT_PURPLE } from "../game/Constants";
 import { stateManager, curUser } from "../components/index"; // canvas again globally used... is it bad?
 import { canvas, ctx } from "../components/Canvas";
-import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LIGHT_PURPLE } from "../Game/Constants";
 import { UserHUB } from "./UserHUB";
 import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
-import { drawCenteredText, StartScreen } from "../Game/StartScreen";
-import { Pong } from "../Game/Pong";
-import { MatchIntro } from "../Game/MatchIntro";
+import { drawCenteredText, StartScreen } from "../game/StartScreen";
+import { MatchIntro } from "../game/MatchIntro";
 
 
 // BUTTONS

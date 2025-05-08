@@ -1,13 +1,14 @@
 import { stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
 import { canvas, ctx } from "../components/Canvas";
 import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
-import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../Game/Constants";
-import { drawCenteredText, StartScreen } from "../Game/StartScreen";
-import { GameStates } from "../Game/GameStates";
+import { USER_ARR_KEY, LOGIN_CHECK_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
+import { drawCenteredText, StartScreen } from "../game/StartScreen";
+import { GameStates } from "../game/GameStates";
 import { Button } from "./Button";
-import { RankingHandler } from "../Game/RankingPoints";
+import { RankingHandler } from "../game/RankingPoints";
 import { UserHubState } from "./Types";
 
+// interface already present in /frontend/src/services/Auth.ts
 export interface User {
     username: string;
 	password: string;

@@ -70,6 +70,9 @@ db:
 	@echo "$(BLUE)SQLite database contents:$(RESET)"
 	docker-compose -f $(COMPOSE_FILE) exec backend sqlite3 /app/data/database.sqlite .tables
 
+# Full stop and cleaning for restart
+nuke: stop fclean build start
+
 # Help command
 help:
 	@echo "$(BLUE)Available commands:$(RESET)"

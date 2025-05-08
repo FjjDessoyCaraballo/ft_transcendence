@@ -1,14 +1,14 @@
-import { GameStates, IGameState } from "../Game/GameStates";
-import { ReturnMainMenuButton } from "../Game/EndScreen";
+import { GameStates, IGameState } from "../game/GameStates";
+import { ReturnMainMenuButton } from "../game/EndScreen";
 import { curUser, stateManager } from "../components/index";
 import { ctx } from "../components/Canvas";
-import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../Game/Constants";
+import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../game/Constants";
 import { ChallengeButton, TournamentButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
 import { GameType, UserHubState } from "./Types";
-import { MatchIntro } from "../Game/MatchIntro";
-import { Tournament } from "../Game/Tournament";
-import { drawCenteredText } from "../Game/StartScreen";
+import { MatchIntro } from "../game/MatchIntro";
+import { Tournament } from "../game/Tournament";
+import { drawCenteredText } from "../game/StartScreen";
 
 export class NextPageButton extends Button
 {
@@ -189,6 +189,11 @@ export class UserHUB implements IGameState
 			return ;
 
 		const passwordInput = document.getElementById("passwordInput") as HTMLInputElement;
+		
+		if (!passwordInput) {
+			return;
+		}
+		
 		const enteredPassword = passwordInput.value;
 		const opponentData = localStorage.getItem(this.opponent.username);
 		const curUserData = localStorage.getItem(curUser);
@@ -206,7 +211,9 @@ export class UserHUB implements IGameState
 			if (enteredPassword === storedUser.password)
 			{
 				const passwordModal = document.getElementById("passwordModal") as HTMLElement;
-				passwordModal.style.display = "none";
+				if (passwordModal) {
+					passwordModal.style.display = "none";
+				}
 				passwordInput.value = "";
 
 				if (this.state === UserHubState.SINGLE_GAME)
@@ -254,8 +261,14 @@ export class UserHUB implements IGameState
 
 		const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
 		const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
-		submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
-		cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
+		
+		if (submitPasswordBtn) {
+			submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
+		}
+		
+		if (cancelPasswordBtn) {
+			cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
+		}
 	}
 
 	update(deltaTime: number)
@@ -337,5 +350,4 @@ export class UserHUB implements IGameState
 			btn.draw(ctx);
 		
 	}
-
 }
