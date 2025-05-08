@@ -17,6 +17,8 @@ import { Ball } from "./Ball";
 // - Points scored by Player1
 // - Points scored by Player2
 
+// Wins and Losses for each user?
+
 // Game Constants
 export const paddleWidth = 15; 
 export const paddleHeight = 100;
@@ -52,6 +54,7 @@ export class Game implements IGameState {
     this.gameLoop = this.gameLoop.bind(this);
     this.enter();
     this.gameLoop();
+    //console.log(localStorage);
   }
 
   handleKeyDown(e: KeyboardEvent) {
