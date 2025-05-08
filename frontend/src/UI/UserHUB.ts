@@ -1,6 +1,7 @@
 import { GameStateManager, GameStates, IGameState } from "../game/GameStates";
 import { ReturnMainMenuButton } from "../game/EndScreen";
-import { ctx, curUser, stateManager } from "../components/index";
+import { curUser, stateManager } from "../components/index";
+import { ctx } from "../components/Canvas";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../game/Constants";
 import { ChallengeButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
@@ -21,6 +22,7 @@ export class PongButton extends Button {
         // This will be overridden in the parent class
     }
 }
+
 
 export class NextPageButton extends Button
 {
@@ -202,6 +204,32 @@ export class UserHUB implements IGameState
 				}
 			}
 		}
+
+		for (const btn of this.pongBtnArr)
+		{
+			if (btn.checkClick())
+			{
+				if (curUser) 
+				{
+					this.opponent = btn.user;
+					this.interactionType = "pong";
+	
+					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
+					if (passwordHeader) 
+						passwordHeader.innerHTML = `Hello ${this.opponent.username}!<br>Please type in your password to start the game`;
+	
+					const passwordModal = document.getElementById("passwordModal") as HTMLElement;
+					const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
+					const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
+				
+					// Show the password modal
+					passwordModal.style.display = "flex";
+					submitPasswordBtn.addEventListener("click", this.submitPasswordBound);
+					cancelPasswordBtn.addEventListener("click", this.cancelPasswordBound);
+			
+				}
+			}
+		}
 	}
 
 	submitPasswordCallback(): void
@@ -271,7 +299,7 @@ export class UserHUB implements IGameState
 		if (passwordInput) {
 			passwordInput.value = "";
 		}
-		
+
 		this.interactionType = null;
 	}
 
@@ -361,5 +389,6 @@ export class UserHUB implements IGameState
 
 		for (const btn of this.pongBtnArr)
 			btn.draw(ctx);
+
 	}
 }

@@ -6,11 +6,13 @@ import { User } from "../UI/UserManager";
 const paddleWidth = 15, paddleHeight = 100;
 const ballSize = 15;
 
+
 class Paddle {
   y: number;
   speed: number = 8;
 
   constructor(public x: number, canvasHeight: number) {
+
     this.y = (canvasHeight - paddleHeight) / 2;
   }
 
@@ -39,6 +41,7 @@ class Ball {
   speedY: number;
 
   constructor(canvasWidth: number, canvasHeight: number) {
+
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
     this.speedX = 7;
@@ -51,6 +54,7 @@ class Ball {
   }
 
   checkCollisions(player1: Paddle, player2: Paddle, canvasHeight: number, canvasWidth: number) {
+
     // Ball collision with top and bottom
     if (this.y <= 0 || this.y + ballSize >= canvasHeight) {
       this.speedY *= -1;
@@ -91,6 +95,7 @@ class Ball {
   }
 
   reset(canvasWidth: number, canvasHeight: number) {
+
     console.log("Ball reset");
     this.x = canvasWidth / 2 - ballSize / 2 + 1.5;
     this.y = canvasHeight / 2;
@@ -140,6 +145,7 @@ export class Game implements IGameState {
     this.player1 = new Player(user1, new Paddle(15, this.canvasHeight));
     this.player2 = new Player(user2, new Paddle(this.canvasWidth - paddleWidth - 15, this.canvasHeight));
     this.ball = new Ball(this.canvasWidth, this.canvasHeight);
+
     
     // Listen for key events
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
@@ -154,10 +160,13 @@ export class Game implements IGameState {
         this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
         this.player2.user.username = "Computer";
         this.gameState = 'playing';
+
+        //this.resetGame(); I don't think we have to reset here
       } else if (e.key === '2') {
         this.twoPlayerMode = true; // Two-player mode
         this.player2.user.username = this.storedOpponentName;
         this.gameState = 'playing';
+        //this.resetGame();
       }
     } else {
       if (e.key === 'Escape') {
@@ -315,6 +324,7 @@ export class Game implements IGameState {
   }
 
   gameLoop() {
-    requestAnimationFrame(this.gameLoop.bind(this));
+
+  //  requestAnimationFrame(this.gameLoop.bind(this));
   }
 }
