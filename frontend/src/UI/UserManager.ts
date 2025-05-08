@@ -1,7 +1,7 @@
 import { stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
 import { canvas, ctx } from "../components/Canvas";
 import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
-import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "../Game/Constants";
+import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../Game/Constants";
 import { drawCenteredText, StartScreen } from "../Game/StartScreen";
 import { GameStates } from "../Game/GameStates";
 import { Button } from "./Button";
@@ -14,7 +14,6 @@ export interface User {
     wins: number;
     losses: number;
 	rankingPoint: number;
-	color: string;
 	// Add match history here...? Or somewhere else?
 }
 
@@ -126,7 +125,6 @@ export class UserManager {
 			wins: user.wins,
 			losses: user.losses,
 			rankingPoint: user.rankingPoint,
-			color: user.color
 		};
 
 		return newUser;
@@ -176,7 +174,7 @@ export class UserManager {
 		// Draw avatar box & text (JUST A TEST)
 		const avatarW = 200;
 		const avatarH = 180;
-		ctx.fillStyle = user.color; // GLOBAL USE of ctx
+		ctx.fillStyle = DEEP_PURPLE; // GLOBAL USE of ctx
 		ctx.fillRect(x, y, avatarW, avatarH);
 
 		ctx.font = '20px arial';
@@ -188,7 +186,7 @@ export class UserManager {
 		const boxW = 700;
 		const boxH = 180;
 		const boxX = x + avatarW + 20;
-		ctx.fillStyle = BUTTON_HOVER_COLOR; // GLOBAL USE
+		ctx.fillStyle = LIGHT_PURPLE; // GLOBAL USE
 		ctx.fillRect(boxX, y, boxW, boxH);
 
 		// Draw username

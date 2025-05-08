@@ -27,7 +27,7 @@ export class Platform {
 		this.y = y;
 		this.orig_x = x;
 		this.orig_y = y;
-		this.color = 'orange';
+		this.color = '#a642c2';
 		this.width = width;
 		this.height = PLATFORM_THICKNESS;
 		this.dir = dir;

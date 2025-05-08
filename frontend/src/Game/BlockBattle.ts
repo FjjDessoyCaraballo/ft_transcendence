@@ -36,26 +36,30 @@ export class BlockBattle implements IGameState
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		
-		this.player1 = new Player(100, 745, user1.color, user1); // Maybe in enter() ?
-		this.player2 = new Player2(1100, 745, user2.color, user2); // Maybe in enter() ?
+		this.player1 = new Player(100, 745, 'green', user1); // Check the color later!!
+		this.player2 = new Player2(1100, 745, 'red', user2); // Check the color later!!
 
 		this.keys = {}; // Maybe in enter() ?
 
-		this.platforms = [
-			new Platform(560, 600, 50, PlatformDir.STILL, 0),
-		]
-
-		/*
-		ORIGINAL TEST MAP
 
 		this.platforms = [
-			new Platform(800, 600, 80, PlatformDir.UP_DOWN, 200),
-			new Platform(300, 600, 80, PlatformDir.UP_DOWN, 200),
-			new Platform(600, 200, 50, PlatformDir.STILL, 100),
-			new Platform(500, 700, 200, PlatformDir.STILL, 100), // mid long
-			new Platform(600, 300, 100, PlatformDir.LEFT_RIGHT, 200)
+			new Platform(900, 550, 80, PlatformDir.UP_DOWN, 80),
+			new Platform(220, 550, 80, PlatformDir.UP_DOWN, 80),
+			new Platform(500, 500, 200, PlatformDir.STILL, 0), // mid long
+			new Platform(320, 700, 80, PlatformDir.STILL, 0), // close to p1 start
+			new Platform(800, 700, 80, PlatformDir.STILL, 0), // close to p2 start
+			new Platform(800, 340, 40, PlatformDir.STILL, 0), // between move & mid long (right)
+			new Platform(350, 340, 40, PlatformDir.STILL, 0), // between move & mid long (left)
+			new Platform(900, 200, 80, PlatformDir.LEFT_RIGHT, 110),
+			new Platform(220, 200, 80, PlatformDir.LEFT_RIGHT, 110),
+			new Platform(550, 300, 100, PlatformDir.UP_DOWN, 80), // above mid
+
+			new Platform(1120, 280, 20, PlatformDir.STILL, 0), // mini right
+			new Platform(60, 280, 20, PlatformDir.STILL, 0), // mini left
+			new Platform(590, 80, 20, PlatformDir.STILL, 0), // mini top
+
 		]
-		*/
+		
 
 		this.coinHandler = new CoinHandler(COIN_SPAWN_TIME, this.platforms);
 		this.coinHandler.start();
@@ -97,7 +101,7 @@ export class BlockBattle implements IGameState
 		// PLAYER 1
 
 		// Draw background
-		ctx.fillStyle = 'rgba(94, 114, 145, 0.75)';
+		ctx.fillStyle = 'rgba(140, 185, 87, 0.75)';
 		ctx.fillRect(0, 0, screenW, screenH);
 
 		// Draw outlines
@@ -138,7 +142,7 @@ export class BlockBattle implements IGameState
 		// PLAYER 2
 		
 		// Draw background
-		ctx.fillStyle = 'rgba(94, 114, 145, 0.75)';
+		ctx.fillStyle = 'rgba(211, 94, 91, 0.75)';
 		const screenX = this.canvas.width - screenW;
 		ctx.fillRect(screenX, 0, screenW, screenH);
 

@@ -87,7 +87,6 @@ export function setupLogin()
 
 			const registerUsername = (document.getElementById("registerUsername") as HTMLInputElement).value;
 			const registerPassword = (document.getElementById("registerPassword") as HTMLInputElement).value;
-			const registerColor = (document.getElementById("registerColor") as HTMLInputElement).value;
 	
 			// Check for duplicate name here!!
 
@@ -97,7 +96,6 @@ export function setupLogin()
 				wins: 0,
 				losses: 0,
 				rankingPoint: 1000,
-				color: registerColor
 			};
 
 			try

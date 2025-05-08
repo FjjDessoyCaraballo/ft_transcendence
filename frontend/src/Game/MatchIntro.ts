@@ -6,7 +6,7 @@ import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { Pong } from "./Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
-import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2 } from "./Constants";
+import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE } from "./Constants";
 
 
 export class MatchIntro implements IGameState
@@ -38,7 +38,6 @@ export class MatchIntro implements IGameState
 				wins: 0,
 				losses: 0,
 				rankingPoint: 9999,
-				color: 'gray'
 			};
 		}
 
@@ -118,16 +117,16 @@ export class MatchIntro implements IGameState
 
 		// Add the expected ranking point diff here...?
 
-		drawCenteredText("GAME IS ABOUT TO START!", '70px Impact', '#0a42ab', 100);
+		drawCenteredText("GAME IS ABOUT TO START!", '70px Impact', DEEP_PURPLE, 100);
 
 		let infoText = '';
 		if (this.gameType != GameType.BLOCK_BATTLE)
 		{
-			infoText = `(press the up key (${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play)`;
+			infoText = `Press the up key (${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play`;
 		}
 		else
-			infoText = `(press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play)`; // Check this for Pong
-		drawCenteredText(infoText, '30px arial', 'white', 140);
+			infoText = `Press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
+		drawCenteredText(infoText, '30px arial', 'white', 150);
 
 		let p1Text = this.player1.username;
 		let p1X = 140;

@@ -2,7 +2,7 @@ import { GameStates, IGameState } from "../Game/GameStates";
 import { Button } from "./Button";
 import { stateManager, curUser } from "../components/index"; // canvas again globally used... is it bad?
 import { canvas, ctx } from "../components/Canvas";
-import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../Game/Constants";
+import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LIGHT_PURPLE } from "../Game/Constants";
 import { UserHUB } from "./UserHUB";
 import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
@@ -186,9 +186,9 @@ export class MainMenu implements IGameState
 		drawCenteredText('You are playing:', '40px arial', 'white', 200);
 
 		if (this.gameType === GameType.BLOCK_BATTLE)
-			drawCenteredText('Block Battle', '40px impact', 'green', 250);
+			drawCenteredText('Block Battle', '40px impact', LIGHT_PURPLE, 250);
 		else
-			drawCenteredText('Pong', '40px impact', 'green', 250);
+			drawCenteredText('Pong', '40px impact', LIGHT_PURPLE, 250);
 
 
 		this.singleGameButton.draw(ctx);

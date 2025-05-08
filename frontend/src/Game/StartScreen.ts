@@ -3,7 +3,7 @@ import { stateManager, curUser } from "../components/index";
 import { MainMenu } from "../UI/MainMenu";
 import { canvas, ctx } from "../components/Canvas"; // Sort of weird to use this globally here to pass it to BlockBattle...
 import { GameStates, IGameState, } from "./GameStates";
-import { TEXT_PADDING } from "./Constants";
+import { DEEP_PURPLE, LIGHT_PURPLE, PURPLE, TEXT_PADDING } from "./Constants";
 import { UserManager } from "../UI/UserManager";
 import { GameType } from "../UI/Types";
 
@@ -68,12 +68,12 @@ export class StartScreen implements IGameState
 		ctx.font = '50px arial';
 		const pongX = (canvas.width / 2) - (ctx.measureText(pongText).width / 2) - TEXT_PADDING;
 		const pongY = 470;
-		this.pongBtn = new PongBtn(pongX, pongY, '#0426bd', '#023075', pongText, 'white', '50px', 'arial');
+		this.pongBtn = new PongBtn(pongX, pongY, DEEP_PURPLE, PURPLE, pongText, 'white', '50px', 'arial');
 
 		const bbText = 'BLOCK BATTLE';
 		const bbX = (canvas.width / 2) - (ctx.measureText(bbText).width / 2) - TEXT_PADDING;
 		const bbY = 570;
-		this.blockBattleBtn = new BlockBattleBtn(bbX, bbY, '#0426bd', '#023075', bbText, 'white', '50px', 'arial');
+		this.blockBattleBtn = new BlockBattleBtn(bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -122,7 +122,7 @@ export class StartScreen implements IGameState
 	{
 		UserManager.drawCurUser();
 		
-		drawCenteredText('Welcome, gamer!', '140px Impact', '#0a42ab', 240);
+		drawCenteredText('Welcome, gamer!', '140px Impact', DEEP_PURPLE, 240);
 
 		if (!curUser)
 			drawCenteredText('Please log in to play the game', '50px arial', 'white', canvas.height / 2 + 100);

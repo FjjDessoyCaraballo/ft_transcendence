@@ -1,5 +1,5 @@
 import { Platform } from "./Platform";
-import { COIN_LIMIT, COIN_RADIUS } from "./Constants";
+import { COIN_WIN_LIMIT, COIN_RADIUS } from "./Constants";
 import { Player } from "./Player";
 
 export interface Coin
@@ -99,7 +99,7 @@ export class CoinHandler {
 				player.coinCount++;
 				coin.isCollected = true;
 				coin.platform.hasCoin = false;
-				if (player.coinCount === COIN_LIMIT)
+				if (player.coinCount === COIN_WIN_LIMIT)
 					player.hasWon = true;
 			}
 		}
