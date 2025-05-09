@@ -1,6 +1,13 @@
 import { GameStates, IGameState } from "./GameStates";
 import { canvas, ctx } from "../components/Canvas";
-import { User } from "../UI/UserManager";
+import { User, UserManager } from "../UI/UserManager";
+import { stateManager } from "../components";
+import { EndScreen } from "./EndScreen";
+import { TournamentPlayer } from "./Tournament";
+import { GameType } from "../UI/Types";
+import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "./Constants";
+
+// Don't access canvas at the module level - only inside functions
 
 // STATS
 // BOTH GAMES
@@ -22,15 +29,13 @@ const PADDLE_WIDTH = 15;
 const PADDLE_HEIGHT = 100;
 const PADDLE_SPEED = 8;
 const BALL_SIZE = 15;
-const CANVAS_WIDTH = canvas.width;
-const CANVAS_HEIGHT = canvas.height;
 const BUFFER = 15;
 
 class Paddle {
   y: number;
 
-  constructor(public x: number) {
-    this.y = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
+  constructor(public x: number, canvasHeight: number) {
+    this.y = (canvasHeight - PADDLE_HEIGHT) / 2;
   }
 
   moveUp() {
@@ -41,19 +46,19 @@ class Paddle {
     this.y += PADDLE_SPEED;
   }
 
-  stayInBounds() {
-    this.y = Math.max(0, Math.min(CANVAS_HEIGHT - PADDLE_HEIGHT, this.y));
+  stayInBounds(canvasHeight: number) {
+    this.y = Math.max(0, Math.min(canvasHeight - PADDLE_HEIGHT, this.y));
   }
 
-  draw() {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = 'white';
     ctx.fillRect(this.x, this.y, PADDLE_WIDTH, PADDLE_HEIGHT);
   }
 }
 
 class Ball {
-  x: number = CANVAS_WIDTH / 2 - BALL_SIZE / 2 + 1.5;
-  y: number = CANVAS_HEIGHT / 2;
+  x: number;
+  y: number;
   speedX: number = 10 * -1;
   speedY: number = 0.5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative;
   currentRallyLen: number = 0;
@@ -61,19 +66,24 @@ class Ball {
   longestRally: number = 0;
   pointsPlayed: number = 0;
 
+  constructor(canvasWidth: number, canvasHeight: number) {
+    this.x = canvasWidth / 2 - BALL_SIZE / 2 + 1.5
+    this.y = (canvasHeight - PADDLE_HEIGHT) / 2;
+  }
+
   move() {
     this.x += this.speedX;
     this.y += this.speedY;
   }
 
-  checkCollisions(player1: Paddle, player2: Paddle) {
+  checkCollisions(player1: Paddle, player2: Paddle, canvasHeight: number, canvasWidth: number) {
     // Ball collision with top and bottom
     if (this.y <= 0) {
       this.y = 0; // Push ball back inside. Fixes wall "hugging"
       this.speedY *= -1;
     } 
-    else if (this.y + BALL_SIZE >= CANVAS_HEIGHT) {
-      this.y = CANVAS_HEIGHT - BALL_SIZE; // Push ball back inside. Fixes wall "hugging"
+    else if (this.y + BALL_SIZE >= canvasHeight) {
+      this.y = canvasHeight - BALL_SIZE; // Push ball back inside. Fixes wall "hugging"
       this.speedY *= -1;
     }
 
@@ -97,7 +107,7 @@ class Ball {
     }
 
     // Player 2 paddle collision
-    if (this.x + BALL_SIZE >= CANVAS_WIDTH - PADDLE_WIDTH - BUFFER && this.y + BALL_SIZE >= player2.y && this.y <= player2.y + PADDLE_HEIGHT) {
+    if (this.x + BALL_SIZE >= canvasWidth - PADDLE_WIDTH - BUFFER && this.y + BALL_SIZE >= player2.y && this.y <= player2.y + PADDLE_HEIGHT) {
         this.currentRallyLen++;
         //console.log('currentRallyLen =', this.currentRallyLen);
         const hitPos = (this.y + BALL_SIZE / 2) - (player2.y + PADDLE_HEIGHT / 2);
@@ -114,7 +124,7 @@ class Ball {
     }
   }
 
-  reset(twoPlayerMode: boolean) {
+  reset(twoPlayerMode: boolean, canvasWidth: number, canvasHeight: number) {
     //console.log("Ball reset");
     if (this.currentRallyLen > this.longestRally)
       this.longestRally = this.currentRallyLen;
@@ -124,8 +134,8 @@ class Ball {
     this.pointsPlayed++;
     //console.log('pointsPlayed =', this.pointsPlayed);
     this.currentRallyLen = 0;
-    this.x = CANVAS_WIDTH / 2 - BALL_SIZE / 2 + 1.5;
-    this.y = CANVAS_HEIGHT / 2;
+    this.x = canvasWidth / 2 - BALL_SIZE / 2 + 1.5;
+    this.y = canvasHeight / 2;
   
     // Pause the ball temporarily
     this.speedX = 0;
@@ -143,7 +153,7 @@ class Ball {
     }, 1000); // 1000ms = 1 second delay
   }
 
-  draw() {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = 'white';
     ctx.fillRect(this.x, this.y, BALL_SIZE, BALL_SIZE);
   }
@@ -154,56 +164,84 @@ constructor(public user: User, public paddle: Paddle, public score: number = 0) 
 }
 
 
-export class Game implements IGameState {
+export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
-  gameState: 'menu' | 'playing' | 'result' = 'menu';
+  gameState: 'menu' | 'playing' | 'result' | 'ai';
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
   averageRally: number = 0;
 
   aiLastUpdateTime: number = 0;
-  aiTargetY: number = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2; // AI's current target
+  aiTargetY: number; // AI's current target
 
   twoPlayerMode: boolean = false;
   player1: Player;
   player2: Player;
+  tournamentData1: TournamentPlayer | null;
+  tournamentData2: TournamentPlayer | null;
   storedOpponentName: string;
-  ball: Ball = new Ball();
+  ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
+  canvasWidth: number;
+  canvasHeight: number;
+  isStateReady: boolean;
 
-  constructor(user1: User, user2: User) {
+  constructor(user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
+    // Get canvas dimensions when constructor is called, not at module level
+    const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+    this.canvasWidth = canvas.width;
+    this.canvasHeight = canvas.height;
     this.storedOpponentName = user2.username;
-    this.player1 = new Player(user1, new Paddle(BUFFER)); //STAT
-    this.player2 = new Player(user2, new Paddle(CANVAS_WIDTH - PADDLE_WIDTH - BUFFER)); //STAT
-    this.gameLoop = this.gameLoop.bind(this);
-    this.enter();
-    this.gameLoop();
-    //console.log(localStorage);
+    this.aiTargetY = (this.canvasHeight - PADDLE_HEIGHT) / 2; // AI's current target
+    this.player1 = new Player(user1, new Paddle(BUFFER, this.canvasHeight)); //STAT
+    this.player2 = new Player(user2, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+    this.ball = new Ball(this.canvasWidth, this.canvasHeight);
+    this.isStateReady = false;
+    this.gameState = state;
+    this.tournamentData1 = tData1;
+	  this.tournamentData2 = tData2;
+    if (this.gameState === 'playing')
+      {
+        this.twoPlayerMode = true; // Two-player mode
+            this.player2.user.username = this.storedOpponentName;
+      }
+      else if (this.gameState === 'ai')
+      {
+        this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
+            this.player2.user.username = "Computer";
+            this.gameState = 'playing';
+      }
+
+        // Listen for key events
+        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+        document.addEventListener('keyup', this.handleKeyUp.bind(this));
   }
 
   handleKeyDown(e: KeyboardEvent) {
     if (this.gameState === 'menu') {
+		/*
       if (e.key === '1') {
         this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
         this.player2.user.username = "Computer";
-        this.startTime = performance.now();
         this.gameState = 'playing';
-        this.resetGame();
+
+        //this.resetGame(); I don't think we have to reset here
       } else if (e.key === '2') {
         this.twoPlayerMode = true; // Two-player mode
         this.player2.user.username = this.storedOpponentName;
-        this.startTime = performance.now();
         this.gameState = 'playing';
-        this.resetGame();
+        //this.resetGame();
       }
-    } 
-    else {
+		*/
+    } else {
+
+		// We should probably disable this...?
+
       if (e.key === 'Escape') {
         this.gameState = 'menu';
         this.resetGame();
-      } 
-      else {
+      } else {
         this.keysPressed[e.key] = true;
       }
     }
@@ -219,7 +257,7 @@ export class Game implements IGameState {
 
       // calculates the time it takes for the ball to hit either the top or bottom wall of the canvas
       const timeToWallY = ballVY > 0 
-        ? (CANVAS_HEIGHT - ballY - BALL_SIZE) / ballVY 
+        ? (this.canvasHeight - ballY - BALL_SIZE) / ballVY 
         : -ballY / ballVY;
 
       // calculates the time it will take for the ball to travel horizontally to the target X position
@@ -270,8 +308,8 @@ export class Game implements IGameState {
         this.player2.paddle.moveUp();
       }
     }
-    this.player1.paddle.stayInBounds();
-    this.player2.paddle.stayInBounds();
+    this.player1.paddle.stayInBounds(this.canvasHeight);
+    this.player2.paddle.stayInBounds(this.canvasHeight);
   }
 
   enter()
@@ -287,13 +325,13 @@ export class Game implements IGameState {
     document.removeEventListener('keyup', this.handleKeyUp.bind(this));
 	}
 
-  update() {
+  updateGame() {
     if (this.gameState !== 'playing') 
       return ; // Shouldn't have to do this!!
     //console.log('Current gameState:', this.gameState);
     this.updatePlayerPositions();
     this.ball.move();
-    this.ball.checkCollisions(this.player1.paddle, this.player2.paddle);
+    this.ball.checkCollisions(this.player1.paddle, this.player2.paddle, this.canvasHeight, this.canvasWidth);
 
     // Reset ball if missed and count score
     if (this.ball.x < 0) {
@@ -304,10 +342,10 @@ export class Game implements IGameState {
         this.winner = this.player2;
         this.duration = performance.now() - this.startTime;
       }
-      this.ball.reset(this.twoPlayerMode);
+      this.ball.reset(this.twoPlayerMode, this.canvasWidth, this.canvasHeight);
     }
 
-    if (this.ball.x > CANVAS_WIDTH) {
+    if (this.ball.x > this.canvasWidth) {
       this.player1.score++;
       if (this.player1.score === 5) {
         this.gameState = 'result';
@@ -315,47 +353,110 @@ export class Game implements IGameState {
         this.winner = this.player1;
         this.duration = performance.now() - this.startTime;
       }
-      this.ball.reset(this.twoPlayerMode);
+      this.ball.reset(this.twoPlayerMode, this.canvasWidth, this.canvasHeight);
     }
   }
 
-  drawResult() {
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  update() {
 
-    ctx.fillStyle = 'white';
-    ctx.font = "50px 'Courier New', monospace";
-    const pong = this.winner?.user.username + " is the winner!";
-    const pongWidth = ctx.measureText(pong).width;
-    ctx.fillText(pong, (CANVAS_WIDTH * 0.5) - (pongWidth / 2), CANVAS_HEIGHT / 4);
-
-    ctx.font = "30px 'Courier New', monospace";
-    //add player points here
-    const p1 = this.player1.user.username + ": " + this.player1.score + " points";
-    ctx.fillText(p1, (CANVAS_WIDTH * 0.5) - (ctx.measureText(p1).width / 2), CANVAS_HEIGHT / 4 + 100);
-    const p2 = this.player2.user.username + ": " + this.player2.score + " points";
-    ctx.fillText(p2, (CANVAS_WIDTH * 0.5) - (ctx.measureText(p2).width / 2), CANVAS_HEIGHT / 4 + 150);
-
-    const seconds = (this.duration / 1000).toFixed(2);
-    const durationText = `Game duration: ${seconds} seconds`;
-    ctx.fillText(durationText, (CANVAS_WIDTH * 0.5) - (ctx.measureText(durationText).width / 2), CANVAS_HEIGHT / 4 + 200);
-
-    const longestRally = "Longest rally: " + this.ball.longestRally + " hits";
-    ctx.fillText(longestRally, (CANVAS_WIDTH * 0.5) - (ctx.measureText(longestRally).width / 2), CANVAS_HEIGHT / 4 + 250);
-
-    const avgText = `Average rally: ${this.averageRally.toFixed(2)} hits`;
-    ctx.fillText(avgText, (CANVAS_WIDTH * 0.5) - (ctx.measureText(avgText).width / 2), CANVAS_HEIGHT / 4 + 300);
+		if (this.gameState === 'playing')
+			this.updateGame();
   }
 
-  drawMenu() {
+  drawResult() {
+
+	// Tournament ending
+	if (this.tournamentData1 && this.tournamentData2)
+		{
+			if (this.winner === this.player1)
+			{
+				this.tournamentData1.tournamentPoints++;
+				this.tournamentData1.pongPointsScored += this.player1.score;
+				this.tournamentData2.pongPointsScored += this.player2.score;
+				this.tournamentData1.isWinner = true;
+			}	
+			else if (this.winner === this.player2)
+			{
+				this.tournamentData2.tournamentPoints++;
+				this.tournamentData1.pongPointsScored += this.player1.score;
+				this.tournamentData2.pongPointsScored += this.player2.score;
+				this.tournamentData2.isWinner = true;
+			}
+						
+			this.isStateReady = true;
+			return ;
+		}
+
+	// Regular ending
+	const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
+	const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
+
+	if (this.twoPlayerMode)
+	{
+		if (this.winner === this.player1)
+			stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG));
+		else if (this.winner === this.player2)
+			stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG));
+	}
+	else
+	{
+		if (this.winner === this.player1)
+			stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG_AI));
+		else if (this.winner === this.player2)
+			stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG_AI));
+	}
+
+
+	/*
+	OLD VERSION FROM TOM:
+
     ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    // Draw paddles
+    this.player1.paddle.draw(ctx);
+    this.player2.paddle.draw(ctx);
+
+    // Draw centre line
+    for (let i = 0; i < this.canvasHeight; i += this.canvasHeight / 20) {
+      ctx.fillRect(this.canvasWidth / 2, i, 3, this.canvasHeight / 40);
+    }
+
+    // Draw ball
+    this.ball.draw(ctx);
+
+    // Draw scores
+    ctx.font = "50px 'Courier New', monospace";
+    const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
+    const player1TextWidth = ctx.measureText(player1Text).width;
+    ctx.fillText(player1Text, (this.canvasWidth * 0.25) - (player1TextWidth / 2), 70);
+
+    const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
+    const player2TextWidth = ctx.measureText(player2Text).width;
+    ctx.fillText(player2Text, (this.canvasWidth * 0.75) - (player2TextWidth / 2), 70);
+  }
+  
+  drawResult(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    ctx.fillStyle = 'white';
+    ctx.font = "30px 'Courier New', monospace";
+    const pong = this.winner?.user.username + " is the winner!";
+    const pongWidth = ctx.measureText(pong).width;
+    ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
+	*/
+  }
+
+  drawMenu(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     ctx.fillStyle = 'white';
     ctx.font = "100px 'Courier New', monospace";
     const pong = "PONG";
     const pongWidth = ctx.measureText(pong).width;
-    ctx.fillText(pong, (CANVAS_WIDTH * 0.5) - (pongWidth / 2), CANVAS_HEIGHT / 4);
+    ctx.fillText(pong, (this.canvasWidth * 0.5) - (pongWidth / 2), this.canvasHeight / 4);
 
     ctx.font = "30px 'Courier New', monospace"; 
     const text1 = "vs computer (Press '1')";
@@ -363,66 +464,72 @@ export class Game implements IGameState {
     const text2 = "vs human (Press '2')";
     const text2Width = ctx.measureText(text2).width;
     
-
-    ctx.fillText(text1, (CANVAS_WIDTH * 0.5) - (text1Width / 2), CANVAS_HEIGHT / 2);
-    ctx.fillText(text2, (CANVAS_WIDTH * 0.5) - (text2Width / 2), CANVAS_HEIGHT / 2 + 50);
+    ctx.fillText(text1, (this.canvasWidth * 0.5) - (text1Width / 2), this.canvasHeight / 2);
+    ctx.fillText(text2, (this.canvasWidth * 0.5) - (text2Width / 2), this.canvasHeight / 2 + 50);
 
     ctx.font = "20px 'Courier New', monospace";
-    const text3 = "Player 1:  up = 'q'  down = 's'";
+    const text3 = `Player 1:  up = '${PONG_UP_1}'  down = '${PONG_DOWN_1}'`;
     const text3Width = ctx.measureText(text3).width;
-    const text4 = "Player 2:  up = 'o'  down = 'k'";
+    const text4 = `Player 2:  up = '${PONG_UP_2}'  down = '${PONG_DOWN_2}'`;
     const text4Width = ctx.measureText(text4).width;
-    ctx.fillText(text3, (CANVAS_WIDTH * 0.5) - (text3Width / 2), CANVAS_HEIGHT / 2 + 150);
-    ctx.fillText(text4, (CANVAS_WIDTH * 0.5) - (text4Width / 2), CANVAS_HEIGHT / 2 + 200);
+    ctx.fillText(text3, (this.canvasWidth * 0.5) - (text3Width / 2), this.canvasHeight / 2 + 150);
+    ctx.fillText(text4, (this.canvasWidth * 0.5) - (text4Width / 2), this.canvasHeight / 2 + 200);
+  }
+
+  drawGame()
+  {
+	// Clear canvas
+	ctx.fillStyle = 'black';
+	ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+	// Draw paddles
+	this.player1.paddle.draw(ctx);
+	this.player2.paddle.draw(ctx);
+
+	// Draw centre line
+	for (let i = 0; i < this.canvasHeight; i += this.canvasHeight / 20) {
+	ctx.fillRect(this.canvasWidth / 2, i, 3, this.canvasHeight / 40);
+	}
+
+	// Draw ball
+	this.ball.draw(ctx);
+
+	// Draw scores
+	ctx.font = "50px 'Courier New', monospace";
+	const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
+	const player1TextWidth = ctx.measureText(player1Text).width;
+	ctx.fillText(player1Text, (this.canvasWidth * 0.25) - (player1TextWidth / 2), 70);
+
+	const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
+	const player2TextWidth = ctx.measureText(player2Text).width;
+	ctx.fillText(player2Text, (this.canvasWidth * 0.75) - (player2TextWidth / 2), 70);
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    // Clear canvas
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw paddles
-    this.player1.paddle.draw();
-    this.player2.paddle.draw();
+	if (this.gameState === 'menu') {
+		this.drawMenu(ctx);
+	  } else if (this.gameState === 'result') {
+		this.drawResult();
+	  } else {
+		this.drawGame();
+	  }
 
-    // Draw centre line
-    for (let i = 0; i < CANVAS_HEIGHT; i += CANVAS_HEIGHT / 20) {
-      ctx.fillRect(CANVAS_WIDTH / 2, i, 3, CANVAS_HEIGHT / 40);
-    }
-
-    // Draw ball
-    this.ball.draw();
-
-    // Draw scores
-    ctx.font = "50px 'Courier New', monospace";
-    const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
-    const player1TextWidth = ctx.measureText(player1Text).width;
-    ctx.fillText(player1Text, (CANVAS_WIDTH * 0.25) - (player1TextWidth / 2), 70);
-
-    const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
-    const player2TextWidth = ctx.measureText(player2Text).width;
-    ctx.fillText(player2Text, (CANVAS_WIDTH * 0.75) - (player2TextWidth / 2), 70);
   }
 
   resetGame() {
-    this.player1.paddle.y = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
-    this.player2.paddle.y = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
-    this.ball.longestRally = 0;
-    this.ball.reset(this.twoPlayerMode);
+    this.player1.paddle.y = (this.canvasHeight - PADDLE_HEIGHT) / 2;
+    this.player2.paddle.y = (this.canvasHeight - PADDLE_HEIGHT) / 2;
+    this.ball.reset(this.twoPlayerMode, this.canvasWidth, this.canvasHeight);
     this.player1.score = 0;
     this.player2.score = 0;
   }
 
+/*
+
   gameLoop() {
-    //console.log('In gameLoop, gameState =', this.gameState);
-    if (this.gameState === 'menu') {
-      this.drawMenu();
-    } else if (this.gameState === 'result') {
-      this.drawResult();
-    } else if (this.gameState === 'playing') {
-      this.update();
-      this.render(ctx);
-    }
-    requestAnimationFrame(this.gameLoop);
+
+  //  requestAnimationFrame(this.gameLoop.bind(this));
   }
+*/
 }

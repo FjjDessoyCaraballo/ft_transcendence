@@ -6,3 +6,17 @@ export interface User
 	name: string;
 	email: string;
 }
+
+export enum UserHubState
+{
+	INFO,
+	SINGLE_GAME,
+	TOURNAMENT
+}
+
+export enum GameType
+{
+	PONG,
+	PONG_AI,
+	BLOCK_BATTLE
+}

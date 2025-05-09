@@ -1,13 +1,14 @@
-import { GameStateManager, GameStates, IGameState } from "../game/GameStates";
+import { GameStates, IGameState } from "../game/GameStates";
 import { ReturnMainMenuButton } from "../game/EndScreen";
 import { curUser, stateManager } from "../components/index";
 import { ctx } from "../components/Canvas";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../game/Constants";
-import { ChallengeButton, PongButton, User, UserManager } from "./UserManager";
+import { ChallengeButton, TournamentButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
-import { InGame } from "../game/InGame";
+import { GameType, UserHubState } from "./Types";
 import { MatchIntro } from "../game/MatchIntro";
-import { Game } from "../game/Pong"
+import { Tournament } from "../game/Tournament";
+import { drawCenteredText } from "../game/StartScreen";
 
 export class NextPageButton extends Button
 {
@@ -42,18 +43,20 @@ export class UserHUB implements IGameState
 	nextPageButton: NextPageButton;
 	prevPageButton: PrevPageButton;
 	challengeBtnArr: ChallengeButton[];
-	pongBtnArr: PongButton[];
 	isNextActive: boolean;
 	isPrevActive: boolean;
 	needNewChallengeButtons: boolean;
 	opponent: User | null;
-	interactionType: "challenge" | "pong" | null;
+	tournamentArr: User [];
+	gameType: GameType;
+	userArr: User [];
+	state: UserHubState;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 	submitPasswordBound: () => void;
 	cancelPasswordBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement)
+	constructor(canvas: HTMLCanvasElement, state: UserHubState, gameType: GameType)
 	{
 		this.name = GameStates.USER_HUB;
 		this.canvas = canvas;
@@ -63,8 +66,35 @@ export class UserHUB implements IGameState
 		this.isPrevActive = false;
 		this.needNewChallengeButtons = true;
 		this.opponent = null;
-		this.interactionType = null;
+		this.state = state;
+		this.tournamentArr = [];
+		this.gameType = gameType;
+		this.userArr = UserManager.getAllUserData();
 
+		if (curUser)
+		{
+			const curUserData = localStorage.getItem(curUser);
+			if (curUserData)
+			{
+				const curUserObj = JSON.parse(curUserData);
+				this.tournamentArr.push(curUserObj);
+			}
+		}
+
+		// Sort userArr based on rankingPoint difference
+		if (curUser)
+		{
+			const curUserObj = UserManager.getUserData(curUser);
+			if (curUserObj)
+			{
+				const curUserRank = curUserObj.rankingPoint;
+				this.userArr.sort((a, b) => {
+					const diffA = Math.abs(a.rankingPoint - curUserRank);
+					const diffB = Math.abs(b.rankingPoint - curUserRank);
+					return diffA - diffB;
+				  });
+			}
+		}
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
@@ -79,11 +109,10 @@ export class UserHUB implements IGameState
 		const button3X = 0 + TEXT_PADDING;
 		const button3Y = 80 + TEXT_PADDING;
 
-		this.returnMenuButton = new ReturnMainMenuButton(button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
 		this.nextPageButton = new NextPageButton(button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial');
 		this.prevPageButton = new PrevPageButton(button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial');
 		this.challengeBtnArr = [];
-		this.pongBtnArr = [];
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -110,10 +139,6 @@ export class UserHUB implements IGameState
 			btn.checkMouse(x, y);
 		}
 
-		for (const btn of this.pongBtnArr)
-		{
-			btn.checkMouse(x, y);
-		}
 	}
 
 	mouseClickCallback()
@@ -128,10 +153,17 @@ export class UserHUB implements IGameState
 		{
 			if (btn.checkClick())
 			{
-				if (curUser) 
+				// Logic for "Remove from tournament" -button
+				const tournamentPlayer = this.tournamentArr.find(player => player.username === btn.user.username);
+
+				if (tournamentPlayer && btn.text === 'REMOVE')
+				{
+					const idx = this.tournamentArr.indexOf(tournamentPlayer);
+					this.tournamentArr.splice(idx, 1);
+				}
+				else if (curUser) 
 				{
 					this.opponent = btn.user;
-					this.interactionType = "challenge";
 
 					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
 					if (passwordHeader) 
@@ -145,36 +177,10 @@ export class UserHUB implements IGameState
 					passwordModal.style.display = "flex";
 					submitPasswordBtn.addEventListener("click", this.submitPasswordBound);
 					cancelPasswordBtn.addEventListener("click", this.cancelPasswordBound);
-		
 				}
 			}
 		}
 
-		for (const btn of this.pongBtnArr)
-		{
-			if (btn.checkClick())
-			{
-				if (curUser) 
-				{
-					this.opponent = btn.user;
-					this.interactionType = "pong";
-	
-					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
-					if (passwordHeader) 
-						passwordHeader.innerHTML = `Hello ${this.opponent.username}!<br>Please type in your password to start the game`;
-	
-					const passwordModal = document.getElementById("passwordModal") as HTMLElement;
-					const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
-					const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
-				
-					// Show the password modal
-					passwordModal.style.display = "flex";
-					submitPasswordBtn.addEventListener("click", this.submitPasswordBound);
-					cancelPasswordBtn.addEventListener("click", this.cancelPasswordBound);
-			
-				}
-			}
-		}
 	}
 
 	submitPasswordCallback(): void
@@ -183,6 +189,11 @@ export class UserHUB implements IGameState
 			return ;
 
 		const passwordInput = document.getElementById("passwordInput") as HTMLInputElement;
+		
+		if (!passwordInput) {
+			return;
+		}
+		
 		const enteredPassword = passwordInput.value;
 		const opponentData = localStorage.getItem(this.opponent.username);
 		const curUserData = localStorage.getItem(curUser);
@@ -200,12 +211,22 @@ export class UserHUB implements IGameState
 			if (enteredPassword === storedUser.password)
 			{
 				const passwordModal = document.getElementById("passwordModal") as HTMLElement;
-				passwordModal.style.display = "none";
+				if (passwordModal) {
+					passwordModal.style.display = "none";
+				}
 				passwordInput.value = "";
-				if (this.interactionType === "challenge")
-					stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent));
-				if (this.interactionType === "pong")
-					stateManager.changeState(new Game(curUserObj, this.opponent));
+
+				if (this.state === UserHubState.SINGLE_GAME)
+				{
+					stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent, null, null, this.gameType));
+				}
+				else
+				{
+					this.tournamentArr.push(this.opponent);
+
+					if (this.tournamentArr.length === 4)
+						stateManager.changeState(new Tournament(this.canvas, this.tournamentArr, this.gameType));
+				}
 			}
 			else
 			{
@@ -225,7 +246,6 @@ export class UserHUB implements IGameState
 		submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
 		cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
 		passwordInput.value = "";
-		this.interactionType = null;
 	}
 
 	enter()
@@ -241,8 +261,14 @@ export class UserHUB implements IGameState
 
 		const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
 		const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
-		submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
-		cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
+		
+		if (submitPasswordBtn) {
+			submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
+		}
+		
+		if (cancelPasswordBtn) {
+			cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
+		}
 	}
 
 	update(deltaTime: number)
@@ -260,24 +286,42 @@ export class UserHUB implements IGameState
 
 		UserManager.drawCurUser();
 
-		const userArr: User [] = UserManager.getAllUserData();
+		if (this.state === UserHubState.TOURNAMENT)
+		{
+			let playerCountText = `${this.tournamentArr.length}/4 players chosen`;
+			drawCenteredText(playerCountText, '40px impact', 'white', 120)
+		}
+
 		let x = 130; // check this proprely later
 		let y = 150;
 
 		for (let i = this.userStartIdx; i < this.userStartIdx + 3; ++i)
 		{
-			if (i >= userArr.length)
+			if (i >= this.userArr.length)
 				break ;
 
-			const challengeBtn: ChallengeButton = UserManager.drawUserInfo(userArr[i], x, y);
+			const isInTournament = this.tournamentArr.some(player => player.username === this.userArr[i].username);
 
-			if (this.needNewChallengeButtons && challengeBtn.user.username !== curUser)
+			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(this.userArr[i], x, y, this.state, isInTournament);
+
+			if (this.needNewChallengeButtons && btn.user.username !== curUser
+				&& this.state !== UserHubState.INFO)
 			{
-				this.challengeBtnArr.push(challengeBtn);
-				const pongButton = new PongButton(x + 660, y + 40, 'red', '#780202', 'PONG', 'white', '25px', 'arial', userArr[i]);
-				this.pongBtnArr.push(pongButton);
+				this.challengeBtnArr.push(btn);
 			}
-			
+
+			// Check if we need to update the tournament button
+			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === this.userArr[i].username);
+
+			if ((isInTournament && tournamentBtn && tournamentBtn.text === 'ADD TO TOURNAMENT')
+				|| (!isInTournament && tournamentBtn && tournamentBtn.text === 'REMOVE')
+			)
+			{
+				const idx = this.challengeBtnArr.indexOf(tournamentBtn);
+				this.challengeBtnArr.splice(idx, 1);
+				this.challengeBtnArr.push(btn);
+			}
+
 			y += 185;
 		}
 
@@ -286,7 +330,7 @@ export class UserHUB implements IGameState
 
 		this.returnMenuButton.draw(ctx);
 
-		if (this.userStartIdx < userArr.length - 3)
+		if (this.userStartIdx < this.userArr.length - 3)
 		{
 			this.nextPageButton.draw(ctx);
 			this.isNextActive = true;
@@ -302,14 +346,8 @@ export class UserHUB implements IGameState
 		else
 			this.isPrevActive = false;
 
-		
 		for (const btn of this.challengeBtnArr)
 			btn.draw(ctx);
-
-		for (const btn of this.pongBtnArr)
-			btn.draw(ctx);
 		
-
 	}
-
 }

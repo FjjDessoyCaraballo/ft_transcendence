@@ -20,17 +20,19 @@ export class Platform {
 	dir: PlatformDir;
 	range: number;
 	cShape: CollisionShape;
+	hasCoin: boolean;
 
 	constructor(x: number, y: number, width: number, dir: PlatformDir, range: number) {
 		this.x = x;
 		this.y = y;
 		this.orig_x = x;
 		this.orig_y = y;
-		this.color = 'orange';
+		this.color = '#a642c2';
 		this.width = width;
 		this.height = PLATFORM_THICKNESS;
 		this.dir = dir;
 		this.range = range;
+		this.hasCoin = false;
 		
 		if (dir == PlatformDir.UP_DOWN)
 			this.velocity = { x: 0, y: -PLATFORM_SPEED };
