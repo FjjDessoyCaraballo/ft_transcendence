@@ -17,13 +17,14 @@ export const Header: React.FC<HeaderProps> = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [windowOpen, setWindowOpen] = useState(false);
 
 
   useEffect(() => {
     const loginStatus = localStorage.getItem('logged-in');
     setIsLoggedIn(loginStatus === 'true');
     
-    // Add event listener to detect changes in localStorage
+    // Event listener to detect changes in localStorage
     const handleStorageChange = () => {
       const currentLoginStatus = localStorage.getItem('logged-in');
       setIsLoggedIn(currentLoginStatus === 'true');
@@ -41,11 +42,18 @@ export const Header: React.FC<HeaderProps> = () => {
   }, []);
 
   const HandleRegistrationClick = () => {
-    setShowGDPR(true);
+    if (windowOpen === false)
+    {
+      setWindowOpen(true);
+      setShowGDPR(true);
+    }
   };
 
   const HandleLoginClick = () => {
-    setShowLogin(true);
+  if (windowOpen === false) {
+      setWindowOpen(true)
+      setShowLogin(true);
+    }
   }
 
   const HandleSettingsClick = () => {
@@ -92,10 +100,12 @@ export const Header: React.FC<HeaderProps> = () => {
           onAccept={() => {
             console.log('GDPR accepted');
             setShowGDPR(false);
+            setWindowOpen(false);
           }}
           onDecline={() => {
             console.log('GDPR declined');
             setShowGDPR(false);
+            setWindowOpen(false);
           }}
         />
       )}
@@ -106,10 +116,12 @@ export const Header: React.FC<HeaderProps> = () => {
             setShowLogin(false);
             setIsLoggedIn(true);
             window.dispatchEvent(new Event('loginStatusChanged'));
+            setWindowOpen(false);
           }}
           onDecline={() => {
             console.log('Login failed/canceled');
             setShowLogin(false);
+            setWindowOpen(false);
           }}
         />
       )}
