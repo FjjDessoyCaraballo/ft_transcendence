@@ -25,9 +25,10 @@ export const registerUser = async (userData: RegisterData) => {
       body: JSON.stringify(userData)
     });
   } catch (error) {
-    throw error;
+    if (error instanceof Error)
+      throw Error;
+    throw new Error('Registration failed. Please try again later.');
   }
-  throw new Error('Registration failed. Please try again later.');
 };
 
 /**
@@ -40,9 +41,8 @@ export const getUserData = async (username: string): Promise<User> => {
   try {
     return await apiRequest(`/users/${username}`);
   } catch (error) {
-    if (error instanceof Error) {
+    if (error instanceof Error) 
       throw error;
-    }
     throw new Error('Failed to fetch user data.');
   }
 };
@@ -56,9 +56,8 @@ export const getAllUsers = async (): Promise<User[]> => {
   try {
     return await apiRequest('/users');
   } catch (error) {
-    if (error instanceof Error) {
+    if (error instanceof Error)
       throw error;
-    }
     throw new Error('Failed to fetch user list.');
   }
 };
