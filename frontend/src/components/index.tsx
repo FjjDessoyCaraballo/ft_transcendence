@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { GameStateManager } from '../game/GameStates'; 
 import { StartScreen } from '../game/StartScreen';
 import { Header } from '../UI/Header'
+import { canvas, ctx } from './Canvas'
 
 export const stateManager = new GameStateManager();
 
