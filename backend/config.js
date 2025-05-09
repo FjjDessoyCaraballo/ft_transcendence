@@ -5,7 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
   
   // Default config with environment variable fallbacks
   const config = {
-	port: process.env.BACKEND_PORT || 3000,
+	port: process.env.BACKEND_PORT || 3443,
 	nodeEnv: process.env.NODE_ENV || 'development',
 	
 	jwtSecret: process.env.JWT_SECRET || 'dev_jwt_secret',

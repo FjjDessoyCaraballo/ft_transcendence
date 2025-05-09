@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     ports:
-      - "${BACKEND_PORT:-3000}:3000"
+      - "${BACKEND_PORT:-3443}:3443"
     volumes:
       - ./backend:/app
       - /app/node_modules
