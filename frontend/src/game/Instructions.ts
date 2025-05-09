@@ -1,28 +1,29 @@
 import { GameStateManager, GameStates, IGameState } from "./GameStates";
 import { ReturnMainMenuButton } from "./EndScreen";
-import { ctx } from "../components/index";
+import { ctx, canvas } from "../components/Canvas";
 import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./Constants";
 import { UserManager } from "../UI/UserManager";
+import { GameType } from "../UI/Types";
 
 export class Instructions implements IGameState
 {
 	name: GameStates;
-	canvas: HTMLCanvasElement;
+	gameType: GameType;
 	returnMenuButton: ReturnMainMenuButton;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement)
+	constructor(gameType: GameType)
 	{
 		this.name = GameStates.INSTRUCTIONS;
-		this.canvas = canvas;
+		this.gameType = gameType;
 
 		let text = 'RETURN TO MENU';
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const buttonX = (canvas.width / 2) - (ctx.measureText(text).width / 2) - TEXT_PADDING;
 		const buttonY = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
 
-		this.returnMenuButton = new ReturnMainMenuButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', this.gameType);
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -30,10 +31,10 @@ export class Instructions implements IGameState
 
 	mouseMoveCallback(event: MouseEvent)
 	{
-		const rect = this.canvas.getBoundingClientRect();
+		const rect = canvas.getBoundingClientRect();
 		
-		const scaleX = this.canvas.width / rect.width;
-		const scaleY = this.canvas.height / rect.height;
+		const scaleX = canvas.width / rect.width;
+		const scaleY = canvas.height / rect.height;
 
 		const x = (event.clientX - rect.left) * scaleX;
 		const y = (event.clientY - rect.top) * scaleY;
@@ -48,14 +49,14 @@ export class Instructions implements IGameState
 
 	enter()
 	{
-		this.canvas.addEventListener('mousemove', this.mouseMoveBound);
-		this.canvas.addEventListener('click', this.mouseClickBound);
+		canvas.addEventListener('mousemove', this.mouseMoveBound);
+		canvas.addEventListener('click', this.mouseClickBound);
 	}
 
 	exit()
 	{
-		this.canvas.removeEventListener('mousemove', this.mouseMoveBound);
-		this.canvas.removeEventListener('click', this.mouseClickBound);
+		canvas.removeEventListener('mousemove', this.mouseMoveBound);
+		canvas.removeEventListener('click', this.mouseClickBound);
 	}
 
 	update(deltaTime: number)
@@ -68,8 +69,8 @@ export class Instructions implements IGameState
 		
 		// Draw info box
 		const boxPadding = 70;
-		const boxW = this.canvas.width - 2 * boxPadding;
-		const boxH = this.canvas.height - 2 * boxPadding;
+		const boxW = canvas.width - 2 * boxPadding;
+		const boxH = canvas.height - 2 * boxPadding;
 		ctx.fillStyle = BUTTON_HOVER_COLOR;
 		ctx.fillRect(boxPadding, boxPadding, boxW, boxH);
 
@@ -77,7 +78,7 @@ export class Instructions implements IGameState
 		const headerText = 'GAME INSTRUCTIONS';
 		ctx.font = '50px arial';
 		ctx.fillStyle = 'black';
-		const headerX = (this.canvas.width / 2) - (ctx.measureText(headerText).width / 2);
+		const headerX = (canvas.width / 2) - (ctx.measureText(headerText).width / 2);
 		const headerY = boxPadding + 60 + 10; // 60 = font size, 10 = small margin
 		ctx.fillText(headerText, headerX, headerY);
 
@@ -91,7 +92,7 @@ export class Instructions implements IGameState
 
 		for (const line of infoTextArr)
 		{
-			infoX = (this.canvas.width / 2) - (ctx.measureText(line).width / 2);
+			infoX = (canvas.width / 2) - (ctx.measureText(line).width / 2);
 			infoY = headerY + 20 + lineHeight * lineCount; // 20 = font size
 			ctx.fillText(line, infoX, infoY);
 			lineCount++;

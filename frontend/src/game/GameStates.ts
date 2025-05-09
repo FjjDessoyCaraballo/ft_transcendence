@@ -6,7 +6,10 @@ export enum GameStates
 	INSTRUCTIONS,
 	USER_HUB,
 	MATCH_INTRO,
-	IN_GAME,
+	BLOCK_BATTLE,
+    PONG,
+	TOURNAMENT_INTRO,
+	TOURNAMENT,
 	END_SCREEN
 };
 
@@ -46,6 +49,7 @@ export class GameStateManager {
 		else
 			return this.currentState.name;
 	}
+
 }
 
 
