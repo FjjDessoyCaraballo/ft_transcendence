@@ -59,7 +59,7 @@ class Paddle {
 class Ball {
   x: number;
   y: number;
-  speedX: number = 10 * -1;
+  speedX: number = 15 * -1;
   speedY: number = 0.5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative;
   currentRallyLen: number = 0;
   totalHits: number = 0;
@@ -143,11 +143,11 @@ class Ball {
   
     setTimeout(() => {
       if (twoPlayerMode) {
-        this.speedX = 10 * (Math.random() > 0.5 ? 1 : -1);
+        this.speedX = 15 * (Math.random() > 0.5 ? 1 : -1);
         this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
       }
       else {
-        this.speedX = 10 * -1;
+        this.speedX = 15 * -1;
         this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
       }
     }, 1000); // 1000ms = 1 second delay
