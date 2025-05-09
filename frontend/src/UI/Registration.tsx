@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { WindowManager } from './Header';
 import { registerUser } from '../services/userService'
 
-export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
+export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	// State management
 	const [visible, setVisible] = useState(true);
 	const [showRegistration, setShowRegistration] = useState(false);

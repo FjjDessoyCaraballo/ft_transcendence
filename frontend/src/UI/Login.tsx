@@ -30,7 +30,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     // Here you would typically make an API call to validate credentials
     // For now, using localStorage as a simple auth mechanism
     const userData = localStorage.getItem(username);
-    console.log('User data from localStorage:', userData); // debug
+    console.log('User data from localStorage:', userData); // Debug
     if (!userData) {
       setErrorMessage('Invalid username or password');
       return;
