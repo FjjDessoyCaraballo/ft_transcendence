@@ -22,6 +22,11 @@ fastify.get('/', async (request, reply) => {
   return { hello: 'world' };
 });
 
+//health check endpoint
+fastify.get('/health', async (request, reply) => {
+  return { status: 'ok', message: 'Server is up and running' };
+});
+
 // Start the server
 const start = async () => {
   try {

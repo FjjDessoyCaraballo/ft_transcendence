@@ -47,29 +47,62 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	  if (localStorage.getItem(username)) {
 		setErrorMessage('Username already exists');
 	  }
-	  
+
 	  try {
-		await registerUser({
-			username: username,
-			password: password
-		});
+		const userData = {
+		  username: username,
+		  password: password,
+		  wins: 0,
+		  losses: 0,
+		  rankingPoint: 1000,
+		};
+		
+		localStorage.setItem(username, JSON.stringify(userData));
+		
+		const userArrKey = 'registeredUsers';
+		const userArrData = localStorage.getItem(userArrKey);
+		
+		if (!userArrData) {
+		  let userArr: string[] = [username];
+		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
+		} else {
+		  let userArr: string[] = JSON.parse(userArrData);
+		  userArr.push(username);
+		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
+		}
 
 		localStorage.setItem('username', username);
+		localStorage.setItem('password', password);
 		setVisible(false);
 		onAccept();
+	} catch (error) {
+		setErrorMessage('Registration failed. Please try again.');
+		console.error('Registration error:', error);
+	}
+};
+
+	// API CONNECTION ON HOLD
+	//   try {
+	// 	await registerUser({
+	// 		username: username,
+	// 		password: password
+	// 	});
+
+	// 	localStorage.setItem('username', username);
+	// 	setVisible(false);
+	// 	onAccept();
 		
-	  } catch (error) {
-		if (error instanceof Error) {
-			setErrorMessage('Registration failed. Please try again.');
-		console.error('Registration error:', error);
-		} else {
-			setErrorMessage('Registration failed. Please try again.');
-		}
-		console.error('Registration error:', error);
-	  } finally {
-		setIsLoading(false);
-	  }
-	};
+	//   } catch (error) {
+	// 	if (error instanceof Error) {
+	// 		setErrorMessage('Registration failed. Please try again.');
+	// 	console.error('Registration error:', error);
+	// 	} else {
+	// 		setErrorMessage('Registration failed. Please try again.');
+	// 	}
+	// 	console.error('Registration error:', error);
+	//   } finally {
+	// 	setIsLoading(false);
+	//   }
   
 	if (!visible) return null;
 
