@@ -20,13 +20,13 @@ import { Ball } from "./Ball";
 // Wins and Losses for each user?
 
 // Game Constants
-export const paddleWidth = 15; 
-export const paddleHeight = 100;
-export const paddleSpeed = 8;
-export const ballSize = 15;
-export const canvasWidth = canvas.width;
-export const canvasHeight = canvas.height;
-export const buffer = 15;
+export const PADDLE_WIDTH = 15; 
+export const PADDLE_HEIGHT = 100;
+export const PADDLE_SPEED = 8;
+export const BALL_SIZE = 15;
+export const CANVAS_WIDTH = canvas.width;
+export const CANVAS_HEIGHT = canvas.height;
+export const BUFFER = 15;
 
 
 export class Game implements IGameState {
@@ -37,7 +37,7 @@ export class Game implements IGameState {
   averageRally: number = 0;
 
   aiLastUpdateTime: number = 0;
-  aiTargetY: number = (canvasHeight - paddleHeight) / 2; // AI's current target
+  aiTargetY: number = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2; // AI's current target
 
   twoPlayerMode: boolean = false;
   player1: Player;
@@ -49,8 +49,8 @@ export class Game implements IGameState {
 
   constructor(user1: User, user2: User) {
     this.storedOpponentName = user2.username;
-    this.player1 = new Player(user1, new Paddle(15)); //STAT
-    this.player2 = new Player(user2, new Paddle(canvasWidth - paddleWidth - 15)); //STAT
+    this.player1 = new Player(user1, new Paddle(BUFFER)); //STAT
+    this.player2 = new Player(user2, new Paddle(CANVAS_WIDTH - PADDLE_WIDTH - BUFFER)); //STAT
     this.gameLoop = this.gameLoop.bind(this);
     this.enter();
     this.gameLoop();
@@ -94,7 +94,7 @@ export class Game implements IGameState {
 
       // calculates the time it takes for the ball to hit either the top or bottom wall of the canvas
       const timeToWallY = ballVY > 0 
-        ? (canvasHeight - ballY - ballSize) / ballVY 
+        ? (CANVAS_HEIGHT - ballY - BALL_SIZE) / ballVY 
         : -ballY / ballVY;
 
       // calculates the time it will take for the ball to travel horizontally to the target X position
@@ -137,11 +137,11 @@ export class Game implements IGameState {
       }
 
       // AI movement toward target using same speed as human
-      const paddleCenter = this.player2.paddle.y + paddleHeight / 2;
-      if (paddleCenter < this.aiTargetY - paddleSpeed) {
+      const paddleCenter = this.player2.paddle.y + PADDLE_HEIGHT / 2;
+      if (paddleCenter < this.aiTargetY - PADDLE_SPEED) {
         this.player2.paddle.moveDown();
       } 
-      else if (paddleCenter > this.aiTargetY + paddleSpeed) {
+      else if (paddleCenter > this.aiTargetY + PADDLE_SPEED) {
         this.player2.paddle.moveUp();
       }
     }
@@ -182,7 +182,7 @@ export class Game implements IGameState {
       this.ball.reset(this.twoPlayerMode);
     }
 
-    if (this.ball.x > canvasWidth) {
+    if (this.ball.x > CANVAS_WIDTH) {
       this.player1.score++;
       if (this.player1.score === 5) {
         this.gameState = 'result';
@@ -196,41 +196,41 @@ export class Game implements IGameState {
 
   drawResult() {
     ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     ctx.fillStyle = 'white';
     ctx.font = "50px 'Courier New', monospace";
     const pong = this.winner?.user.username + " is the winner!";
     const pongWidth = ctx.measureText(pong).width;
-    ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
+    ctx.fillText(pong, (CANVAS_WIDTH * 0.5) - (pongWidth / 2), CANVAS_HEIGHT / 4);
 
     ctx.font = "30px 'Courier New', monospace";
     //add player points here
     const p1 = this.player1.user.username + ": " + this.player1.score + " points";
-    ctx.fillText(p1, (canvasWidth * 0.5) - (ctx.measureText(p1).width / 2), canvasHeight / 4 + 100);
+    ctx.fillText(p1, (CANVAS_WIDTH * 0.5) - (ctx.measureText(p1).width / 2), CANVAS_HEIGHT / 4 + 100);
     const p2 = this.player2.user.username + ": " + this.player2.score + " points";
-    ctx.fillText(p2, (canvasWidth * 0.5) - (ctx.measureText(p2).width / 2), canvasHeight / 4 + 150);
+    ctx.fillText(p2, (CANVAS_WIDTH * 0.5) - (ctx.measureText(p2).width / 2), CANVAS_HEIGHT / 4 + 150);
 
     const seconds = (this.duration / 1000).toFixed(2);
     const durationText = `Game duration: ${seconds} seconds`;
-    ctx.fillText(durationText, (canvasWidth * 0.5) - (ctx.measureText(durationText).width / 2), canvasHeight / 4 + 200);
+    ctx.fillText(durationText, (CANVAS_WIDTH * 0.5) - (ctx.measureText(durationText).width / 2), CANVAS_HEIGHT / 4 + 200);
 
     const longestRally = "Longest rally: " + this.ball.longestRally + " hits";
-    ctx.fillText(longestRally, (canvasWidth * 0.5) - (ctx.measureText(longestRally).width / 2), canvasHeight / 4 + 250);
+    ctx.fillText(longestRally, (CANVAS_WIDTH * 0.5) - (ctx.measureText(longestRally).width / 2), CANVAS_HEIGHT / 4 + 250);
 
     const avgText = `Average rally: ${this.averageRally.toFixed(2)} hits`;
-    ctx.fillText(avgText, (canvasWidth * 0.5) - (ctx.measureText(avgText).width / 2), canvasHeight / 4 + 300);
+    ctx.fillText(avgText, (CANVAS_WIDTH * 0.5) - (ctx.measureText(avgText).width / 2), CANVAS_HEIGHT / 4 + 300);
   }
 
   drawMenu() {
     ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     ctx.fillStyle = 'white';
     ctx.font = "100px 'Courier New', monospace";
     const pong = "PONG";
     const pongWidth = ctx.measureText(pong).width;
-    ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
+    ctx.fillText(pong, (CANVAS_WIDTH * 0.5) - (pongWidth / 2), CANVAS_HEIGHT / 4);
 
     ctx.font = "30px 'Courier New', monospace"; 
     const text1 = "vs computer (Press '1')";
@@ -239,30 +239,30 @@ export class Game implements IGameState {
     const text2Width = ctx.measureText(text2).width;
     
 
-    ctx.fillText(text1, (canvasWidth * 0.5) - (text1Width / 2), canvasHeight / 2);
-    ctx.fillText(text2, (canvasWidth * 0.5) - (text2Width / 2), canvasHeight / 2 + 50);
+    ctx.fillText(text1, (CANVAS_WIDTH * 0.5) - (text1Width / 2), CANVAS_HEIGHT / 2);
+    ctx.fillText(text2, (CANVAS_WIDTH * 0.5) - (text2Width / 2), CANVAS_HEIGHT / 2 + 50);
 
     ctx.font = "20px 'Courier New', monospace";
     const text3 = "Player 1:  up = 'q'  down = 's'";
     const text3Width = ctx.measureText(text3).width;
     const text4 = "Player 2:  up = 'o'  down = 'k'";
     const text4Width = ctx.measureText(text4).width;
-    ctx.fillText(text3, (canvasWidth * 0.5) - (text3Width / 2), canvasHeight / 2 + 150);
-    ctx.fillText(text4, (canvasWidth * 0.5) - (text4Width / 2), canvasHeight / 2 + 200);
+    ctx.fillText(text3, (CANVAS_WIDTH * 0.5) - (text3Width / 2), CANVAS_HEIGHT / 2 + 150);
+    ctx.fillText(text4, (CANVAS_WIDTH * 0.5) - (text4Width / 2), CANVAS_HEIGHT / 2 + 200);
   }
 
   render(ctx: CanvasRenderingContext2D) {
     // Clear canvas
     ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // Draw paddles
     this.player1.paddle.draw();
     this.player2.paddle.draw();
 
     // Draw centre line
-    for (let i = 0; i < canvasHeight; i += canvasHeight / 20) {
-      ctx.fillRect(canvasWidth / 2, i, 3, canvasHeight / 40);
+    for (let i = 0; i < CANVAS_HEIGHT; i += CANVAS_HEIGHT / 20) {
+      ctx.fillRect(CANVAS_WIDTH / 2, i, 3, CANVAS_HEIGHT / 40);
     }
 
     // Draw ball
@@ -272,16 +272,16 @@ export class Game implements IGameState {
     ctx.font = "50px 'Courier New', monospace";
     const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
     const player1TextWidth = ctx.measureText(player1Text).width;
-    ctx.fillText(player1Text, (canvasWidth * 0.25) - (player1TextWidth / 2), 70);
+    ctx.fillText(player1Text, (CANVAS_WIDTH * 0.25) - (player1TextWidth / 2), 70);
 
     const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
     const player2TextWidth = ctx.measureText(player2Text).width;
-    ctx.fillText(player2Text, (canvasWidth * 0.75) - (player2TextWidth / 2), 70);
+    ctx.fillText(player2Text, (CANVAS_WIDTH * 0.75) - (player2TextWidth / 2), 70);
   }
 
   resetGame() {
-    this.player1.paddle.y = (canvasHeight - paddleHeight) / 2;
-    this.player2.paddle.y = (canvasHeight - paddleHeight) / 2;
+    this.player1.paddle.y = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
+    this.player2.paddle.y = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
     this.ball.longestRally = 0;
     this.ball.reset(this.twoPlayerMode);
     this.player1.score = 0;

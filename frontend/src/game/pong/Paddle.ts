@@ -1,29 +1,29 @@
 import { User } from "../../UI/UserManager";
 import { ctx } from "../../components/Canvas";
-import { canvasHeight, paddleHeight, paddleWidth, paddleSpeed } from "./Pong";
+import { CANVAS_HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_SPEED } from "./Pong";
 
 export class Paddle {
     y: number;
   
     constructor(public x: number) {
-      this.y = (canvasHeight - paddleHeight) / 2;
+      this.y = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
     }
   
     moveUp() {
-      this.y -= paddleSpeed;
+      this.y -= PADDLE_SPEED;
     }
   
     moveDown() {
-      this.y += paddleSpeed;
+      this.y += PADDLE_SPEED;
     }
   
     stayInBounds() {
-      this.y = Math.max(0, Math.min(canvasHeight - paddleHeight, this.y));
+      this.y = Math.max(0, Math.min(CANVAS_HEIGHT - PADDLE_HEIGHT, this.y));
     }
   
     draw() {
       ctx.fillStyle = 'white';
-      ctx.fillRect(this.x, this.y, paddleWidth, paddleHeight);
+      ctx.fillRect(this.x, this.y, PADDLE_WIDTH, PADDLE_HEIGHT);
     }
   }
   
