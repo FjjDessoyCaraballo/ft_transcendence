@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GDPRPopup } from './Registration';
+import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
 
@@ -13,7 +13,7 @@ export interface WindowManager {
 }
 
 export const Header: React.FC<HeaderProps> = () => {
-  const [showGDPR, setShowGDPR] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -45,7 +45,7 @@ export const Header: React.FC<HeaderProps> = () => {
     if (windowOpen === false)
     {
       setWindowOpen(true);
-      setShowGDPR(true);
+      setShowRegistration(true);
     }
   };
 
@@ -95,16 +95,16 @@ export const Header: React.FC<HeaderProps> = () => {
       </header>
       
       {/* Popups */}
-      {showGDPR && (
-        <GDPRPopup
+      {showRegistration && (
+        <RegistrationPopup
           onAccept={() => {
             console.log('GDPR accepted');
-            setShowGDPR(false);
+            setShowRegistration(false);
             setWindowOpen(false);
           }}
           onDecline={() => {
             console.log('GDPR declined');
-            setShowGDPR(false);
+            setShowRegistration(false);
             setWindowOpen(false);
           }}
         />
