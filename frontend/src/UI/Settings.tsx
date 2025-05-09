@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { updateCurUser } from '../components';
 
 interface SettingsProps {
 	onClick: () => void;
@@ -17,6 +18,8 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	const HandleLogout = () => {
 		// reserved for API call
 		localStorage.setItem('logged-in', 'false');
+		localStorage.removeItem('LoggedIn');
+		updateCurUser(null);
 		window.dispatchEvent(new Event('loginStatusChanged'));
 		onClick();
 	}

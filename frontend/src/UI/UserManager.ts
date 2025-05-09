@@ -1,11 +1,12 @@
 import { stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
 import { canvas, ctx } from "../components/Canvas";
 import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
-import { BUTTON_HOVER_COLOR, USER_ARR_KEY, LOGIN_CHECK_KEY} from "../game/Constants";
-import { StartScreen } from "../game/StartScreen";
+import { USER_ARR_KEY, LOGIN_CHECK_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
+import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { GameStates } from "../game/GameStates";
 import { Button } from "./Button";
 import { RankingHandler } from "../game/RankingPoints";
+import { UserHubState } from "./Types";
 
 // interface already present in /frontend/src/services/Auth.ts
 export interface User {
@@ -14,7 +15,6 @@ export interface User {
     wins: number;
     losses: number;
 	rankingPoint: number;
-	color: string;
 	// Add match history here...? Or somewhere else?
 }
 
@@ -33,6 +33,20 @@ export class ChallengeButton extends Button
 }
 
 export class PongButton extends Button
+{
+	user: User;
+
+	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	{
+		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.user = user;
+	}
+
+	clickAction(): void {
+	}
+}
+
+export class TournamentButton extends Button
 {
 	user: User;
 
@@ -112,7 +126,6 @@ export class UserManager {
 			wins: user.wins,
 			losses: user.losses,
 			rankingPoint: user.rankingPoint,
-			color: user.color
 		};
 
 		return newUser;
@@ -157,12 +170,12 @@ export class UserManager {
     }
 
 
-	static drawUserInfo(user: User, x: number, y: number): ChallengeButton
+	static drawUserInfo(user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
 	{
 		// Draw avatar box & text (JUST A TEST)
 		const avatarW = 200;
 		const avatarH = 180;
-		ctx.fillStyle = user.color; // GLOBAL USE of ctx
+		ctx.fillStyle = DEEP_PURPLE; // GLOBAL USE of ctx
 		ctx.fillRect(x, y, avatarW, avatarH);
 
 		ctx.font = '20px arial';
@@ -174,7 +187,7 @@ export class UserManager {
 		const boxW = 700;
 		const boxH = 180;
 		const boxX = x + avatarW + 20;
-		ctx.fillStyle = BUTTON_HOVER_COLOR; // GLOBAL USE
+		ctx.fillStyle = LIGHT_PURPLE; // GLOBAL USE
 		ctx.fillRect(boxX, y, boxW, boxH);
 
 		// Draw username
@@ -188,6 +201,7 @@ export class UserManager {
 		const infoHeight = usernameY + 60;
 		const infoWidth = 200;
 		const lineHeight = 30;
+		const buttonOffset = 20;
 
 		ctx.font = '20px arial';
 		ctx.fillStyle = '#1111d6';
@@ -200,14 +214,38 @@ export class UserManager {
 		ctx.fillStyle = 'black';
 		ctx.fillText(user.rankingPoint.toFixed(2), boxX + boxPadding + infoWidth, infoHeight + lineHeight);
 
-		// Draw challenge button
+		// Create challenge button
+		if (state === UserHubState.SINGLE_GAME)
+		{
+			let text = 'CHALLENGE';
+			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
+			const buttonY = infoHeight - buttonOffset;
+			const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
+			return challengeButton;
+		}
+		else
+		{
+			let tournamentBtn;
 
-		let text = 'BLOCK WARS';
-		const buttonX = boxX + boxPadding + infoWidth * 2;
-		const buttonY = infoHeight;
-		const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
+			if (!isInTournament)
+			{
+				let text = 'ADD TO TOURNAMENT';
+				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 - 20;
+				const buttonY = infoHeight - buttonOffset;
+				tournamentBtn = new TournamentButton(buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user);
+			}
+			else
+			{
+				let text = 'REMOVE';
+				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 + 40;
+				const buttonY = infoHeight - buttonOffset;
+				tournamentBtn = new TournamentButton(buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user);
+			}
 
-		return challengeButton;
+			return tournamentBtn;
+
+		}
+
 	}
 
 
@@ -228,14 +266,8 @@ export class UserManager {
 		}
 		else
 		{
-			ctx.fillStyle = 'white';
-			ctx.font = '22px arial';
-			const text = "Currently logged in user: ";
-			ctx.fillText(text, canvas.width / 2 - ctx.measureText(text).width / 2 , 20);
-	
-			ctx.fillStyle = 'red';
-			ctx.font = '28px arial';
-			ctx.fillText(curUser, canvas.width / 2 - ctx.measureText(curUser).width / 2, 50);
+			drawCenteredText('Currently logged in user: ', '22px arial', 'white', 30);
+			drawCenteredText(curUser, '28px arial', 'red', 60);
 		}
 	}
 }

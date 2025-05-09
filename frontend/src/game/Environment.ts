@@ -1,4 +1,4 @@
-import { FLOOR_THICKNESS, WALL_THICKNESS, PLATFORM_THICKNESS, PLATFORM_SPEED, } from "./Constants";
+import { FLOOR_THICKNESS, WALL_THICKNESS, DEEP_PURPLE, PURPLE} from "./Constants";
 import { canvas } from "../components/Canvas";
 
 interface GameArea {
@@ -19,12 +19,12 @@ window.onload = () => {
   
 
 export function drawGround(ctx: CanvasRenderingContext2D){
-	ctx.fillStyle = 'orange';
+	ctx.fillStyle = '#5d4863';
     ctx.fillRect(0, canvas.height - FLOOR_THICKNESS, canvas.width, FLOOR_THICKNESS);
 }
 
 export function drawWalls(ctx: CanvasRenderingContext2D){
-	ctx.fillStyle = 'orange';
+	ctx.fillStyle = '#5d4863';
 
     ctx.fillRect(0, 0, WALL_THICKNESS, canvas.height);
 	ctx.fillRect(canvas.width - WALL_THICKNESS, 0, WALL_THICKNESS, canvas.height);

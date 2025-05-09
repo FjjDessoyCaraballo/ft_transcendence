@@ -1,4 +1,4 @@
-import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT} from "./Constants";
+import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT, BB_LEFT_1, BB_RIGHT_1, BB_UP_1, BB_DOWN_1, BB_SHOOT_1} from "./Constants";
 import { Projectile } from "./Projectiles";
 import { gameArea } from "./Environment";
 import { CollisionShape, collType } from "./CollisionShape";
@@ -22,6 +22,9 @@ export class Player {
 	cShapeSize : number;
 	cShapeOffset : number;
 	health: Health;
+	isDead: boolean;
+	hasWon: boolean;
+	coinCount: number;
 	userData: User | null;
 
 	onPlatform?: Platform;
@@ -43,12 +46,15 @@ export class Player {
 		this.cShapeOffset = 2;
 		this.cShape = new CollisionShape(this.x + this.cShapeOffset, this.y + this.cShapeOffset, this.cShapeSize, this.cShapeSize, collType.PLAYER, this);
 		this.health = new Health();
+		this.isDead = false;
+		this.coinCount = 0;
+		this.hasWon = false;
 		this.userData = user;
     }
 
     move(keys: { [key: string]: boolean }, deltaTime: number) {
 
-		if (this.onPlatform && !keys['a'] && !keys['d'])
+		if (this.onPlatform && !keys[BB_LEFT_1] && !keys[BB_RIGHT_1])
 		{
 			this.x += this.onPlatform.velocity.x * deltaTime;
 			this.y += this.onPlatform.velocity.y * deltaTime;
@@ -160,20 +166,20 @@ export class Player {
 	checkKeyEvents(keys: { [key: string]: boolean }) {
 		this.velocity.x = 0;
 
-        if (keys['w'] && this.isOnGround) {
+        if (keys[BB_UP_1] && this.isOnGround) {
             this.velocity.y = JUMP_POWER;
 			this.isOnGround = false;
 			this.onPlatform = undefined;
         }
-        if (keys['a']) {
+        if (keys[BB_LEFT_1]) {
             this.velocity.x = -PLAYER_SPEED;
 			this.direction = 'left';
         }
-        if (keys['d']) {
+        if (keys[BB_RIGHT_1]) {
             this.velocity.x = PLAYER_SPEED;
 			this.direction = 'right';
         }
-		if (keys[' '] && this.canFire()) {
+		if (keys[BB_SHOOT_1] && this.canFire()) {
             this.fireProjectile();
         }
 	}
@@ -206,6 +212,7 @@ export class Player {
         for (const projectile of this.projectiles) {
             projectile.draw(ctx);
         }
+
 
 //		this.cShape.draw(ctx); // --> For debug
     }

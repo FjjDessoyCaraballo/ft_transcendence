@@ -1,6 +1,5 @@
 import { BULLET_DMG } from "./Constants";
 
-
 export enum collType
 {
 	PLAYER,
