@@ -67,6 +67,9 @@ export const Header: React.FC<HeaderProps> = () => {
           <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
             Transcendence
           </h1>
+          <h4 className="p-5 pb-2 m-0 text-1xl font-mono font-bold text-[#4B0082]">
+            A Dads and Coders Inc. product
+          </h4>
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
               
