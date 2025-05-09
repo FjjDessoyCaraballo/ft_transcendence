@@ -1,13 +1,13 @@
-import { GameStateManager, GameStates, IGameState } from "../Game/GameStates";
-import { ReturnMainMenuButton } from "../Game/EndScreen";
+import { GameStateManager, GameStates, IGameState } from "../game/GameStates";
+import { ReturnMainMenuButton } from "../game/EndScreen";
 import { curUser, stateManager } from "../components/index";
 import { ctx } from "../components/Canvas";
-import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../Game/Constants";
+import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../game/Constants";
 import { ChallengeButton, PongButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
-import { InGame } from "../Game/InGame";
-import { MatchIntro } from "../Game/MatchIntro";
-import { Game } from "../Game/Pong/Pong"
+import { InGame } from "../game/InGame";
+import { MatchIntro } from "../game/MatchIntro";
+import { Game } from "../game/pong/Pong"
 
 export class NextPageButton extends Button
 {

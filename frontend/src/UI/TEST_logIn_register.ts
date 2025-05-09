@@ -1,5 +1,5 @@
 import { User } from "./UserManager";
-import { USER_ARR_KEY, LOGIN_CHECK_KEY } from "../Game/Constants";
+import { USER_ARR_KEY, LOGIN_CHECK_KEY } from "../game/Constants";
 import { updateCurUser } from "../components/index";
 
 /*
