@@ -31,7 +31,7 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  onDecline();
 	};
   
-	const HandleRegistration = (e: React.FormEvent) => {
+	const HandleRegistration = async (e: React.FormEvent) => {
 	  e.preventDefault();
 	  
 	  if (!username || !password || !confirmPassword) {
@@ -48,46 +48,13 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 		setErrorMessage('Username already exists');
 	  }
 
-// 	  try {
-// 		const userData = {
-// 		  username: username,
-// 		  password: password,
-// 		  wins: 0,
-// 		  losses: 0,
-// 		  rankingPoint: 1000,
-// 		};
-		
-// 		localStorage.setItem(username, JSON.stringify(userData));
-		
-// 		const userArrKey = 'registeredUsers';
-// 		const userArrData = localStorage.getItem(userArrKey);
-		
-// 		if (!userArrData) {
-// 		  let userArr: string[] = [username];
-// 		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
-// 		} else {
-// 		  let userArr: string[] = JSON.parse(userArrData);
-// 		  userArr.push(username);
-// 		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
-// 		}
-
-// 		localStorage.setItem('username', username);
-// 		localStorage.setItem('password', password);
-// 		setVisible(false);
-// 		onAccept();
-// 	} catch (error) {
-// 		setErrorMessage('Registration failed. Please try again.');
-// 		console.error('Registration error:', error);
-// 	}
-// };
-
-	// API CONNECTION ON HOLD
 	try {
 		await registerUser({
 			username: username,
 			password: password
 		});
 
+		// remove for end-product, otherwise this can be a security concern
 		localStorage.setItem('username', username);
 		setVisible(false);
 		onAccept();
@@ -103,6 +70,7 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  } finally {
 		setIsLoading(false);
 	  }
+	}
   
 	if (!visible) return null;
 
