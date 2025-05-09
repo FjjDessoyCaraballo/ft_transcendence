@@ -81,7 +81,7 @@ ft_transcendence/
    cd ft_transcendence
    ```
 
-2. Create an `.env` file with the necessary environment variables (see `.env.example`).
+2. Create an `.env` file with the necessary environment variables.
 
 3. Build and start the containers:
    ```bash
