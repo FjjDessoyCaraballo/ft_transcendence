@@ -22,42 +22,40 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
   try {
     // For local development when backend is not available yet
     // Check if we're in development mode without backend connectivity
-    const newUser = {
-      username: registerData.username,
-      password: registerData.password,
-      wins: 0,
-      losses: 0,
-      rankingPoint: 1000,
-    };
+    // const newUser = {
+    //   username: registerData.username,
+    //   password: registerData.password,
+    //   wins: 0,
+    //   losses: 0,
+    //   rankingPoint: 1000,
+    // };
     
-    localStorage.setItem(registerData.username, JSON.stringify(newUser));
+    // localStorage.setItem(registerData.username, JSON.stringify(newUser));
     
-    const userArrKey = 'registeredUsers';
-    const userArrData = localStorage.getItem(userArrKey);
+    // const userArrKey = 'registeredUsers';
+    // const userArrData = localStorage.getItem(userArrKey);
     
-    if (!userArrData) {
-      let userArr: string[] = [registerData.username];
-      localStorage.setItem(userArrKey, JSON.stringify(userArr));
-    } else {
-      let userArr: string[] = JSON.parse(userArrData);
-      userArr.push(registerData.username);
-      localStorage.setItem(userArrKey, JSON.stringify(userArr));
-    }
+    // if (!userArrData) {
+    //   let userArr: string[] = [registerData.username];
+    //   localStorage.setItem(userArrKey, JSON.stringify(userArr));
+    // } else {
+    //   let userArr: string[] = JSON.parse(userArrData);
+    //   userArr.push(registerData.username);
+    //   localStorage.setItem(userArrKey, JSON.stringify(userArr));
+    // }
     
-    // Mock response for development
-    return {
-      user: newUser as User,
-      token: "mock-token-for-dev",
-      message: "Registration successful"
-    };
+    // // Mock response for development
+    // return {
+    //   user: newUser as User,
+    //   token: "mock-token-for-dev",
+    //   message: "Registration successful"
+    // };
     
-    /* 
     // Real API implementation (uncomment when backend is ready)
     return await apiRequest('/users/register', {
       method: 'POST',
       body: JSON.stringify(registerData)
     });
-    */
   } catch (error) {
     if (error instanceof Error)
       throw error;
