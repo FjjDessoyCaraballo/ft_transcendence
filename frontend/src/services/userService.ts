@@ -52,7 +52,7 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
     // };
     
     // Real API implementation (uncomment when backend is ready)
-    return await apiRequest('/users/register', {
+    return await apiRequest('/register', {
       method: 'POST',
       body: JSON.stringify(registerData)
     });
