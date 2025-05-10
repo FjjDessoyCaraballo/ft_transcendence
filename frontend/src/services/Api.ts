@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3443';
+const API_URL = 'https://localhost:3443';
 
 // not sure if this is needed, but it is here for now
 interface ApiError {

@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 	
 	dbPath: process.env.DB_PATH || '/app/data/database.sqlite',
 	
-	corsOrigin: process.env.REACT_APP_API_URL || 'http://localhost:9000'
+	corsOrigin: 'http://localhost:9000' || 'http://localhost:9000'
   };
   
   module.exports = config;
