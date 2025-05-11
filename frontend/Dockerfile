@@ -16,6 +16,9 @@ RUN apt-get update && \
 # Install dependencies
 RUN npm install
 
+# Install webpack and other dev dependencies
+RUN npm install --save-dev webpack webpack-cli webpack-dev-server html-webpack-plugin ts-loader style-loader css-loader postcss-loader
+
 # Install React and TypeScript definitions
 RUN npm install react react-dom @types/react @types/react-dom --save
 
@@ -27,12 +30,6 @@ COPY . .
 
 # Make the entrypoint script executable
 RUN chmod +x /app/entrypoint.sh
-
-# Compile TypeScript files
-RUN npx tsc
-
-# Build the application
-RUN npm run build
 
 # Expose the port the app will run on
 EXPOSE 9000

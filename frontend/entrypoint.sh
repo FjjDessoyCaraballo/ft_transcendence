@@ -11,6 +11,6 @@ if [ ! -f /app/certs/cert.pem ] || [ ! -f /app/certs/key.pem ]; then
   cd /app
 fi
 
-# Start the application with HTTPS
+# Start the webpack dev server (it will use the HTTPS config from webpack.config.js)
 echo "Starting frontend server with HTTPS..."
-exec npm run dev -- --host 0.0.0.0 --port 9000 --https --cert /app/certs/cert.pem --key /app/certs/key.pem
+exec npm run dev
