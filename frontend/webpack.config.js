@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: './src/components/index.tsx',
   module: {
     rules: [
       {
@@ -13,7 +13,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          'style-loader',
+          'style-loader',  
           'css-loader',
           'postcss-loader'
         ]
@@ -21,7 +21,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
   output: {
     filename: 'bundle.js',
@@ -39,6 +39,7 @@ module.exports = {
     compress: true,
     port: 9000,
     hot: true,
-    open: true
+    open: true,
+    historyApiFallback: true
   },
 };

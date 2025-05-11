@@ -4,7 +4,7 @@ async function routes(fastify, options) {
 	fastify.register(require('./game'), { prefix: '/api/games' });
 	fastify.register(require('./friend'), { prefix: '/api/friends' });
 	
-	// Add a simple root route
+	// Simple root route
 	fastify.get('/', async (request, reply) => {
 	  return { status: 'API is running' };
 	});
