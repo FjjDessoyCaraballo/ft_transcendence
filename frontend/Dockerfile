@@ -6,14 +6,27 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    openssl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
 # Install dependencies
 RUN npm install
 
 # Install React and TypeScript definitions
 RUN npm install react react-dom @types/react @types/react-dom --save
 
+# Create certificates directory
+RUN mkdir -p /app/certs
+
 # Copy the rest of the application code
 COPY . .
+
+# Make the entrypoint script executable
+RUN chmod +x /app/entrypoint.sh
 
 # Compile TypeScript files
 RUN npx tsc
@@ -24,5 +37,5 @@ RUN npm run build
 # Expose the port the app will run on
 EXPOSE 9000
 
-# Command to run the application
-CMD ["npm", "run", "dev"]
+# Set the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
