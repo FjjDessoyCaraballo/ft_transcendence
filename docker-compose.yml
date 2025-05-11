@@ -16,6 +16,8 @@ services:
       - JWT_SECRET=${JWT_SECRET:-dev_jwt_secret}
       - COOKIE_SECRET=${COOKIE_SECRET:-dev_cookie_secret}
       - DB_PATH=${DB_PATH:-/app/data/database.sqlite}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:9000}
+      - BACKEND_URL=${BACKEND_URL:-https://localhost:3443}
     restart: unless-stopped
 
   frontend:
@@ -30,7 +32,6 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      # - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:3000}
     depends_on:
       - backend
     restart: unless-stopped
