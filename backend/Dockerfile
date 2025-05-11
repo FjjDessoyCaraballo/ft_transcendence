@@ -1,5 +1,4 @@
-# Use Node.js as the base image
-FROM node:16
+FROM node:20.13.1-bookworm-slim
 
 # Set working directory
 WORKDIR /app
@@ -7,33 +6,31 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install system dependencies including OpenSSL
-RUN apt-get update && apt-get install -y sqlite3 openssl
+# Install system dependencies including OpenSSL and SQLite
+# Use apt-get with optimizations for Docker
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    sqlite3 \
+    openssl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Install dependencies
-RUN npm install
+# Install Node.js dependencies
+RUN npm install --no-audit --production
 
-# Install Fastify and other required packages
-RUN npm install fastify @fastify/cors @fastify/static @fastify/jwt
-RUN npm install sqlite3 better-sqlite3
-RUN npm install fastify-socket.io
-RUN npm install bcrypt
-
-# Create https certs
-# RUN mkdir -p /app/certs && \
-#     openssl genrsa -out /app/certs/key.pem 2048 && \
-#     openssl req -new -x509 -key /app/certs/key.pem -out /app/certs/cert.pem -days 365 -subj "/CN=localhost"
-
-# Create directory for the SQLite database
-RUN mkdir -p /app/data
+# Create directories
+RUN mkdir -p /app/data /app/certs
 RUN chmod 700 /app/data
 
-# Copy the rest of the application code
-COPY init_sqlite.sh /app/init_sqlite.sh
+# Copy the application code
+COPY . /app/
+
+# Make the scripts executable
+RUN chmod +x /app/entrypoint.sh
 RUN chmod +x /app/init_sqlite.sh
 
 # Expose the port the server will run on
 EXPOSE 3443
 
-# Command to run the server
-CMD ["/bin/bash", "-c", "mkdir -p /app/certs && cd /app/certs && openssl genrsa -out key.pem 2048 && openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj '/CN=localhost' && cd /app && /app/init_sqlite.sh && node src/server.js"]
+# Set the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]

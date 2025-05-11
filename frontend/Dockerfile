@@ -1,5 +1,4 @@
-# Use Node.js as the base image
-FROM node:16
+FROM node:20.13.1-bookworm-slim
 
 # Set working directory
 WORKDIR /app
