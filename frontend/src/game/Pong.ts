@@ -188,18 +188,18 @@ export class Pong implements IGameState {
     if (this.gameState === 'playing')
     {
       this.twoPlayerMode = true; // Two-player mode
-          this.player2.user.username = this.storedOpponentName;
+      this.player2.user.username = this.storedOpponentName;
     }
     else if (this.gameState === 'ai')
     {
       this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
-          this.player2.user.username = "Computer";
-          this.gameState = 'playing';
+      this.player2.user.username = "Computer";
+      this.gameState = 'playing';
     }
 
-      // Listen for key events
-      document.addEventListener('keydown', this.handleKeyDown.bind(this));
-      document.addEventListener('keyup', this.handleKeyUp.bind(this));
+    // Listen for key events
+    document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    document.addEventListener('keyup', this.handleKeyUp.bind(this));
   }
 
   handleKeyDown(e: KeyboardEvent) {
