@@ -33,6 +33,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
         username: username,
         password: password
       });
+      window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
     } catch (error) {
       setErrorMessage('Login failed.');

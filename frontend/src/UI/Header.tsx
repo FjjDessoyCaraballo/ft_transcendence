@@ -19,12 +19,10 @@ export const Header: React.FC<HeaderProps> = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
 
-
   useEffect(() => {
     const loginStatus = localStorage.getItem('logged-in');
     setIsLoggedIn(loginStatus === 'true');
     
-    // Event listener to detect changes in localStorage
     const handleStorageChange = () => {
       const currentLoginStatus = localStorage.getItem('logged-in');
       setIsLoggedIn(currentLoginStatus === 'true');
@@ -32,7 +30,6 @@ export const Header: React.FC<HeaderProps> = () => {
     
     window.addEventListener('storage', handleStorageChange);
     
-    // Custom event for login status changes within the same window
     window.addEventListener('loginStatusChanged', handleStorageChange);
     
     return () => {
