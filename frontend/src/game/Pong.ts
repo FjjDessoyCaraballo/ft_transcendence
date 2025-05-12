@@ -7,23 +7,6 @@ import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "./Constants";
 
-// Don't access canvas at the module level - only inside functions
-
-// STATS
-// BOTH GAMES
-// - Player1
-// - Player2
-// - Winner
-// - Game duration
-// - Game type
-// PONG
-// - Longest ball rally
-// - Avg ball rally
-// - Points scored by Player1
-// - Points scored by Player2
-
-// Wins and Losses for each user?
-
 // Game Constants
 const PADDLE_WIDTH = 15; 
 const PADDLE_HEIGHT = 100;
@@ -337,6 +320,21 @@ export class Pong implements IGameState {
 		if (this.gameState === 'playing')
 			this.updateGame();
   }
+
+// STATS
+// BOTH GAMES
+// - Player1 (in TP)
+// - Player2 (in TP)
+// - Winner (in TP)
+// - Game duration 
+// - Game type
+// PONG
+// - Longest ball rally
+// - Avg ball rally
+// - Points scored by Player1 (in TP)
+// - Points scored by Player2 (in TP)
+
+// Wins and Losses for each user?
 
   drawResult() {
     // Tournament ending
