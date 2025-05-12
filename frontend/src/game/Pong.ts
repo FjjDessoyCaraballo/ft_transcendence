@@ -27,7 +27,7 @@ import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "./Constants";
 // Game Constants
 const PADDLE_WIDTH = 15; 
 const PADDLE_HEIGHT = 100;
-const PADDLE_SPEED = 8;
+const PADDLE_SPEED = 10;
 const BALL_SIZE = 15;
 const BUFFER = 15;
 
@@ -166,7 +166,8 @@ constructor(public user: User, public paddle: Paddle, public score: number = 0) 
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
-  gameState: 'menu' | 'playing' | 'result' | 'ai';
+  //gameState: 'menu' | 'playing' | 'result' | 'ai';
+  gameState: 'playing' | 'result' | 'ai';
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
   averageRally: number = 0;
@@ -202,49 +203,24 @@ export class Pong implements IGameState {
     this.tournamentData1 = tData1;
 	  this.tournamentData2 = tData2;
     if (this.gameState === 'playing')
-      {
-        this.twoPlayerMode = true; // Two-player mode
-            this.player2.user.username = this.storedOpponentName;
-      }
-      else if (this.gameState === 'ai')
-      {
-        this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
-            this.player2.user.username = "Computer";
-            this.gameState = 'playing';
-      }
+    {
+      this.twoPlayerMode = true; // Two-player mode
+          this.player2.user.username = this.storedOpponentName;
+    }
+    else if (this.gameState === 'ai')
+    {
+      this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
+          this.player2.user.username = "Computer";
+          this.gameState = 'playing';
+    }
 
-        // Listen for key events
-        document.addEventListener('keydown', this.handleKeyDown.bind(this));
-        document.addEventListener('keyup', this.handleKeyUp.bind(this));
+      // Listen for key events
+      document.addEventListener('keydown', this.handleKeyDown.bind(this));
+      document.addEventListener('keyup', this.handleKeyUp.bind(this));
   }
 
   handleKeyDown(e: KeyboardEvent) {
-    if (this.gameState === 'menu') {
-		/*
-      if (e.key === '1') {
-        this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
-        this.player2.user.username = "Computer";
-        this.gameState = 'playing';
-
-        //this.resetGame(); I don't think we have to reset here
-      } else if (e.key === '2') {
-        this.twoPlayerMode = true; // Two-player mode
-        this.player2.user.username = this.storedOpponentName;
-        this.gameState = 'playing';
-        //this.resetGame();
-      }
-		*/
-    } else {
-
-		// We should probably disable this...?
-
-      // if (e.key === 'Escape') {
-      //   this.gameState = 'menu';
-      //   this.resetGame();
-      // } else {
-        this.keysPressed[e.key] = true;
-      //}
-    }
+      this.keysPressed[e.key] = true;
   }
 
   handleKeyUp(e: KeyboardEvent) {
@@ -326,8 +302,8 @@ export class Pong implements IGameState {
 	}
 
   updateGame() {
-    if (this.gameState !== 'playing') 
-      return ; // Shouldn't have to do this!!
+    // if (this.gameState !== 'playing') 
+    //   return ; // Shouldn't have to do this!!
     //console.log('Current gameState:', this.gameState);
     this.updatePlayerPositions();
     this.ball.move();
@@ -358,52 +334,50 @@ export class Pong implements IGameState {
   }
 
   update() {
-
 		if (this.gameState === 'playing')
 			this.updateGame();
   }
 
   drawResult() {
+    // Tournament ending
+    if (this.tournamentData1 && this.tournamentData2)
+      {
+        if (this.winner === this.player1)
+        {
+          this.tournamentData1.tournamentPoints++;
+          this.tournamentData1.pongPointsScored += this.player1.score;
+          this.tournamentData2.pongPointsScored += this.player2.score;
+          this.tournamentData1.isWinner = true;
+        }	
+        else if (this.winner === this.player2)
+        {
+          this.tournamentData2.tournamentPoints++;
+          this.tournamentData1.pongPointsScored += this.player1.score;
+          this.tournamentData2.pongPointsScored += this.player2.score;
+          this.tournamentData2.isWinner = true;
+        }
+              
+        this.isStateReady = true;
+        return ;
+      }
 
-	// Tournament ending
-	if (this.tournamentData1 && this.tournamentData2)
-		{
-			if (this.winner === this.player1)
-			{
-				this.tournamentData1.tournamentPoints++;
-				this.tournamentData1.pongPointsScored += this.player1.score;
-				this.tournamentData2.pongPointsScored += this.player2.score;
-				this.tournamentData1.isWinner = true;
-			}	
-			else if (this.winner === this.player2)
-			{
-				this.tournamentData2.tournamentPoints++;
-				this.tournamentData1.pongPointsScored += this.player1.score;
-				this.tournamentData2.pongPointsScored += this.player2.score;
-				this.tournamentData2.isWinner = true;
-			}
-						
-			this.isStateReady = true;
-			return ;
-		}
+    // Regular ending
+    const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
+    const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
 
-	// Regular ending
-	const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
-	const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
-
-	if (this.twoPlayerMode)
-	{
-		if (this.winner === this.player1)
-			stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG));
-		else if (this.winner === this.player2)
-			stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG));
-	}
-	else
-	{
-		if (this.winner === this.player1)
-			stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG_AI));
-		else if (this.winner === this.player2)
-			stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG_AI));
+    if (this.twoPlayerMode)
+    {
+      if (this.winner === this.player1)
+        stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG));
+      else if (this.winner === this.player2)
+        stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG));
+    }
+    else
+    {
+      if (this.winner === this.player1)
+        stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG_AI));
+      else if (this.winner === this.player2)
+        stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG_AI));
 	}
 
 
@@ -448,73 +422,74 @@ export class Pong implements IGameState {
 	*/
   }
 
-  drawMenu(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+  // drawMenu(ctx: CanvasRenderingContext2D) {
+  //   ctx.fillStyle = 'black';
+  //   ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    ctx.fillStyle = 'white';
-    ctx.font = "100px 'Courier New', monospace";
-    const pong = "PONG";
-    const pongWidth = ctx.measureText(pong).width;
-    ctx.fillText(pong, (this.canvasWidth * 0.5) - (pongWidth / 2), this.canvasHeight / 4);
+  //   ctx.fillStyle = 'white';
+  //   ctx.font = "100px 'Courier New', monospace";
+  //   const pong = "PONG";
+  //   const pongWidth = ctx.measureText(pong).width;
+  //   ctx.fillText(pong, (this.canvasWidth * 0.5) - (pongWidth / 2), this.canvasHeight / 4);
 
-    ctx.font = "30px 'Courier New', monospace"; 
-    const text1 = "vs computer (Press '1')";
-    const text1Width = ctx.measureText(text1).width;
-    const text2 = "vs human (Press '2')";
-    const text2Width = ctx.measureText(text2).width;
+  //   ctx.font = "30px 'Courier New', monospace"; 
+  //   const text1 = "vs computer (Press '1')";
+  //   const text1Width = ctx.measureText(text1).width;
+  //   const text2 = "vs human (Press '2')";
+  //   const text2Width = ctx.measureText(text2).width;
     
-    ctx.fillText(text1, (this.canvasWidth * 0.5) - (text1Width / 2), this.canvasHeight / 2);
-    ctx.fillText(text2, (this.canvasWidth * 0.5) - (text2Width / 2), this.canvasHeight / 2 + 50);
+  //   ctx.fillText(text1, (this.canvasWidth * 0.5) - (text1Width / 2), this.canvasHeight / 2);
+  //   ctx.fillText(text2, (this.canvasWidth * 0.5) - (text2Width / 2), this.canvasHeight / 2 + 50);
 
-    ctx.font = "20px 'Courier New', monospace";
-    const text3 = `Player 1:  up = '${PONG_UP_1}'  down = '${PONG_DOWN_1}'`;
-    const text3Width = ctx.measureText(text3).width;
-    const text4 = `Player 2:  up = '${PONG_UP_2}'  down = '${PONG_DOWN_2}'`;
-    const text4Width = ctx.measureText(text4).width;
-    ctx.fillText(text3, (this.canvasWidth * 0.5) - (text3Width / 2), this.canvasHeight / 2 + 150);
-    ctx.fillText(text4, (this.canvasWidth * 0.5) - (text4Width / 2), this.canvasHeight / 2 + 200);
-  }
+  //   ctx.font = "20px 'Courier New', monospace";
+  //   const text3 = `Player 1:  up = '${PONG_UP_1}'  down = '${PONG_DOWN_1}'`;
+  //   const text3Width = ctx.measureText(text3).width;
+  //   const text4 = `Player 2:  up = '${PONG_UP_2}'  down = '${PONG_DOWN_2}'`;
+  //   const text4Width = ctx.measureText(text4).width;
+  //   ctx.fillText(text3, (this.canvasWidth * 0.5) - (text3Width / 2), this.canvasHeight / 2 + 150);
+  //   ctx.fillText(text4, (this.canvasWidth * 0.5) - (text4Width / 2), this.canvasHeight / 2 + 200);
+  // }
 
   drawGame()
   {
-	// Clear canvas
-	ctx.fillStyle = 'black';
-	ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+    // Clear canvas
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-	// Draw paddles
-	this.player1.paddle.draw(ctx);
-	this.player2.paddle.draw(ctx);
+    // Draw paddles
+    this.player1.paddle.draw(ctx);
+    this.player2.paddle.draw(ctx);
 
-	// Draw centre line
-	for (let i = 0; i < this.canvasHeight; i += this.canvasHeight / 20) {
-	ctx.fillRect(this.canvasWidth / 2, i, 3, this.canvasHeight / 40);
-	}
+    // Draw centre line
+    for (let i = 0; i < this.canvasHeight; i += this.canvasHeight / 20) {
+    ctx.fillRect(this.canvasWidth / 2, i, 3, this.canvasHeight / 40);
+    }
 
-	// Draw ball
-	this.ball.draw(ctx);
+    // Draw ball
+    this.ball.draw(ctx);
 
-	// Draw scores
-	ctx.font = "50px 'Courier New', monospace";
-	const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
-	const player1TextWidth = ctx.measureText(player1Text).width;
-	ctx.fillText(player1Text, (this.canvasWidth * 0.25) - (player1TextWidth / 2), 70);
+    // Draw scores
+    ctx.font = "50px 'Courier New', monospace";
+    const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
+    const player1TextWidth = ctx.measureText(player1Text).width;
+    ctx.fillText(player1Text, (this.canvasWidth * 0.25) - (player1TextWidth / 2), 70);
 
-	const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
-	const player2TextWidth = ctx.measureText(player2Text).width;
-	ctx.fillText(player2Text, (this.canvasWidth * 0.75) - (player2TextWidth / 2), 70);
+    const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
+    const player2TextWidth = ctx.measureText(player2Text).width;
+    ctx.fillText(player2Text, (this.canvasWidth * 0.75) - (player2TextWidth / 2), 70);
   }
 
   render(ctx: CanvasRenderingContext2D) {
 
-	if (this.gameState === 'menu') {
-		this.drawMenu(ctx);
-	  } else if (this.gameState === 'result') {
-		this.drawResult();
-	  } else {
-		this.drawGame();
+	  // if (this.gameState === 'menu') {
+		//   this.drawMenu(ctx);
+	  // } 
+    if (this.gameState === 'result') {
+		  this.drawResult();
+	  } 
+    else {
+		  this.drawGame();
 	  }
-
   }
 
   resetGame() {
@@ -524,12 +499,4 @@ export class Pong implements IGameState {
     this.player1.score = 0;
     this.player2.score = 0;
   }
-
-/*
-
-  gameLoop() {
-
-  //  requestAnimationFrame(this.gameLoop.bind(this));
-  }
-*/
 }
