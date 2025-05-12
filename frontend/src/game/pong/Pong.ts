@@ -1,151 +1,20 @@
-import { GameStates, IGameState } from "./GameStates";
-import { canvas, ctx } from "../components/Canvas";
-import { User, UserManager } from "../UI/UserManager";
-import { stateManager } from "../components";
-import { EndScreen } from "./EndScreen";
-import { TournamentPlayer } from "./Tournament";
-import { GameType } from "../UI/Types";
-import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "./Constants";
+import { GameStates, IGameState } from "../GameStates";
+import { canvas, ctx } from "../../components/Canvas";
+import { User, UserManager } from "../../UI/UserManager";
+import { stateManager } from "../../components";
+import { EndScreen } from "../EndScreen";
+import { TournamentPlayer } from "../Tournament";
+import { GameType } from "../../UI/Types";
+import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "../Constants";
+import { Player, Paddle} from "./Paddle";
+import { Ball } from "./Ball";
 
 // Game Constants
-const PADDLE_WIDTH = 15; 
-const PADDLE_HEIGHT = 100;
-const PADDLE_SPEED = 10;
-const BALL_SIZE = 15;
-const BUFFER = 15;
-
-class Paddle {
-  y: number;
-
-  constructor(public x: number, canvasHeight: number) {
-    this.y = (canvasHeight - PADDLE_HEIGHT) / 2;
-  }
-
-  moveUp() {
-    this.y -= PADDLE_SPEED;
-  }
-
-  moveDown() {
-    this.y += PADDLE_SPEED;
-  }
-
-  stayInBounds(canvasHeight: number) {
-    this.y = Math.max(0, Math.min(canvasHeight - PADDLE_HEIGHT, this.y));
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = 'white';
-    ctx.fillRect(this.x, this.y, PADDLE_WIDTH, PADDLE_HEIGHT);
-  }
-}
-
-class Ball {
-  x: number;
-  y: number;
-  speedX: number = 16 * -1;
-  speedY: number = 0.5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative;
-  currentRallyLen: number = 0;
-  totalHits: number = 0;
-  longestRally: number = 0;
-  pointsPlayed: number = 0;
-
-  constructor(canvasWidth: number, canvasHeight: number) {
-    this.x = canvasWidth / 2 - BALL_SIZE / 2 + 1.5
-    this.y = (canvasHeight - PADDLE_HEIGHT) / 2;
-  }
-
-  move() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-  }
-
-  checkCollisions(player1: Paddle, player2: Paddle, canvasHeight: number, canvasWidth: number) {
-    // Ball collision with top and bottom
-    if (this.y <= 0) {
-      this.y = 0; // Push ball back inside. Fixes wall "hugging"
-      this.speedY *= -1;
-    } 
-    else if (this.y + BALL_SIZE >= canvasHeight) {
-      this.y = canvasHeight - BALL_SIZE; // Push ball back inside. Fixes wall "hugging"
-      this.speedY *= -1;
-    }
-
-
-    // Player 1 paddle collision
-    if (this.x <= PADDLE_WIDTH + BUFFER && this.y + BALL_SIZE >= player1.y && this.y <= player1.y + PADDLE_HEIGHT) {
-        this.currentRallyLen++;
-        //console.log('currentRallyLen =', this.currentRallyLen);
-        const hitPos = (this.y + BALL_SIZE / 2) - (player1.y + PADDLE_HEIGHT / 2); // calculates the difference between the centres of the ball and the paddle
-        const normalized = hitPos / (PADDLE_HEIGHT / 2); // -1 (top) to 1 (bottom)
-      
-        const bounceAngle = normalized * Math.PI / 4; // -1 (-45 degrees) to 1 (+45 degrees)
-        const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2); // keep same speed after bounce (pythagoras)
-      
-        this.speedX = Math.cos(bounceAngle) * speed; // reflected to right
-        this.speedY = Math.sin(bounceAngle) * speed;
-      
-        // Make sure ball is moving right
-        if (this.speedX < 0) 
-          this.speedX *= -1;
-    }
-
-    // Player 2 paddle collision
-    if (this.x + BALL_SIZE >= canvasWidth - PADDLE_WIDTH - BUFFER && this.y + BALL_SIZE >= player2.y && this.y <= player2.y + PADDLE_HEIGHT) {
-        this.currentRallyLen++;
-        //console.log('currentRallyLen =', this.currentRallyLen);
-        const hitPos = (this.y + BALL_SIZE / 2) - (player2.y + PADDLE_HEIGHT / 2);
-        const normalized = hitPos / (PADDLE_HEIGHT / 2);
-      
-        const bounceAngle = normalized * Math.PI / 4;
-        const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2);
-      
-        this.speedX = -Math.cos(bounceAngle) * speed; // reflected to left
-        this.speedY = Math.sin(bounceAngle) * speed;
-      
-        if (this.speedX > 0) 
-          this.speedX *= -1;
-    }
-  }
-
-  reset(twoPlayerMode: boolean, canvasWidth: number, canvasHeight: number) {
-    //console.log("Ball reset");
-    if (this.currentRallyLen > this.longestRally)
-      this.longestRally = this.currentRallyLen;
-    //console.log('longestRally =', this.longestRally);
-    this.totalHits += this.currentRallyLen;
-    //console.log('totalHits =', this.totalHits);
-    this.pointsPlayed++;
-    //console.log('pointsPlayed =', this.pointsPlayed);
-    this.currentRallyLen = 0;
-    this.x = canvasWidth / 2 - BALL_SIZE / 2 + 1.5;
-    this.y = canvasHeight / 2;
-  
-    // Pause the ball temporarily
-    this.speedX = 0;
-    this.speedY = 0;
-  
-    setTimeout(() => {
-      if (twoPlayerMode) {
-        this.speedX = 16 * (Math.random() > 0.5 ? 1 : -1);
-        this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
-      }
-      else {
-        this.speedX = 16 * -1;
-        this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
-      }
-    }, 1000); // 1000ms = 1 second delay
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = 'white';
-    ctx.fillRect(this.x, this.y, BALL_SIZE, BALL_SIZE);
-  }
-}
-
-export class Player {
-constructor(public user: User, public paddle: Paddle, public score: number = 0) {}
-}
-
+export const PADDLE_WIDTH = 15; 
+export const PADDLE_HEIGHT = 100;
+export const PADDLE_SPEED = 10;
+export const BALL_SIZE = 15;
+export const BUFFER = 15;
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
@@ -285,9 +154,6 @@ export class Pong implements IGameState {
 	}
 
   updateGame() {
-    // if (this.gameState !== 'playing') 
-    //   return ; // Shouldn't have to do this!!
-    //console.log('Current gameState:', this.gameState);
     this.updatePlayerPositions();
     this.ball.move();
     this.ball.checkCollisions(this.player1.paddle, this.player2.paddle, this.canvasHeight, this.canvasWidth);
@@ -388,74 +254,7 @@ export class Pong implements IGameState {
       else if (this.winner === this.player2)
         stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG_AI));
 	  }
-	/*
-	OLD VERSION FROM TOM:
-
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-
-    // Draw paddles
-    this.player1.paddle.draw(ctx);
-    this.player2.paddle.draw(ctx);
-
-    // Draw centre line
-    for (let i = 0; i < this.canvasHeight; i += this.canvasHeight / 20) {
-      ctx.fillRect(this.canvasWidth / 2, i, 3, this.canvasHeight / 40);
-    }
-
-    // Draw ball
-    this.ball.draw(ctx);
-
-    // Draw scores
-    ctx.font = "50px 'Courier New', monospace";
-    const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
-    const player1TextWidth = ctx.measureText(player1Text).width;
-    ctx.fillText(player1Text, (this.canvasWidth * 0.25) - (player1TextWidth / 2), 70);
-
-    const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
-    const player2TextWidth = ctx.measureText(player2Text).width;
-    ctx.fillText(player2Text, (this.canvasWidth * 0.75) - (player2TextWidth / 2), 70);
   }
-  
-  drawResult(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-
-    ctx.fillStyle = 'white';
-    ctx.font = "30px 'Courier New', monospace";
-    const pong = this.winner?.user.username + " is the winner!";
-    const pongWidth = ctx.measureText(pong).width;
-    ctx.fillText(pong, (canvasWidth * 0.5) - (pongWidth / 2), canvasHeight / 4);
-	*/
-  }
-
-  // drawMenu(ctx: CanvasRenderingContext2D) {
-  //   ctx.fillStyle = 'black';
-  //   ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-
-  //   ctx.fillStyle = 'white';
-  //   ctx.font = "100px 'Courier New', monospace";
-  //   const pong = "PONG";
-  //   const pongWidth = ctx.measureText(pong).width;
-  //   ctx.fillText(pong, (this.canvasWidth * 0.5) - (pongWidth / 2), this.canvasHeight / 4);
-
-  //   ctx.font = "30px 'Courier New', monospace"; 
-  //   const text1 = "vs computer (Press '1')";
-  //   const text1Width = ctx.measureText(text1).width;
-  //   const text2 = "vs human (Press '2')";
-  //   const text2Width = ctx.measureText(text2).width;
-    
-  //   ctx.fillText(text1, (this.canvasWidth * 0.5) - (text1Width / 2), this.canvasHeight / 2);
-  //   ctx.fillText(text2, (this.canvasWidth * 0.5) - (text2Width / 2), this.canvasHeight / 2 + 50);
-
-  //   ctx.font = "20px 'Courier New', monospace";
-  //   const text3 = `Player 1:  up = '${PONG_UP_1}'  down = '${PONG_DOWN_1}'`;
-  //   const text3Width = ctx.measureText(text3).width;
-  //   const text4 = `Player 2:  up = '${PONG_UP_2}'  down = '${PONG_DOWN_2}'`;
-  //   const text4Width = ctx.measureText(text4).width;
-  //   ctx.fillText(text3, (this.canvasWidth * 0.5) - (text3Width / 2), this.canvasHeight / 2 + 150);
-  //   ctx.fillText(text4, (this.canvasWidth * 0.5) - (text4Width / 2), this.canvasHeight / 2 + 200);
-  // }
 
   drawGame()
   {
