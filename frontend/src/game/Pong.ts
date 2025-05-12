@@ -239,16 +239,16 @@ export class Pong implements IGameState {
 
   updatePlayerPositions() {
     // Player 1 movement
-    if (this.keysPressed['q']) 
+    if (this.keysPressed[PONG_UP_1]) 
       this.player1.paddle.moveUp();
-    if (this.keysPressed['s']) 
+    if (this.keysPressed[PONG_DOWN_1]) 
       this.player1.paddle.moveDown();
 
     if (this.twoPlayerMode) {
       // Player 2 movement
-      if (this.keysPressed['o']) 
+      if (this.keysPressed[PONG_UP_2]) 
         this.player2.paddle.moveUp();
-      if (this.keysPressed['k']) 
+      if (this.keysPressed[PONG_DOWN_2]) 
         this.player2.paddle.moveDown();
     } 
     else {
