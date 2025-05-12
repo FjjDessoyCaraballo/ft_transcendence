@@ -339,25 +339,25 @@ export class Pong implements IGameState {
   drawResult() {
     // Tournament ending
     if (this.tournamentData1 && this.tournamentData2)
+    {
+      if (this.winner === this.player1)
       {
-        if (this.winner === this.player1)
-        {
-          this.tournamentData1.tournamentPoints++;
-          this.tournamentData1.pongPointsScored += this.player1.score;
-          this.tournamentData2.pongPointsScored += this.player2.score;
-          this.tournamentData1.isWinner = true;
-        }	
-        else if (this.winner === this.player2)
-        {
-          this.tournamentData2.tournamentPoints++;
-          this.tournamentData1.pongPointsScored += this.player1.score;
-          this.tournamentData2.pongPointsScored += this.player2.score;
-          this.tournamentData2.isWinner = true;
-        }
-              
-        this.isStateReady = true;
-        return ;
+        this.tournamentData1.tournamentPoints++;
+        this.tournamentData1.pongPointsScored += this.player1.score;
+        this.tournamentData2.pongPointsScored += this.player2.score;
+        this.tournamentData1.isWinner = true;
+      }	
+      else if (this.winner === this.player2)
+      {
+        this.tournamentData2.tournamentPoints++;
+        this.tournamentData1.pongPointsScored += this.player1.score;
+        this.tournamentData2.pongPointsScored += this.player2.score;
+        this.tournamentData2.isWinner = true;
       }
+              
+      this.isStateReady = true;
+      return ;
+    }
 
     // Regular ending
     const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
