@@ -33,6 +33,10 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
         username: username,
         password: password
       });
+
+      localStorage.setItem('logged-in', 'true');
+      localStorage.setItem('LoggedIn', JSON.stringify(username));
+      
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
     } catch (error) {

@@ -20,21 +20,23 @@ export const Header: React.FC<HeaderProps> = () => {
   const [windowOpen, setWindowOpen] = useState(false);
 
   useEffect(() => {
-    const loginStatus = localStorage.getItem('logged-in');
-    setIsLoggedIn(loginStatus === 'true');
-    
-    const handleStorageChange = () => {
-      const currentLoginStatus = localStorage.getItem('logged-in');
-      setIsLoggedIn(currentLoginStatus === 'true');
+    const checkLoginStatus = () => {
+      const loginStatus = localStorage.getItem('logged-in');
+      setIsLoggedIn(loginStatus === 'true');
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    window.addEventListener('loginStatusChanged', handleStorageChange);
-    
+
+    checkLoginStatus();
+
+    const handleLoginChange = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('loginStatusChanged', handleLoginChange);
+    window.addEventListener('storage', handleLoginChange);
+
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('loginStatusChanged', handleStorageChange);
+      window.removeEventListener('loginStatusChanged', handleLoginChange);
+      window.removeEventListener('storage', handleLoginChange);
     };
   }, []);
 
@@ -115,6 +117,7 @@ export const Header: React.FC<HeaderProps> = () => {
             console.log('Login successful');
             setShowLogin(false);
             setIsLoggedIn(true);
+            localStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
             setWindowOpen(false);
           }}
