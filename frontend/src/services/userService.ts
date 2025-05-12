@@ -20,7 +20,7 @@ interface RegisterResponse {
  */
 export const registerUser = async (registerData: RegisterData): Promise<RegisterResponse> => {
   try {    
-    return await apiRequest('/api/users/register', {
+    return await apiRequest('/users/register', {
       method: 'POST',
       body: JSON.stringify(registerData)
     });
@@ -28,6 +28,25 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
     if (error instanceof Error)
       throw error;
     throw new Error('Registration failed. Please try again later.');
+  }
+};
+
+/**
+ * Login user
+ * 
+ * @param userData User registration data
+ * @returns Promise with user data
+ */
+export const loginUser = async (registerData: RegisterData): Promise<RegisterData> => {
+  try {
+    return await apiRequest('/users/login', {
+      method: 'POST',
+      body: JSON.stringify(registerData)
+    });
+  } catch (error) {
+    if (error instanceof Error) 
+      throw error;
+    throw new Error('Failed to fetch user data.');
   }
 };
 
@@ -89,7 +108,7 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
  */
 export const deleteUserAccount = async (): Promise<{ success: boolean, message: string }> => {
   try {
-    return await apiRequest('users/delete', {
+    return await apiRequest('/users/delete', {
       method: 'DELETE'
     });    
   } catch (error) {

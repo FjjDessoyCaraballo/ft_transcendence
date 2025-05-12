@@ -44,18 +44,12 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 
 	  setIsLoading(true);
 
-	  if (localStorage.getItem(username)) {
-		setErrorMessage('Username already exists');
-	  }
-
 	try {
 		await registerUser({
 			username: username,
 			password: password
 		});
 
-		// remove for end-product, otherwise this can be a security concern
-		localStorage.setItem('username', username);
 		setVisible(false);
 		onAccept();
 		
