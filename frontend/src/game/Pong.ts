@@ -359,6 +359,17 @@ export class Pong implements IGameState {
       return ;
     }
 
+    // GAME STATS FOR CURRENT GAME - NOT USING YET
+    // const player1Username = this.player1.user.username;
+    // const player2Username = this.player2.user.username;
+    // const winnerUsername = this.winner?.user.username || '';
+    // const gameType = this.twoPlayerMode ? 'PONG' : 'PONG_AI';
+    // const durationMs = this.duration;
+    // const averageRally = this.averageRally;
+    // const longestRally = this.ball.longestRally;
+    // const player1Score = this.player1.score;
+    // const player2Score = this.player2.score;
+
     // Regular ending
     const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
     const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
