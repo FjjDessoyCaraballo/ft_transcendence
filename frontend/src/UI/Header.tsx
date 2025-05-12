@@ -1,5 +1,7 @@
 // In Header.tsx
 import React, { useState, useEffect } from 'react';
+import { Dashboard } from './Dashboard'
+import { GameCanvas } from './GameCanvas';
 import { GDPRPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
@@ -18,6 +20,11 @@ export const Header: React.FC<HeaderProps> = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+	// State management for Dashboard
+  const [isGameVisible, setIsGameVisible] = useState(true);
+  const [buttonText, setButtonText] = useState('Dashboard');
+  const [isDashboardVisible, setIsDashboardVisible] = useState(false);
 
 
   useEffect(() => {
@@ -53,6 +60,19 @@ export const Header: React.FC<HeaderProps> = () => {
     setShowSettings(true);
   }
 
+  // Dashboard state change functions
+  const handleDashboardClick = () => {
+    setIsGameVisible(false);
+    setIsDashboardVisible(true);
+    setButtonText('To Game');
+  };
+
+  const handleBackToGameClick = () => {
+    setIsGameVisible(true);
+    setIsDashboardVisible(false);
+    setButtonText('Dashboard');
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[9999] shadow-md">
@@ -62,12 +82,19 @@ export const Header: React.FC<HeaderProps> = () => {
           </h1>
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
+			<>
+				<button
+  				className="buttonsStyle"
+  				onClick={isGameVisible ? handleDashboardClick : handleBackToGameClick}>
+  				{buttonText}
+				</button>
               
               <button
               className="buttonsStyle"
               onClick={HandleSettingsClick}>
               Settings
             </button>
+			</>
           ) : (
             <>
               <button 
@@ -122,6 +149,13 @@ export const Header: React.FC<HeaderProps> = () => {
           }}
         />
       )}
+
+	<main className="pt-32"> {/* or adjust to match header height */}
+	{isGameVisible && <GameCanvas />}
+	{isDashboardVisible && <Dashboard />}
+	</main>
+	
     </>
+
   );
 };

@@ -1,5 +1,5 @@
 import { GameStates, IGameState } from "./GameStates";
-import { stateManager } from "../components/index";
+import { global_stateManager } from "../UI/GameCanvas";
 import { User } from "../UI/UserManager";
 import { BlockBattle } from "./BlockBattle";
 import { TournamentPlayer } from "./Tournament";
@@ -21,11 +21,12 @@ export class MatchIntro implements IGameState
 	p2IsReady: boolean;
 	keys: { [key: string]: boolean };
 	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
 	gameType: GameType;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, player1: User, player2: User | null, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, type: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, player1: User, player2: User | null, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, type: GameType)
 	{
 		this.name = GameStates.MATCH_INTRO;
 
@@ -42,6 +43,7 @@ export class MatchIntro implements IGameState
 		}
 
 		this.canvas = canvas;
+		this.ctx = ctx;
 		this.player1 = player1;
 		this.player2 = player2;
 		this.keys = {}; // Maybe in enter() ?
@@ -99,11 +101,11 @@ export class MatchIntro implements IGameState
 			if (!this.tournamentData1)
 			{
 				if (this.gameType === GameType.BLOCK_BATTLE)
-					stateManager.changeState(new BlockBattle(this.canvas, this.player1, this.player2, null, null));
+					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.player1, this.player2, null, null));
 				else if (this.gameType === GameType.PONG)
-					stateManager.changeState(new Pong(this.player1, this.player2, null, null, 'playing'));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'playing'));
 				else if (this.gameType === GameType.PONG_AI)
-					stateManager.changeState(new Pong(this.player1, this.player2, null, null, 'ai'));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'ai'));
 			}
 			else
 				this.isStateReady = true;
@@ -117,7 +119,7 @@ export class MatchIntro implements IGameState
 
 		// Add the expected ranking point diff here...?
 
-		drawCenteredText("GAME IS ABOUT TO START!", '70px Impact', DEEP_PURPLE, 100);
+		drawCenteredText(this.canvas, this.ctx, "GAME IS ABOUT TO START!", '70px Impact', DEEP_PURPLE, 100);
 
 		let infoText = '';
 		if (this.gameType != GameType.BLOCK_BATTLE)
@@ -126,11 +128,11 @@ export class MatchIntro implements IGameState
 		}
 		else
 			infoText = `Press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
-		drawCenteredText(infoText, '30px arial', 'white', 150);
+		drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
 
 		let p1Text = this.player1.username;
 		let p1X = 140;
-		drawText(p1Text, '55px arial', p1FillColor, p1X, 440);
+		drawText(this.ctx, p1Text, '55px arial', p1FillColor, p1X, 440);
 
 		let p1Rank;
 		if (!this.tournamentData1)
@@ -146,11 +148,11 @@ export class MatchIntro implements IGameState
 		const rank1X = p1X + halfOfP1Text - ctx.measureText(p1Rank).width / 2;
 		ctx.fillText(p1Rank, rank1X, 480);
 
-		drawCenteredText('VS', '60px arial', 'white', 440);
+		drawCenteredText(this.canvas, this.ctx, 'VS', '60px arial', 'white', 440);
 
 		const p2Text = this.player2.username;
 		const p2X = this.canvas.width - ctx.measureText(p2Text).width - 140;
-		drawText(p2Text, '55px arial', p2FillColor, p2X, 440);
+		drawText(this.ctx, p2Text, '55px arial', p2FillColor, p2X, 440);
 
 		let p2Rank;
 		if (!this.tournamentData2)

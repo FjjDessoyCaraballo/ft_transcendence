@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
-import { updateCurUser } from '../components';
+import { updateCurUser } from './GameCanvas';
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs

@@ -1,7 +1,6 @@
 import { GameStates, IGameState } from "../game/GameStates";
 import { ReturnMainMenuButton } from "../game/EndScreen";
-import { curUser, stateManager } from "../components/index";
-import { ctx } from "../components/Canvas";
+import { global_curUser, global_stateManager } from "./GameCanvas";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../game/Constants";
 import { ChallengeButton, TournamentButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
@@ -12,9 +11,10 @@ import { drawCenteredText } from "../game/StartScreen";
 
 export class NextPageButton extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 	}
 
 	clickAction(): void {
@@ -23,9 +23,9 @@ export class NextPageButton extends Button
 
 export class PrevPageButton extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 	}
 
 	clickAction(): void {
@@ -39,6 +39,7 @@ export class UserHUB implements IGameState
 	userStartIdx: number;
 	prevUserStartIdx: number;
 	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
 	returnMenuButton: ReturnMainMenuButton;
 	nextPageButton: NextPageButton;
 	prevPageButton: PrevPageButton;
@@ -56,10 +57,11 @@ export class UserHUB implements IGameState
 	submitPasswordBound: () => void;
 	cancelPasswordBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, state: UserHubState, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, state: UserHubState, gameType: GameType)
 	{
 		this.name = GameStates.USER_HUB;
 		this.canvas = canvas;
+		this.ctx = ctx;
 		this.userStartIdx = 0;
 		this.prevUserStartIdx = 0;
 		this.isNextActive = true;
@@ -71,9 +73,9 @@ export class UserHUB implements IGameState
 		this.gameType = gameType;
 		this.userArr = UserManager.getAllUserData();
 
-		if (curUser)
+		if (global_curUser)
 		{
-			const curUserData = localStorage.getItem(curUser);
+			const curUserData = localStorage.getItem(global_curUser);
 			if (curUserData)
 			{
 				const curUserObj = JSON.parse(curUserData);
@@ -82,9 +84,9 @@ export class UserHUB implements IGameState
 		}
 
 		// Sort userArr based on rankingPoint difference
-		if (curUser)
+		if (global_curUser)
 		{
-			const curUserObj = UserManager.getUserData(curUser);
+			const curUserObj = UserManager.getUserData(global_curUser);
 			if (curUserObj)
 			{
 				const curUserRank = curUserObj.rankingPoint;
@@ -109,9 +111,9 @@ export class UserHUB implements IGameState
 		const button3X = 0 + TEXT_PADDING;
 		const button3Y = 80 + TEXT_PADDING;
 
-		this.returnMenuButton = new ReturnMainMenuButton(button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
-		this.nextPageButton = new NextPageButton(button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial');
-		this.prevPageButton = new PrevPageButton(button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
+		this.nextPageButton = new NextPageButton(ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial');
+		this.prevPageButton = new PrevPageButton(ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial');
 		this.challengeBtnArr = [];
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
@@ -161,7 +163,7 @@ export class UserHUB implements IGameState
 					const idx = this.tournamentArr.indexOf(tournamentPlayer);
 					this.tournamentArr.splice(idx, 1);
 				}
-				else if (curUser) 
+				else if (global_curUser) 
 				{
 					this.opponent = btn.user;
 
@@ -185,7 +187,7 @@ export class UserHUB implements IGameState
 
 	submitPasswordCallback(): void
 	{
-		if (!this.opponent || !curUser)
+		if (!this.opponent || !global_curUser)
 			return ;
 
 		const passwordInput = document.getElementById("passwordInput") as HTMLInputElement;
@@ -196,7 +198,7 @@ export class UserHUB implements IGameState
 		
 		const enteredPassword = passwordInput.value;
 		const opponentData = localStorage.getItem(this.opponent.username);
-		const curUserData = localStorage.getItem(curUser);
+		const curUserData = localStorage.getItem(global_curUser);
 
 		if (!opponentData || !curUserData)
 		{
@@ -218,14 +220,14 @@ export class UserHUB implements IGameState
 
 				if (this.state === UserHubState.SINGLE_GAME)
 				{
-					stateManager.changeState(new MatchIntro(this.canvas, curUserObj, this.opponent, null, null, this.gameType));
+					global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserObj, this.opponent, null, null, this.gameType));
 				}
 				else
 				{
 					this.tournamentArr.push(this.opponent);
 
 					if (this.tournamentArr.length === 4)
-						stateManager.changeState(new Tournament(this.canvas, this.tournamentArr, this.gameType));
+						global_stateManager.changeState(new Tournament(this.canvas, this.ctx, this.tournamentArr, this.gameType));
 				}
 			}
 			else
@@ -284,12 +286,12 @@ export class UserHUB implements IGameState
 			this.challengeBtnArr.length = 0;
 		}
 
-		UserManager.drawCurUser();
+		UserManager.drawCurUser(this.canvas, ctx);
 
 		if (this.state === UserHubState.TOURNAMENT)
 		{
 			let playerCountText = `${this.tournamentArr.length}/4 players chosen`;
-			drawCenteredText(playerCountText, '40px impact', 'white', 120)
+			drawCenteredText(this.canvas, this.ctx, playerCountText, '40px impact', 'white', 120)
 		}
 
 		let x = 130; // check this proprely later
@@ -302,9 +304,9 @@ export class UserHUB implements IGameState
 
 			const isInTournament = this.tournamentArr.some(player => player.username === this.userArr[i].username);
 
-			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(this.userArr[i], x, y, this.state, isInTournament);
+			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(ctx, this.userArr[i], x, y, this.state, isInTournament);
 
-			if (this.needNewChallengeButtons && btn.user.username !== curUser
+			if (this.needNewChallengeButtons && btn.user.username !== global_curUser
 				&& this.state !== UserHubState.INFO)
 			{
 				this.challengeBtnArr.push(btn);

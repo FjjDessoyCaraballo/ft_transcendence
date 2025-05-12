@@ -1,10 +1,9 @@
 import '../styles/main.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { GameStateManager, GameStates } from '../game/GameStates'; 
-import { StartScreen } from '../game/StartScreen';
 import { Header } from '../UI/Header'
-import { canvas, ctx } from "../components/Canvas";
+
+/*
 
 export const stateManager = new GameStateManager();
 
@@ -14,6 +13,8 @@ export function updateCurUser(newUser: string | null) { curUser = newUser; }
 let prevTimeStamp = 0;
 
 stateManager.changeState(new StartScreen(canvas));
+
+*/
 
 const headerContainer = document.createElement('header');
 headerContainer.id = 'header-container';
@@ -28,6 +29,7 @@ root.render(
 	</React.StrictMode>
 );
 
+/*
 function updateGame(deltaTime: number) {
 	stateManager.update(deltaTime);
 }
@@ -53,3 +55,4 @@ function gameLoop(timeStamp: number) {
 
 requestAnimationFrame(gameLoop);
 
+*/

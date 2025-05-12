@@ -1,5 +1,4 @@
 import { TEXT_PADDING } from "../game/Constants";
-import { ctx } from "../components/Canvas"; // is this bad...? Using global variable?
 
 export abstract class Button
 {
@@ -15,7 +14,7 @@ export abstract class Button
 	font: string;
 	isHover: boolean;
 
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
 		this.x = x;
 		this.y = y;

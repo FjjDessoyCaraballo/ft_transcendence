@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { updateCurUser } from '../components';
+import { updateCurUser } from './GameCanvas';
 
 interface SettingsProps {
 	onClick: () => void;

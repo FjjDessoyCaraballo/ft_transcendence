@@ -13,6 +13,9 @@ RUN npm install
 # Install React and TypeScript definitions
 RUN npm install react react-dom @types/react @types/react-dom --save
 
+# Install Chart.js for Dashboard data graphs
+RUN npm install chart.js react-chartjs-2
+
 # Copy the rest of the application code
 COPY . .
 

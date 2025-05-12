@@ -1,6 +1,5 @@
-import { stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
-import { canvas, ctx } from "../components/Canvas";
-import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
+import { global_stateManager } from "./GameCanvas";
+import { global_curUser, updateCurUser } from "./GameCanvas"
 import { USER_ARR_KEY, LOGIN_CHECK_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
 import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { GameStates } from "../game/GameStates";
@@ -22,9 +21,9 @@ export class ChallengeButton extends Button
 {
 	user: User;
 
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.user = user;
 	}
 
@@ -36,9 +35,9 @@ export class PongButton extends Button
 {
 	user: User;
 
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.user = user;
 	}
 
@@ -50,9 +49,9 @@ export class TournamentButton extends Button
 {
 	user: User;
 
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.user = user;
 	}
 
@@ -170,7 +169,7 @@ export class UserManager {
     }
 
 
-	static drawUserInfo(user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
+	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
 	{
 		// Draw avatar box & text (JUST A TEST)
 		const avatarW = 200;
@@ -220,7 +219,7 @@ export class UserManager {
 			let text = 'CHALLENGE';
 			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
 			const buttonY = infoHeight - buttonOffset;
-			const challengeButton = new ChallengeButton(buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
+			const challengeButton = new ChallengeButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
 			return challengeButton;
 		}
 		else
@@ -232,14 +231,14 @@ export class UserManager {
 				let text = 'ADD TO TOURNAMENT';
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 - 20;
 				const buttonY = infoHeight - buttonOffset;
-				tournamentBtn = new TournamentButton(buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user);
+				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user);
 			}
 			else
 			{
 				let text = 'REMOVE';
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 + 40;
 				const buttonY = infoHeight - buttonOffset;
-				tournamentBtn = new TournamentButton(buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user);
+				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user);
 			}
 
 			return tournamentBtn;
@@ -249,16 +248,16 @@ export class UserManager {
 	}
 
 
-	static drawCurUser()
+	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
 	{
-		if (!curUser)
+		if (!global_curUser)
 		{
 			const loginUser = localStorage.getItem(LOGIN_CHECK_KEY);
 			if (!loginUser)
 			{
-				const curGameState: GameStates | null = stateManager.getStateName();
+				const curGameState: GameStates | null = global_stateManager.getStateName();
 				if (curGameState !== null && curGameState !== GameStates.START_SCREEN)
-					stateManager.changeState(new StartScreen(canvas));
+					global_stateManager.changeState(new StartScreen(canvas, ctx));
 				return ;
 			}
 			else
@@ -266,8 +265,8 @@ export class UserManager {
 		}
 		else
 		{
-			drawCenteredText('Currently logged in user: ', '22px arial', 'white', 30);
-			drawCenteredText(curUser, '28px arial', 'red', 60);
+			drawCenteredText(canvas, ctx, 'Currently logged in user: ', '22px arial', 'white', 30);
+			drawCenteredText(canvas, ctx, global_curUser, '28px arial', 'red', 60);
 		}
 	}
 }
