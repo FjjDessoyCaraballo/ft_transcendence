@@ -378,9 +378,7 @@ export class Pong implements IGameState {
         stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG_AI));
       else if (this.winner === this.player2)
         stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG_AI));
-	}
-
-
+	  }
 	/*
 	OLD VERSION FROM TOM:
 
