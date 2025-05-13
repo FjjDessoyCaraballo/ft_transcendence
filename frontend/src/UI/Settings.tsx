@@ -1,11 +1,45 @@
 import React, { useState } from 'react';
-import { getUserDataForDownload, deleteUserAccount, changePassword } from '../services/userService'; 
+import { getUserDataForDownload, deleteUserAccount } from '../services/userService'; 
+import { PasswordChangePopup } from './PasswordChange'
 
 interface SettingsProps {
 	onClick: () => void;
 }
 
+const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void }> = ({onClose, onConfirm}) => {
+	return (
+		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+		<div className="bg-white rounded-lg shadow-lg w-[500px] max-w-[90%] overflow-hidden mx-auto">
+		  <div className="p-6 bg-red-600 text-white">
+			<h2 className="text-2xl font-bold font-mono">Delete Account</h2>
+		  </div>
+		  <div className="p-6">
+			<p className="mb-6 text-gray-700">
+			  Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.
+			</p>
+			<div className="flex justify-end gap-3">
+			  <button 
+				onClick={onClose}
+				className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300"
+			  >
+				Cancel
+			  </button>
+			  <button 
+				onClick={onConfirm}
+				className="px-5 py-2 rounded bg-red-600 text-white font-mono transition-colors hover:bg-red-700"
+			  >
+				Delete My Account
+			  </button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	);
+};
+
 export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
+	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+	const [showChangePassword, setShowChangePassword] = useState(false);
 
 	const HandleDownloadData = async () => {
 		try {
@@ -23,120 +57,22 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 		onClick();
 	}
 
-	const HandleChangePassword = async () => {
-		const [oldPassword, setOldPassword] = useState('');
-		const [newPassword, setNewPassword] = useState('');
-		const [confirmPassword, setConfirmPassword] = useState('');
-		const [errorMessage, setErrorMessage] = useState('');
-
-		try {
-			await changePassword({
-				oldPassword: oldPassword,
-				newPassword: newPassword
-			});
-		} catch (error) {
-			throw new Error("Could not change password. Try again later.");
-		}
-
-		onClick();
-
-		return (
-			<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-			<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
-			  <div className="p-6 bg-[#4B0082] text-white">
-				<h2 className="text-2xl font-bold font-mono">Password Change</h2>
-			  </div>
-			  
-			  <form onSubmit={HandleChangePassword} className="p-6">
-				{errorMessage && (
-				  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-					{errorMessage}
-				  </div>
-				)}
-				
-				<div className="mb-4">
-				  <label 
-					htmlFor="oldPassword" 
-					className="block text-gray-700 font-mono mb-2"
-				  >
-					Old Password
-				  </label>
-				  <input 
-					type="password"
-					id="oldPassword"
-					placeholder="Provide the old password"
-					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
-					value={oldPassword}
-					onChange={(e) => setOldPassword(e.target.value)}
-				  />
-				</div>
-				
-				<div className="mb-4">
-				  <label 
-					htmlFor="newPassword" 
-					className="block text-gray-700 font-mono mb-2"
-				  >
-					New Password
-				  </label>
-				  <input 
-					type="password"
-					id="newPassword"
-					placeholder="Create a new password"
-					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
-					value={newPassword}
-					onChange={(e) => setNewPassword(e.target.value)}
-				  />
-				</div>
-				
-				<div className="mb-6">
-				  <label 
-					htmlFor="confirmPassword" 
-					className="block text-gray-700 font-mono mb-2"
-				  >
-					Confirm New Password
-				  </label>
-				  <input 
-					type="password"
-					id="confirmPassword"
-					placeholder="Confirm your password"
-					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
-					value={confirmPassword}
-					onChange={(e) => setConfirmPassword(e.target.value)}
-				  />
-				</div>
-				
-				<div className="flex justify-end gap-3">
-				  <button 
-					type="button"
-					className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300"
-				  >
-					Cancel
-			  </button>
-			  <button 
-					type="submit"
-					className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]"
-				  >
-					Change
-				</button>
-				</div>
-			  </form>
-			</div>
-		  </div>
-		  );
+	const HandleChangePasswordClick = () => {
+		setShowChangePassword(true);
 	}
 
-	const DeleteAccount = async () => {
-		// Data deletion needs an extra layer of confirmation. No one wants to
-		// delete their data by accident.
+	const DeleteAccountClick = () => {
+		setShowDeleteAccount(true);
+	}
+
+	const confirmDeleteAccount = async () => {
 		try {
 			await deleteUserAccount();
-			localStorage.setItem('logged-in', 'false');
-			window.dispatchEvent(new Event('loginStatusChanged'));	
-			alert('Data has been deleted');
+			HandleLogout();
 		} catch (error) {
-			throw new Error('Could not delete data now. Try again later or contact data protection officer.')
+			throw new Error('Could not delete data. Try again later or contact data protection officer.');
 		}
-		onClick();
+		setShowDeleteAccount(false);
 	}
 
 	const HandleAvatarChange = async () => {
@@ -159,11 +95,13 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	}
 
 	return (
+	<>
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 		  <div className="bg-white rounded-lg shadow-lg w-[400px] max-w-[90%] overflow-hidden mx-auto">
 			<div className="p-6 bg-[#4B0082] text-white">
 			  <h2 className="text-2xl font-bold font-mono">Settings</h2>
 			</div>
+
 			{/* DOWNLOAD DATA BUTTON */}
 			<div className="buttonsDiv">
 			<button 
@@ -174,16 +112,18 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
       		Download Data
           	</button>
 		  	</div>
+
 			{/* CHANGE PASSWORD BUTTON */}
 			<div className="buttonsDiv">
 			<button 
               type="submit"
               className="buttonsStyle"
-			  onClick={HandleChangePassword}
+			  onClick={HandleChangePasswordClick}
 			>
       		Change Password
           	</button>
 		  	</div>
+
 			{/* CHANGE AVATAR BUTTON */}
 			<div className="buttonsDiv">
 			<button 
@@ -194,26 +134,18 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
       		Change Avatar
           	</button>
 		  	</div>
+
 			{/* ACCOUNT DELETION */}
 			<div className="buttonsDiv">
 			<button 
               type="submit"
-              className="buttonsStyle"
-			  onClick={DeleteAccount}
+              className="buttonsStyle text-red-600 hover:bg-red-50"
+			  onClick={DeleteAccountClick}
 			>
       		Delete Account
           	</button>
 		  	</div>
-			{/* LOGOUT */}
-			<div className="buttonsDiv">
-			<button 
-              type="submit"
-              className="buttonsStyle"
-			  onClick={HandleLogout}
-			>
-      		Logout
-          	</button>
-		  	</div>
+
 			{/* CONTRIBUTE */}
 			<div className="buttonsDiv">
 			<button 
@@ -224,6 +156,18 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
       		Contribute
           	</button>
 		  	</div>
+
+			{/* LOGOUT */}
+			<div className="buttonsDiv">
+			<button 
+              type="submit"
+              className="buttonsStyle"
+			  onClick={HandleLogout}
+			>
+      		Logout
+          	</button>
+		  	</div>
+
 			{/* CLOSE BUTTON */}
 			<div className="buttonsDiv">
             <button 
@@ -236,5 +180,19 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 			</div>
 		  </div>
 		</div>
-	  );
+
+      {/* Render the password change popup when needed */}
+      {showChangePassword && (
+        <PasswordChangePopup onClose={() => setShowChangePassword(false)} />
+      )}
+      
+      {/* Render the delete account confirmation popup when needed */}
+      {showDeleteAccount && (
+        <DeleteAccountPopup 
+          onClose={() => setShowDeleteAccount(false)} 
+          onConfirm={confirmDeleteAccount}
+        />
+      )}
+    </>
+  );
 };
