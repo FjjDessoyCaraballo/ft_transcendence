@@ -12,6 +12,11 @@ interface RegisterResponse {
   message: string;
 }
 
+interface PasswordChange {
+  oldPassword: string;
+  newPassword: string;
+}
+
 /**
  * Register a new user with the API
  * 
@@ -25,9 +30,7 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
       body: JSON.stringify(registerData)
     });
   } catch (error) {
-    if (error instanceof Error)
-      throw error;
-    throw new Error('Registration failed. Please try again later.');
+      throw new Error('Registration failed. Please try again later.');
   }
 };
 
@@ -44,9 +47,7 @@ export const loginUser = async (registerData: RegisterData): Promise<RegisterDat
       body: JSON.stringify(registerData)
     });
   } catch (error) {
-    if (error instanceof Error) 
-      throw error;
-    throw new Error('Failed to fetch user data.');
+      throw new Error('Failed to fetch user data.');
   }
 };
 
@@ -60,9 +61,7 @@ export const getUserData = async (username: string): Promise<User> => {
   try {
     return await apiRequest(`/users/${username}`);
   } catch (error) {
-    if (error instanceof Error) 
-      throw error;
-    throw new Error('Failed to fetch user data.');
+      throw new Error('Failed to fetch user data.');
   }
 };
 
@@ -75,9 +74,7 @@ export const getAllUsers = async (): Promise<User[]> => {
   try {
     return await apiRequest('/users');    
   } catch (error) {
-    if (error instanceof Error)
-      throw error;
-    throw new Error('Failed to fetch user list.');
+      throw new Error('Failed to fetch user list.');
   }
 };
 
@@ -95,9 +92,7 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
       body: JSON.stringify({ winner, loser })
     });    
   } catch (error) {
-    if (error instanceof Error)
-      throw error;
-    throw new Error('Failed to update user statistics');
+      throw new Error('Failed to update user statistics');
   }
 };
 
@@ -108,13 +103,11 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
  */
 export const deleteUserAccount = async (): Promise<{ success: boolean, message: string }> => {
   try {
-    return await apiRequest('/users/delete', {
+    return await apiRequest('/users/account', {
       method: 'DELETE'
     });    
   } catch (error) {
-    if (error instanceof Error)
-      throw error;
-    throw new Error('Failed to delete user account. Contact data protection officer.');
+      throw new Error('Failed to delete user account. Contact data protection officer.');
   }
 };
 
@@ -125,10 +118,25 @@ export const deleteUserAccount = async (): Promise<{ success: boolean, message: 
  */
 export const getUserDataForDownload = async (): Promise<any> => {
   try {
-    return await apiRequest('/users/data-download');    
+    return await apiRequest('/users/export-data');    
   } catch (error) {
-    if (error instanceof Error)
-      throw error;
-    throw new Error('Failed to retrieve user data for download. Contact data protection officer.');
+      throw new Error('Failed to retrieve user data for download. Contact data protection officer.');
+  }
+};
+
+/**
+ * Simple password change request
+ * 
+ * @param passwordChange old and new password
+ * @returns promise with the changed password
+ */
+export const changePassword = async (passwordChange: PasswordChange): Promise<PasswordChange> => {
+  try {
+    return await apiRequest('/users/password', {
+      method: 'PUT',
+      body: JSON.stringify(passwordChange)
+    });
+  } catch (error) {
+      throw new Error('Password change failed. Please try again later.');
   }
 };

@@ -50,9 +50,9 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
   } catch (error) {
     if (error instanceof Error) {
       console.error('Network error:', error);
-      throw new Error('Network error. Please check your connection and try again.');
+      throw error;
     }
-    throw error;
+    throw new Error('Network error. Please check your connection and try again.');
   }
 };
 
