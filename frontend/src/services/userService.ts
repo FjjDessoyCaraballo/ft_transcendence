@@ -132,9 +132,14 @@ export const getUserDataForDownload = async (): Promise<any> => {
  */
 export const changePassword = async (passwordChange: PasswordChange): Promise<PasswordChange> => {
   try {
+    const formattedPayload = {
+      currentPassword: passwordChange.oldPassword,
+      newPassword: passwordChange.newPassword
+    };
+
     return await apiRequest('/users/password', {
       method: 'PUT',
-      body: JSON.stringify(passwordChange)
+      body: JSON.stringify(formattedPayload)
     });
   } catch (error) {
       throw new Error('Password change failed. Please try again later.');
