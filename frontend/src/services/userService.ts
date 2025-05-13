@@ -40,12 +40,13 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
  * @param userData User registration data
  * @returns Promise with user data
  */
-export const loginUser = async (registerData: RegisterData): Promise<RegisterData> => {
+export const loginUser = async (registerData: RegisterData): Promise<{ token: string, user: User }> => {
   try {
-    return await apiRequest('/users/login', {
+    const response = await apiRequest('/users/login', {
       method: 'POST',
       body: JSON.stringify(registerData)
     });
+    return response;
   } catch (error) {
       throw new Error('Failed to fetch user data.');
   }

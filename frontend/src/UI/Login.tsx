@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
 import { loginUser } from '../services/userService'
+import { setToken } from '../services/TokenService';
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
@@ -29,10 +30,16 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     }
 
     try {
-      await loginUser({
+      const response = await loginUser({
         username: username,
         password: password
       });
+
+      if (response && response.token) {
+        await setToken(response.token);
+      } else {
+        console.error('No token received from server.')
+      }
 
       localStorage.setItem('logged-in', 'true');
       localStorage.setItem('LoggedIn', JSON.stringify(username));

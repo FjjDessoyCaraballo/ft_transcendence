@@ -1,5 +1,6 @@
 import { apiRequest } from './Api';
 import { User } from "../UI/UserManager"
+import { clearToken } from './TokenService';
 
 interface LoginData {
   username: string;
@@ -39,6 +40,15 @@ export const login = async (username: string, password: string): Promise<LoginRe
       throw error;
     }
     throw new Error('Login failed. Please try again.');
+  } finally {
+    await clearToken();
+
+    // Take this out later
+    localStorage.removeItem('user');
+    localStorage.setItem('logged-in', 'false');
+    localStorage.removeItem('LoggedIn');
+    
+    window.dispatchEvent(new Event('loginStatusChanged'));
   }
 };
 

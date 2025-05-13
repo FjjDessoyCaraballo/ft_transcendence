@@ -1,4 +1,5 @@
 const API_URL = 'https://localhost:3443/api';
+import { getToken } from './TokenService'
 
 // not sure if this is needed, but it is here for now
 interface ApiError {
@@ -8,7 +9,7 @@ interface ApiError {
 }
 
 /**
- * Helper function for making API requests
+ * Helper function for making API requests. Abstraction to help other API calls easier.
  * 
  * @param endpoint API endpoint path (starting with /)
  * @param options fetch options
@@ -16,18 +17,18 @@ interface ApiError {
  * @throws Error with message from API or generic error
  */
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('token');
-  
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {})
-  };
-  
-  if (token) {
-    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  }
-  
   try {
+    const token = await getToken();
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+    
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    }
+    
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers
@@ -43,7 +44,7 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
 
     if (!response.ok) {
       if (typeof data === 'object' && data !== null && 'error' in data)
-        throw new Error (data.error || `Request failed with status ${response.status}`);
+        throw new Error(data.error || `Request failed with status ${response.status}`);
     }
 
     return data;

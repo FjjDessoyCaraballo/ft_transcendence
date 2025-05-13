@@ -19,26 +19,26 @@ function initializeWorker() {
 		worker.onmessage = (event) => {
 			const { status, action, token, message } = event.data;
 
-			const pendingRequests = pendingRequests.shift();
+			const pendingRequest = pendingRequests.shift();
 
-			if (pendingRequests) {
+			if (pendingRequest) {
 				if (status === 'success') {
 					if (action === 'getToken') {
-						pendingRequests.resolve(token);
+						pendingRequest.resolve(token);
 					} else {
-						pendingRequests.resolve(message || true);
+						pendingRequest.resolve(message || true);
 					}
 				} else {
-					pendingRequests.reject(message || 'Unkown error');
+					pendingRequest.reject(message || 'Unkown error');
 				}
 			}
 		}
 
 		worker.onerror = (error) => {
 			console.error('Web Worker error:', error);
-			const pendingRequests = pendingRequests.shift();
-			if (pendingRequests) {
-				pendingRequests.reject(error);
+			const pendingRequest = pendingRequests.shift();
+			if (pendingRequest) {
+				pendingRequest.reject(error);
 			}
 		};
 
