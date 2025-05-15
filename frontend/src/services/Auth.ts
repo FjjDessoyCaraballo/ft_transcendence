@@ -27,8 +27,6 @@ export const login = async (username: string, password: string): Promise<LoginRe
       body: JSON.stringify({ username, password })
     });
 
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
     localStorage.setItem('logged-in', 'true');
     localStorage.setItem('LoggedIn', JSON.stringify(username));
 
@@ -43,8 +41,6 @@ export const login = async (username: string, password: string): Promise<LoginRe
   } finally {
     await clearToken();
 
-    // Take this out later
-    localStorage.removeItem('user');
     localStorage.setItem('logged-in', 'false');
     localStorage.removeItem('LoggedIn');
     
@@ -85,11 +81,8 @@ export const logout = async (): Promise<void> => {
     console.error('Error during logout API call:', error);
     // even if this fails, we logout locally from localStorage
   } finally {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
     localStorage.setItem('logged-in', 'false');
-    localStorage.removeItem('LoggedIn');
-    
+    localStorage.removeItem('LoggedIn');   
     window.dispatchEvent(new Event('loginStatusChanged'));
   }
 };
@@ -109,7 +102,6 @@ export const verifyToken = async (): Promise<boolean> => {
     return (true);
   } catch (error) {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     localStorage.setItem('logged-in', 'false');
     localStorage.removeItem('LoggedIn');
 
