@@ -84,7 +84,7 @@ export const clearToken = (): Promise<boolean> => {
 	return sendMessage('clearToken');
 }
 
-export const setLoggedInState = (isLoggedIn: boolean, username?: string): Promise<boolean> => {
+export const setLoggedInState = (isLoggedIn: boolean, username?: string | null): Promise<boolean> => {
 	return sendMessage('setLoggedIn', { status: isLoggedIn, username });
 };
 

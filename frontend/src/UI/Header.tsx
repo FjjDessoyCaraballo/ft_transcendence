@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
+import { setLoggedInState, getToken, getAuthState, clearToken } from '../services/TokenService'
 
 interface HeaderProps {
   onClick: () => void;
@@ -20,9 +21,15 @@ export const Header: React.FC<HeaderProps> = () => {
   const [windowOpen, setWindowOpen] = useState(false);
 
   useEffect(() => {
-    const checkLoginStatus = () => {
-      const loginStatus = localStorage.getItem('logged-in');
-      setIsLoggedIn(loginStatus === 'true');
+    const checkLoginStatus = async () => {
+      try {
+        const { isLoggedIn,  } = await getAuthState();
+        if (isLoggedIn)
+          setShowLogin(true);
+      } catch (error) {
+        console.error('Error checking authstate: ', error);
+        setShowLogin(false);
+      }
     };
 
     checkLoginStatus();
@@ -32,11 +39,9 @@ export const Header: React.FC<HeaderProps> = () => {
     };
 
     window.addEventListener('loginStatusChanged', handleLoginChange);
-    window.addEventListener('storage', handleLoginChange);
 
     return () => {
       window.removeEventListener('loginStatusChanged', handleLoginChange);
-      window.removeEventListener('storage', handleLoginChange);
     };
   }, []);
 

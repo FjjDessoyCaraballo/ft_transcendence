@@ -42,6 +42,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
       // localStorage.setItem('logged-in', 'true');
       
       window.dispatchEvent(new Event('loginStatusChanged'));
+      alert("Login successful!");
       onAccept();
     } catch (error) {
       setErrorMessage('Login failed.');

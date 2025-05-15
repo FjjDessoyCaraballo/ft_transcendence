@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getUserDataForDownload, deleteUserAccount } from '../services/userService'; 
 import { PasswordChangePopup } from './PasswordChange'
+import { setLoggedInState, getToken, getAuthState, clearToken } from '../services/TokenService'
 
 interface SettingsProps {
 	onClick: () => void;
@@ -50,10 +51,26 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 		onClick();
 	}
 
-	const HandleLogout = () => {
+	const HandleLogout = async () => {
 		// needs to be changed to JWT instead of localStorage()
-		localStorage.setItem('logged-in', 'false');
-		window.dispatchEvent(new Event('loginStatusChanged'));
+		try {
+			const { isLoggedIn, currentUser } = await getAuthState();
+			if (isLoggedIn) {
+					await setLoggedInState(false, currentUser);
+					window.dispatchEvent(new Event('loginStatusChanged'));
+			} else {
+				throw new Error("you're not logged in.")
+			}
+		} catch (error) {
+			console.error("There was a whoopsie: ", error);
+		}
+		try {
+			await clearToken();
+			console.warn("Token cleared");
+		} catch (error) {
+			console.error("Error: Could not clear token");
+		}
+
 		onClick();
 	}
 
