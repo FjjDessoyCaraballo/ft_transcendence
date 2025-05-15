@@ -89,7 +89,7 @@ export class EndScreen implements IGameState
         this.mouseClickBound = () => this.mouseClickCallback();
 
 		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
-			UserManager.updateUserStats(winner, loser);
+			UserManager.updateUserStats(winner, loser, this.gameType);
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -151,10 +151,10 @@ export class EndScreen implements IGameState
 		}
 		else if (!this.tournamentData1)
 		{
-			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.rankingPoint.toFixed(2)}.`;
+			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, winnerRankText, '30px arial', 'white', 300);
 			
-			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.rankingPoint.toFixed(2)}.`;
+			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 

@@ -9,6 +9,10 @@ export function updateCurUser(newUser: string | null) {
   global_curUser = newUser;
 }
 
+// JUST A TEST until localHost is completely removed
+if (localStorage.getItem('logged-in') === 'true' && global_curUser === null)
+	localStorage.setItem('logged-in', 'false');
+
 export const global_stateManager = new GameStateManager();
 
 export const global_gameArea = {

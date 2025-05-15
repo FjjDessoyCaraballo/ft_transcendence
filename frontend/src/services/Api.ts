@@ -16,6 +16,7 @@ interface ApiError {
  * @throws Error with message from API or generic error
  */
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+
   const token = localStorage.getItem('token');
   
   const headers: HeadersInit = {
@@ -28,6 +29,7 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
   }
   
   try {
+
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers

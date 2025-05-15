@@ -4,7 +4,6 @@ import { GameCanvas } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
-import { updateCurUser } from './GameCanvas';
 
 interface HeaderProps {
   onClick: () => void;

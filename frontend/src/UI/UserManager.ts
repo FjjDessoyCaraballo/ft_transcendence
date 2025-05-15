@@ -3,9 +3,11 @@ import { USER_ARR_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
 import { drawCenteredText } from "../game/StartScreen";
 import { Button } from "./Button";
 import { RankingHandler } from "../game/RankingPoints";
-import { UserHubState } from "./Types";
+import { GameType, UserHubState } from "./Types";
 
-// interface already present in /frontend/src/services/Auth.ts
+/*
+OLD VERSION
+
 export interface User {
     username: string;
 	password: string;
@@ -14,6 +16,30 @@ export interface User {
 	rankingPoint: number;
 	// Add match history here...? Or somewhere else?
 }
+	*/
+
+export interface User {
+	id: number;
+	username: string;
+//	password: string; --> Not needed in the frontend, right?
+	ranking_points: number;
+	avatar_url: string;
+	games_played_pong: number;
+	wins_pong: number;
+	losses_pong: number;
+	games_played_blockbattle: number;
+	wins_blockbattle: number;
+	losses_blockbattle: number;
+	tournaments_played: number;
+	tournaments_won: number;
+	tournament_points: number;
+	created_at: Date;
+	updated_at: Date;
+	deleted_at: Date | null;
+//	match_history: MatchData[]; --> Needs to be added at some point maybe...?
+}
+
+
 
 export class ChallengeButton extends Button
 {
@@ -77,18 +103,31 @@ export class UserManager {
     }
 
     static getUserData(username: string): User | null {
+
+
         const data = localStorage.getItem(username);
         return data ? JSON.parse(data) : null; // Return null if no data is found
+
+		
     }
 
     static deleteUserData(username: string): void {
         localStorage.removeItem(username);
     }
 
-	static updateUserStats(winner: User, loser: User): void 
+	static updateUserStats(winner: User, loser: User, type: GameType): void 
 	{
-		winner.wins++;
-		loser.losses++;
+		if (type === GameType.BLOCK_BATTLE)
+		{
+			winner.wins_blockbattle++;
+			loser.losses_blockbattle++;
+		}
+		else if (type === GameType.PONG)
+		{
+			winner.wins_pong++;
+			loser.losses_pong++;
+		}
+		
 		RankingHandler.updateRanking(winner, loser);
 
 		this.updateUserData(winner.username, winner); // This does not necessarily need the username...?
@@ -118,11 +157,24 @@ export class UserManager {
 	static cloneUser(user: User): User
 	{
 		let newUser: User = {
+			id: user.id,
 			username: user.username,
-			password: user.password,
-			wins: user.wins,
-			losses: user.losses,
-			rankingPoint: user.rankingPoint,
+		//	password: string; --> Not needed in the frontend, right?
+			ranking_points: user.ranking_points,
+			avatar_url: user.avatar_url,
+			games_played_pong: user.games_played_pong,
+			wins_pong: user.wins_pong,
+			losses_pong: user.losses_pong,
+			games_played_blockbattle: user.games_played_blockbattle,
+			wins_blockbattle: user.wins_blockbattle,
+			losses_blockbattle: user.losses_blockbattle,
+			tournaments_played: user.tournaments_played,
+			tournaments_won: user.tournaments_won,
+			tournament_points: user.tournament_points,
+			created_at: user.created_at,
+			updated_at: user.updated_at,
+			deleted_at: user.deleted_at
+		//	match_history: MatchData[]; --> Needs to be added at some point maybe...?
 		};
 
 		return newUser;
@@ -203,13 +255,13 @@ export class UserManager {
 		ctx.font = '20px arial';
 		ctx.fillStyle = '#1111d6';
 		ctx.fillText('WINS / LOSSES:  ', boxX + boxPadding, infoHeight);
-		const winLoseData = `${user.wins} / ${user.losses}`;
+		const winLoseData = `${user.wins_blockbattle + user.wins_pong} / ${user.losses_blockbattle + user.losses_pong}`; // CHECK THIS: Should we separate these?
 		ctx.fillStyle = 'black';
 		ctx.fillText(winLoseData, boxX + boxPadding, infoHeight + lineHeight);
 		ctx.fillStyle = '#1111d6';
 		ctx.fillText('RANKING POINTS:  ', boxX + boxPadding + infoWidth, infoHeight);
 		ctx.fillStyle = 'black';
-		ctx.fillText(user.rankingPoint.toFixed(2), boxX + boxPadding + infoWidth, infoHeight + lineHeight);
+		ctx.fillText(user.ranking_points.toFixed(2), boxX + boxPadding + infoWidth, infoHeight + lineHeight);
 
 		// Create challenge button
 		if (state === UserHubState.SINGLE_GAME)

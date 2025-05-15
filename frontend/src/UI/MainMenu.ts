@@ -7,6 +7,7 @@ import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
 import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { MatchIntro } from "../game/MatchIntro";
+import { getAllUsers, getUserData } from "../services/userService";
 
 
 // BUTTONS
@@ -78,16 +79,29 @@ export class PongAiBtn extends Button
 		this.ctx = ctx;
 	}
 
+	async fetchUserData()
+	{
+		if (!global_curUser)
+			return ;
+
+		try {
+			
+			const userData = await getUserData(global_curUser);
+
+			global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, userData, null, null, null, GameType.PONG_AI));
+				
+		} catch (error) {
+			
+			console.error('Error while fetching user data');
+			alert('Error while fetching user data');
+		}
+	}
+
 	clickAction(): void {
 
 		if (global_curUser)
 		{
-			const curUserData = localStorage.getItem(global_curUser);
-			if (curUserData)
-			{
-				const curUserObj = JSON.parse(curUserData);
-				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserObj, null, null, null, GameType.PONG_AI));
-			}
+			this.fetchUserData();
 		}
 
 	}

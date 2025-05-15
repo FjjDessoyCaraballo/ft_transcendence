@@ -58,7 +58,9 @@ export const loginUser = async (registerData: RegisterData): Promise<RegisterDat
  */
 export const getUserData = async (username: string): Promise<User> => {
   try {
+
     return await apiRequest(`/users/${username}`);
+
   } catch (error) {
     if (error instanceof Error) 
       throw error;

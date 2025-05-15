@@ -8,6 +8,7 @@ import { GameType, UserHubState } from "./Types";
 import { MatchIntro } from "../game/MatchIntro";
 import { Tournament } from "../game/Tournament";
 import { drawCenteredText } from "../game/StartScreen";
+import { getUserData } from "../services/userService";
 
 export class NextPageButton extends Button
 {
@@ -75,27 +76,8 @@ export class UserHUB implements IGameState
 
 		if (global_curUser)
 		{
-			const curUserData = localStorage.getItem(global_curUser);
-			if (curUserData)
-			{
-				const curUserObj = JSON.parse(curUserData);
-				this.tournamentArr.push(curUserObj);
-			}
-		}
-
-		// Sort userArr based on rankingPoint difference
-		if (global_curUser)
-		{
-			const curUserObj = UserManager.getUserData(global_curUser);
-			if (curUserObj)
-			{
-				const curUserRank = curUserObj.rankingPoint;
-				this.userArr.sort((a, b) => {
-					const diffA = Math.abs(a.rankingPoint - curUserRank);
-					const diffB = Math.abs(b.rankingPoint - curUserRank);
-					return diffA - diffB;
-				  });
-			}
+			this.addUserToTournament(global_curUser);
+			this.sortUserDataByCurUserRank();
 		}
 
 		let text1 = 'RETURN TO MENU';
@@ -275,6 +257,49 @@ export class UserHUB implements IGameState
 
 	update(deltaTime: number)
 	{
+	}
+
+	async addUserToTournament(username: string)
+	{
+		if (!username)
+			return ;
+
+		try {
+
+			const userData = await getUserData(username);
+
+			this.tournamentArr.push(userData);
+
+		} catch (error) {
+			
+			console.error('Error while fetching user data');
+			alert('Error while fetching user data');
+		}
+		
+	}
+
+	async sortUserDataByCurUserRank()
+	{
+		if (!global_curUser)
+			return ;
+
+		try {
+			
+			const userData = await getUserData(global_curUser);
+			const curUserRank = userData.ranking_points;
+
+			this.userArr.sort((a, b) => {
+				const diffA = Math.abs(a.ranking_points - curUserRank);
+				const diffB = Math.abs(b.ranking_points - curUserRank);
+				return diffA - diffB;
+			});
+
+		} catch (error) {
+			
+			console.error('Error while fetching user data');
+			alert('Error while fetching user data');
+		}
+
 	}
 
 	render(ctx: CanvasRenderingContext2D)

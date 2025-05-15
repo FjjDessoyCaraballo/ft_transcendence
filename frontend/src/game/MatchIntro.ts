@@ -34,11 +34,22 @@ export class MatchIntro implements IGameState
 		if (!player2)
 		{
 			player2 = {
+				id: 9999,
 				username: 'Computer',
-				password: '',
-				wins: 0,
-				losses: 0,
-				rankingPoint: 9999,
+				ranking_points: 9999,
+				avatar_url: 'Something funny here',
+				games_played_pong: 9999,
+				wins_pong: 9999,
+				losses_pong: 9999,
+				games_played_blockbattle: 9999,
+				wins_blockbattle: 9999,
+				losses_blockbattle: 9999,
+				tournaments_played: 9999,
+				tournaments_won: 9999,
+				tournament_points: 9999,
+				created_at: new Date(),
+				updated_at: new Date(),
+				deleted_at: null
 			};
 		}
 
@@ -136,7 +147,7 @@ export class MatchIntro implements IGameState
 
 		let p1Rank;
 		if (!this.tournamentData1)
-			p1Rank = `Ranking points: ${this.player1.rankingPoint.toFixed(2)}`;
+			p1Rank = `Ranking points: ${this.player1.ranking_points.toFixed(2)}`;
 		else
 		{
 			p1Rank = `Place: ${this.tournamentData1.place}
@@ -156,7 +167,7 @@ export class MatchIntro implements IGameState
 
 		let p2Rank;
 		if (!this.tournamentData2)
-			p2Rank = `Ranking points: ${this.player2.rankingPoint.toFixed(2)}`;
+			p2Rank = `Ranking points: ${this.player2.ranking_points.toFixed(2)}`;
 		else
 		{
 			p2Rank = `Place: ${this.tournamentData2.place}
