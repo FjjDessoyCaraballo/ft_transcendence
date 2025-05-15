@@ -20,21 +20,31 @@ export const Header: React.FC<HeaderProps> = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const { isLoggedIn,  } = await getAuthState();
-        if (isLoggedIn)
-          setShowLogin(true);
-      } catch (error) {
-        console.error('Error checking authstate: ', error);
-        setShowLogin(false);
-      }
-    };
+  // Function to check and update login status
+  const checkLoginStatus = async () => {
+    try {
+      const authState = await getAuthState();
+      console.log("Auth state:", authState);
+      setIsLoggedIn(authState.isLoggedIn);
 
+      const localStorageLoggedIn = localStorage.getItem('logged-in') === 'true';
+      if (localStorageLoggedIn !== authState.isLoggedIn) {
+        console.log("Auth state mismatch with localStorage, using localStorage value");
+        setIsLoggedIn(localStorageLoggedIn);
+      }
+    } catch (error) {
+      console.error('Error checking authstate: ', error);
+      setIsLoggedIn(false);
+    }
+  };
+
+  useEffect(() => {
+    // Check login status when component mounts
     checkLoginStatus();
 
+    // Set up event listener for login status changes
     const handleLoginChange = () => {
+      console.log("Login status changed event triggered");
       checkLoginStatus();
     };
 
@@ -46,15 +56,14 @@ export const Header: React.FC<HeaderProps> = () => {
   }, []);
 
   const HandleRegistrationClick = () => {
-    if (windowOpen === false)
-    {
+    if (windowOpen === false) {
       setWindowOpen(true);
       setShowRegistration(true);
     }
   };
 
   const HandleLoginClick = () => {
-  if (windowOpen === false) {
+    if (windowOpen === false) {
       setWindowOpen(true)
       setShowLogin(true);
     }
@@ -63,6 +72,9 @@ export const Header: React.FC<HeaderProps> = () => {
   const HandleSettingsClick = () => {
     setShowSettings(true);
   }
+
+  // Debug render to help identify state
+  console.log("Rendering Header with isLoggedIn:", isLoggedIn);
 
   return (
     <>
@@ -76,27 +88,25 @@ export const Header: React.FC<HeaderProps> = () => {
           </h4>
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
-              
               <button
-              className="buttonsStyle"
-              onClick={HandleSettingsClick}>
-              Settings
-            </button>
-          ) : (
-            <>
-              <button 
                 className="buttonsStyle"
-                onClick={HandleLoginClick}>
-                Login
+                onClick={HandleSettingsClick}>
+                Settings
               </button>
-              <button 
-              /* I had to override the container px because string was too large */
-                className="buttonsStyle px-1"
-                onClick={HandleRegistrationClick}>
-                Registration
-              </button>
-            </>
-          )}
+            ) : (
+              <>
+                <button 
+                  className="buttonsStyle"
+                  onClick={HandleLoginClick}>
+                  Login
+                </button>
+                <button 
+                  className="buttonsStyle px-1"
+                  onClick={HandleRegistrationClick}>
+                  Registration
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -121,7 +131,7 @@ export const Header: React.FC<HeaderProps> = () => {
           onAccept={() => {
             console.log('Login successful');
             setShowLogin(false);
-            setIsLoggedIn(true);
+            setIsLoggedIn(true); // Set local state as well
             localStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
             setWindowOpen(false);
@@ -136,8 +146,10 @@ export const Header: React.FC<HeaderProps> = () => {
       {showSettings && (
         <SettingsPopup
           onClick={() => {
-            console.log('Settings clicked');
+            console.log('Settings closed');
             setShowSettings(false);
+            // Check if we need to refresh login state after settings close
+            checkLoginStatus();
           }}
         />
       )}

@@ -54,10 +54,16 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	const HandleLogout = async () => {
 	try {
 		await clearToken();
-		console.warn("Token cleared");
+		console.log("Token cleared");
 		
+		// Update logged in state in TokenService
 		await setLoggedInState(false, null);
 		
+		// Update localStorage for immediate UI feedback
+		// localStorage.setItem('logged-in', 'false');
+		
+		// Dispatch event for other components to react
+		console.log("Dispatching loginStatusChanged event from logout");
 		window.dispatchEvent(new Event('loginStatusChanged'));
 		
 		onClick();
