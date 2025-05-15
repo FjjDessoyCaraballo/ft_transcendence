@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
+import { updateCurUser } from '../components';
 
 interface HeaderProps {
   onClick: () => void;

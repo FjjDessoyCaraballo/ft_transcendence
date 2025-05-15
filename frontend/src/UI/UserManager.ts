@@ -1,7 +1,7 @@
 import { stateManager } from "../components/index"; // GLOBAL USE OF ctx and canvas
 import { canvas, ctx } from "../components/Canvas";
 import { curUser, updateCurUser } from "../components/index"; // GLOBAL USE
-import { USER_ARR_KEY, LOGIN_CHECK_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
+import { USER_ARR_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
 import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { GameStates } from "../game/GameStates";
 import { Button } from "./Button";
@@ -251,20 +251,7 @@ export class UserManager {
 
 	static drawCurUser()
 	{
-		if (!curUser)
-		{
-			const loginUser = localStorage.getItem(LOGIN_CHECK_KEY);
-			if (!loginUser)
-			{
-				const curGameState: GameStates | null = stateManager.getStateName();
-				if (curGameState !== null && curGameState !== GameStates.START_SCREEN)
-					stateManager.changeState(new StartScreen(canvas));
-				return ;
-			}
-			else
-				updateCurUser(JSON.parse(loginUser));
-		}
-		else
+		if (curUser)
 		{
 			drawCenteredText('Currently logged in user: ', '22px arial', 'white', 30);
 			drawCenteredText(curUser, '28px arial', 'red', 60);
