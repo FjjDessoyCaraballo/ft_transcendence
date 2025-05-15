@@ -121,3 +121,13 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# database volumes
+database.sqlite
+
+# https certificates
+*.pem
+*.key
+certs/
+
+notes

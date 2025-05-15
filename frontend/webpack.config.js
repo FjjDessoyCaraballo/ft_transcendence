@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const fs = require('fs');
 
 module.exports = {
   entry: './src/components/index.tsx',
@@ -36,10 +37,15 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'public'),
     },
+	host: '0.0.0.0',
     compress: true,
     port: 9000,
     hot: true,
     open: true,
-    historyApiFallback: true
+    historyApiFallback: true,
+	https: {
+		key: fs.readFileSync(path.join(__dirname, 'certs/key.pem')),
+		cert: fs.readFileSync(path.join(__dirname, 'certs/cert.pem')),
+	}
   },
 };

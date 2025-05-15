@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { GameStateManager, GameStates } from '../game/GameStates'; 
 import { StartScreen } from '../game/StartScreen';
 import { Header } from '../UI/Header'
-import { canvas, ctx } from "../components/Canvas";
+import { canvas, ctx } from './Canvas'
 
 export const stateManager = new GameStateManager();
 
@@ -45,7 +45,7 @@ function gameLoop(timeStamp: number) {
 
 	if (!curUser && stateManager.getStateName() !== GameStates.START_SCREEN)
 		stateManager.changeState(new StartScreen(canvas));
-
+	
 	updateGame(deltaTime);
 	renderGame();
     requestAnimationFrame(gameLoop);
