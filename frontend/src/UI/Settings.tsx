@@ -52,27 +52,19 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	}
 
 	const HandleLogout = async () => {
-		// needs to be changed to JWT instead of localStorage()
-		try {
-			const { isLoggedIn, currentUser } = await getAuthState();
-			if (isLoggedIn) {
-					await setLoggedInState(false, currentUser);
-					window.dispatchEvent(new Event('loginStatusChanged'));
-			} else {
-				throw new Error("you're not logged in.")
-			}
-		} catch (error) {
-			console.error("There was a whoopsie: ", error);
-		}
-		try {
-			await clearToken();
-			console.warn("Token cleared");
-		} catch (error) {
-			console.error("Error: Could not clear token");
-		}
-
+	try {
+		await clearToken();
+		console.warn("Token cleared");
+		
+		await setLoggedInState(false, null);
+		
+		window.dispatchEvent(new Event('loginStatusChanged'));
+		
 		onClick();
+	} catch (error) {
+		console.error("Error during logout:", error);
 	}
+	};
 
 	const HandleChangePasswordClick = () => {
 		setShowChangePassword(true);
