@@ -1,5 +1,4 @@
-# Use Node.js as the base image
-FROM node:16
+FROM node:20.13.1-bookworm-slim
 
 # Set working directory
 WORKDIR /app
@@ -7,24 +6,31 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install system dependencies including OpenSSL and SQLite
+# Use apt-get with optimizations for Docker
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    sqlite3 \
+    openssl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Install Fastify and other required packages
-RUN npm install fastify @fastify/cors @fastify/static @fastify/jwt
-RUN npm install sqlite3 better-sqlite3
-RUN npm install bcrypt
-RUN npm install fastify-socket.io
+# Install Node.js dependencies
+RUN npm install --no-audit --production
 
-# Create directory for the SQLite database
-RUN mkdir -p /app/data
-RUN chmod 777 /app/data
+# Create directories
+RUN mkdir -p /app/data /app/certs
+RUN chmod 700 /app/data
 
-# Copy the rest of the application code
-COPY . .
+# Copy the application code
+COPY . /app/
+
+# Make the scripts executable
+RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/init_sqlite.sh
 
 # Expose the port the server will run on
-EXPOSE 3000
+EXPOSE 3443
 
-# Command to run the server
-CMD ["node", "src/server.js"]
+# Set the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]

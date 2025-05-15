@@ -47,7 +47,7 @@ function gameLoop(timeStamp: number) {
 
 	if (!curUser && stateManager.getStateName() !== GameStates.START_SCREEN)
 		stateManager.changeState(new StartScreen(canvas));
-
+	
 	updateGame(deltaTime);
 	renderGame();
     requestAnimationFrame(gameLoop);
