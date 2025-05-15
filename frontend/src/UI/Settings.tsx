@@ -183,7 +183,8 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 
       {/* Render the password change popup when needed */}
       {showChangePassword && (
-        <PasswordChangePopup onClose={() => setShowChangePassword(false)} />
+        <PasswordChangePopup onClose={() => setShowChangePassword(false)} 
+		/>
       )}
       
       {/* Render the delete account confirmation popup when needed */}

@@ -24,6 +24,7 @@ export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }
 				oldPassword: oldPassword,
 				newPassword: newPassword
 			})
+			onClose();
 		} catch (error) {
 			throw new Error("Password change failed. Try again later.");
 		} finally {
