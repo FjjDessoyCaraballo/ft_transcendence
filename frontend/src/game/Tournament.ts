@@ -8,7 +8,7 @@ import { Button } from "../UI/Button";
 import { MatchIntro } from "./MatchIntro";
 import { EndScreen } from "./EndScreen";
 import { GameType } from "../UI/Types";
-import { Pong } from "./Pong";
+import { Pong } from "./pong/Pong";
 import { drawCenteredText } from "./StartScreen";
 
 export interface TournamentPlayer
