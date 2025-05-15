@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
 import { login } from '../services/userService'
-import { setToken } from '../services/TokenService';
+import { setToken, setLoggedInState } from '../services/TokenService';
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
@@ -14,16 +14,13 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     setUsername('');
     setPassword('');
     setErrorMessage('');
-    localStorage.setItem('logged-in', 'false');
+    // localStorage.setItem('logged-in', 'false');
     onDecline();
   };
 
-  // Handle API communication through here
   const HandleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-	  console.log('Attempting login for:', username); // debug
-    // Basic validation
     if (!username || !password) {
       setErrorMessage('Please enter both username and password');
       return;
@@ -35,13 +32,14 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
         password: password
       });
 
-      if (response && response.token) {
+      if (response && response.token && response.user) {
         await setToken(response.token);
+        await setLoggedInState(true, response.user.username)
       } else {
         console.error('No token received from server.')
       }
 
-      localStorage.setItem('logged-in', 'true');
+      // localStorage.setItem('logged-in', 'true');
       
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();

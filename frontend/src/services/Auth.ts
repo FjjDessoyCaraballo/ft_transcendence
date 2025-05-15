@@ -1,8 +1,13 @@
+/**
+ * 
+ * THIS WHOLE FILE IS DEPRECATED
+ * 
+ */
+
+
 // import { apiRequest } from './Api';
 // import { User } from "../UI/UserManager"
 // import { clearToken, getToken, getAuthState, setLoggedInState } from './TokenService';
-
-
 
 /**
  * This helper function performs the login and gets a JWT token.
