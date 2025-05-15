@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dashboard } from './Dashboard'
 import { GameCanvas } from './GameCanvas';
+import { PlayerList } from './PlayerList'
 import { GDPRPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
@@ -21,10 +22,11 @@ export const Header: React.FC<HeaderProps> = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-	// State management for Dashboard
+	// State management for Dashboard and Player List
   const [isGameVisible, setIsGameVisible] = useState(true);
   const [buttonText, setButtonText] = useState('Dashboard');
   const [isDashboardVisible, setIsDashboardVisible] = useState(false);
+  const [isPlayerListVisible, setIsPlayerListVisible] = useState(false);
 
 
   useEffect(() => {
@@ -60,16 +62,26 @@ export const Header: React.FC<HeaderProps> = () => {
     setShowSettings(true);
   }
 
+  const handlePlayerListClick = () => {
+    //console.log('Player List clicked');
+    setIsGameVisible(false);
+    setIsPlayerListVisible(true);
+    setIsDashboardVisible(false);
+    setButtonText('To Game');
+  };
+
   // Dashboard state change functions
   const handleDashboardClick = () => {
     setIsGameVisible(false);
     setIsDashboardVisible(true);
+    setIsPlayerListVisible(false);
     setButtonText('To Game');
   };
 
   const handleBackToGameClick = () => {
     setIsGameVisible(true);
     setIsDashboardVisible(false);
+    setIsPlayerListVisible(false);
     setButtonText('Dashboard');
   };
 
@@ -83,11 +95,23 @@ export const Header: React.FC<HeaderProps> = () => {
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
 			<>
-				<button
-  				className="buttonsStyle"
-  				onClick={isGameVisible ? handleDashboardClick : handleBackToGameClick}>
-  				{buttonText}
-				</button>
+				{(isGameVisible || isDashboardVisible) && (
+          <button
+            className="buttonsStyle"
+            onClick={isDashboardVisible ? handleBackToGameClick : handleDashboardClick}>
+            {isDashboardVisible ? 'To Game' : 'Dashboard'}
+          </button>
+        )}
+
+        {(isGameVisible || isPlayerListVisible) && (
+          <button
+            className="buttonsStyle"
+            onClick={isPlayerListVisible ? handleBackToGameClick : handlePlayerListClick}>
+            {isPlayerListVisible ? 'To Game' : 'Players'}
+          </button>
+        )}
+
+
               
               <button
               className="buttonsStyle"
@@ -153,6 +177,7 @@ export const Header: React.FC<HeaderProps> = () => {
 	<main className="pt-32"> {/* or adjust to match header height */}
 	{isGameVisible && <GameCanvas />}
 	{isDashboardVisible && <Dashboard />}
+  {isPlayerListVisible && <PlayerList onShowDashboard={handleDashboardClick} />}
 	</main>
 	
     </>
