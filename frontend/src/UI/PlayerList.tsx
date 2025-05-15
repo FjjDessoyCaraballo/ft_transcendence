@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { User, UserManager } from "./UserManager";
 
 interface ExtendedUser extends User {
-    isFriend: boolean;
-    avatarUrl: string;
+  friendshipStatus: 'none' | 'pending' | 'accepted';
+  avatarUrl: string;
 }
 
 interface PlayerListProps {
@@ -15,21 +15,39 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
 
     useEffect(() => {
         const fetchedUsers = UserManager.getAllUserData();
-        const extendedUsers: ExtendedUser[] = fetchedUsers.map((user) => ({
-            ...user,
-            isFriend: false, // Initialize friendship status // Change this to get status instead of automatically initializing to false
-            avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.username}`, // Generate avatar
-        }));
+        const extendedUsers: ExtendedUser[] = fetchedUsers.map((user) => {
+          // Simulate random friendship status for now (none, pending, accepted)
+          const statuses: Array<'none' | 'pending' | 'accepted'> = ['none', 'pending', 'accepted'];
+          const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+      
+          return {
+              ...user,
+              friendshipStatus: randomStatus,
+              avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.username}`,
+          };
+      });
+      
         setPlayers(extendedUsers);
     }, []);
 
     const toggleFriend = (username: string) => {
-        setPlayers((prevPlayers) =>
-        prevPlayers.map((player) =>
-            player.username === username ? { ...player, isFriend: !player.isFriend } : player
-        )
-        );
-    };
+      setPlayers((prevPlayers) =>
+          prevPlayers.map((player) =>
+              player.username === username
+                  ? {
+                        ...player,
+                        friendshipStatus:
+                            player.friendshipStatus === 'none'
+                                ? 'pending'
+                                : player.friendshipStatus === 'pending'
+                                ? 'accepted'
+                                : 'none',
+                    }
+                  : player
+          )
+      );
+  };
+  
 
     const loggedInUserString = typeof window !== 'undefined' ? localStorage.getItem('LoggedIn') : null;
     const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
@@ -70,14 +88,22 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                   <div className="flex gap-2 mt-auto">
                     {!isLoggedInUser && (
                       <button
-                        aria-label={player.isFriend ? 'Remove Friend' : 'Add Friend'}
-                        onClick={() => toggleFriend(player.username)}
-                        className={`px-4 py-2 rounded-md text-white ${
-                          player.isFriend ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-500 hover:bg-purple-700'
-                        }`}
-                      >
-                        {player.isFriend ? '✔️ Friend' : '➕ Friend'}
-                      </button>
+                      onClick={() => toggleFriend(player.username)}
+                      className={`px-4 py-2 rounded-md text-white ${
+                          player.friendshipStatus === 'accepted'
+                              ? 'bg-green-500 hover:bg-green-600'
+                              : player.friendshipStatus === 'pending'
+                              ? 'bg-yellow-500 hover:bg-yellow-600'
+                              : 'bg-purple-500 hover:bg-purple-700'
+                      }`}
+                  >
+                      {player.friendshipStatus === 'accepted'
+                          ? '✔️ Friend'
+                          : player.friendshipStatus === 'pending'
+                          ? '⏳ Pending'
+                          : '➕ Friend'}
+                  </button>
+                  
                     )}
                     <button
                       onClick={onShowDashboard}
