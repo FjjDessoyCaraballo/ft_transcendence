@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
-import { loginUser } from '../services/userService'
+import { login } from '../services/userService'
 import { setToken } from '../services/TokenService';
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
@@ -30,7 +30,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     }
 
     try {
-      const response = await loginUser({
+      const response = await login({
         username: username,
         password: password
       });

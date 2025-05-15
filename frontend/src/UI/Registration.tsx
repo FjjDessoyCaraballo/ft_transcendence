@@ -36,10 +36,12 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  
 	  if (!username || !password || !confirmPassword) {
 		setErrorMessage('All fields are required');
+		return ;
 	  }
 	  
 	  if (password !== confirmPassword) {
 		setErrorMessage('Passwords do not match');
+		return ;
 	  }
 
 	  setIsLoading(true);

@@ -1,5 +1,6 @@
 import { apiRequest } from './Api';
 import { User } from '../UI/UserManager'
+import { setLoggedInState, getToken, getAuthState, clearToken } from '../services/TokenService'
 
 interface RegisterData {
   username: string;
@@ -17,6 +18,50 @@ interface PasswordChange {
   newPassword: string;
 }
 
+interface LoginData {
+  username: string;
+  password: string;
+}
+
+interface LoginResponse {
+  user: User;
+  token: string;
+  message?: string;
+}
+
+/**
+ * Login user
+ * 
+ * @param userData User registration data
+ * @returns Promise with user data
+ */
+export const login = async (loginData: LoginData): Promise<{ token: string, user: User }> => {
+  try {
+    const data = await apiRequest('/users/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: loginData.username,
+        password: loginData.password
+      })
+    });
+
+    await setLoggedInState(true, loginData.username);
+    window.dispatchEvent(new Event('loginStatusChanged'));
+
+    return data;
+  
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Login failed. Please try again.');
+  } finally {
+    await clearToken();
+    await setLoggedInState(false);
+    window.dispatchEvent(new Event('loginStatusChanged'));
+  }
+};
+
 /**
  * Register a new user with the API
  * 
@@ -31,24 +76,6 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
     });
   } catch (error) {
       throw new Error('Registration failed. Please try again later.');
-  }
-};
-
-/**
- * Login user
- * 
- * @param userData User registration data
- * @returns Promise with user data
- */
-export const loginUser = async (registerData: RegisterData): Promise<{ token: string, user: User }> => {
-  try {
-    const response = await apiRequest('/users/login', {
-      method: 'POST',
-      body: JSON.stringify(registerData)
-    });
-    return response;
-  } catch (error) {
-      throw new Error('Failed to fetch user data.');
   }
 };
 
@@ -146,3 +173,14 @@ export const changePassword = async (passwordChange: PasswordChange): Promise<Pa
       throw new Error('Password change failed. Please try again later.');
   }
 };
+
+/**
+ * Check if user is authenticated
+ * 
+ * @returns Boolean indicating if user is authenticated
+ */
+export const isAuthenticated = async (): Promise<boolean> => {
+  const token = await getToken();
+  const authState = await getAuthState();
+  return token !== null && authState.isLoggedIn;
+}

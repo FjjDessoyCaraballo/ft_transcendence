@@ -253,8 +253,8 @@ export class UserManager {
 	{
 		if (!curUser)
 		{
-			const loginUser = localStorage.getItem(LOGIN_CHECK_KEY);
-			if (!loginUser)
+			const login = localStorage.getItem(LOGIN_CHECK_KEY);
+			if (!login)
 			{
 				const curGameState: GameStates | null = stateManager.getStateName();
 				if (curGameState !== null && curGameState !== GameStates.START_SCREEN)
@@ -262,7 +262,7 @@ export class UserManager {
 				return ;
 			}
 			else
-				updateCurUser(JSON.parse(loginUser));
+				updateCurUser(JSON.parse(login));
 		}
 		else
 		{
