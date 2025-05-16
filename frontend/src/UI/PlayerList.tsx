@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, UserManager } from "./UserManager";
+import { getAllUsers } from '../services/userService';
 
 interface ExtendedUser extends User {
   friendshipStatus: 'none' | 'pending' | 'accepted';
@@ -14,20 +15,23 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     const [players, setPlayers] = useState<ExtendedUser[]>([]);
 
     useEffect(() => {
-        const fetchedUsers = UserManager.getAllUserData();
-        const extendedUsers: ExtendedUser[] = fetchedUsers.map((user) => {
-          // Simulate random friendship status for now (none, pending, accepted)
-          const statuses: Array<'none' | 'pending' | 'accepted'> = ['none', 'pending', 'accepted'];
-          const status = 'none';
-      
-          return {
-              ...user,
-              friendshipStatus: status,
-              avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.username}`,
-          };
-      });
-      
-        setPlayers(extendedUsers);
+    const fetchPlayers = async () => {
+        try {
+            const fetchedUsers = await getAllUsers();
+
+            const extendedUsers: ExtendedUser[] = fetchedUsers.map((user) => ({
+                ...user,
+                friendshipStatus: 'none',
+                avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.username}`,
+            }));
+
+            setPlayers(extendedUsers);
+        } catch (error) {
+            console.error('Failed to fetch players:', error);
+        }
+     };
+
+      fetchPlayers();
     }, []);
 
     const toggleFriend = (username: string) => {
@@ -61,6 +65,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   
 
     const loggedInUserString = typeof window !== 'undefined' ? localStorage.getItem('LoggedIn') : null;
+    console.log('logged in user:', loggedInUserString);
     const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
     const pendingRequests = players.filter(player => player.friendshipStatus === 'pending');
 
