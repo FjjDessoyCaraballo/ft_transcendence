@@ -1,5 +1,5 @@
 import  React, { useState } from 'react'
-import { changePassword } from '../services/userService'
+import { changePassword, isAuthenticated } from '../services/userService'
 
 export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }) => {
 	const [oldPassword, setOldPassword] = useState('');
@@ -20,11 +20,15 @@ export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }
 
 		try {
 			setIsSubmitting(true);
-			await changePassword({
-				oldPassword: oldPassword,
-				newPassword: newPassword
+			
+			await isAuthenticated()
+			.then(() => {
+				changePassword({
+					oldPassword: oldPassword,
+					newPassword: newPassword
+				})
 			})
-			onClose();
+			.then(() => {onClose();})
 		} catch (error) {
 			throw new Error("Password change failed. Try again later.");
 		} finally {

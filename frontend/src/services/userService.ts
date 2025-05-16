@@ -180,7 +180,14 @@ export const changePassword = async (passwordChange: PasswordChange): Promise<Pa
  * @returns Boolean indicating if user is authenticated
  */
 export const isAuthenticated = async (): Promise<boolean> => {
-  const token = await getToken();
-  const authState = await getAuthState();
-  return token !== null && authState.isLoggedIn;
+  let token: boolean;
+  try {
+    token = await getToken()
+    .then(() => {
+      return token;
+    })
+  } catch (error) {
+    console.error("Error: ",error);
+  }
+  return false;
 }
