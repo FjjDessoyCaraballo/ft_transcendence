@@ -14,7 +14,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     setUsername('');
     setPassword('');
     setErrorMessage('');
-    localStorage.setItem('logged-in', 'false');
+    sessionStorage.setItem('logged-in', 'false');
     onDecline();
   };
 
@@ -41,7 +41,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
         console.error('No token received from server.')
       }
 
-      localStorage.setItem('logged-in', 'true');
+      sessionStorage.setItem('logged-in', 'true');
       
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();

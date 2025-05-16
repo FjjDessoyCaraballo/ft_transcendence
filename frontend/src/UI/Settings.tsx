@@ -51,8 +51,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	}
 
 	const HandleLogout = () => {
-		// needs to be changed to JWT instead of localStorage()
-		localStorage.setItem('logged-in', 'false');
+		sessionStorage.setItem('logged-in', 'false');
 		window.dispatchEvent(new Event('loginStatusChanged'));
 		onClick();
 	}

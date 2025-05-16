@@ -17,17 +17,14 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  setPassword('');
 	  setConfirmPassword('');
 	  setErrorMessage('');
-	  localStorage.setItem('gdpr-accepted', 'false');
 	  onDecline();
 	};
   
 	const HandleGDPRAccept = () => {
-	  localStorage.setItem('gdpr-accepted', 'true');
 	  setShowRegistration(true);
 	};
   
 	const HandleGDPRDecline = () => {
-	  localStorage.setItem('gdpr-accepted', 'false');
 	  onDecline();
 	};
   
@@ -36,10 +33,12 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  
 	  if (!username || !password || !confirmPassword) {
 		setErrorMessage('All fields are required');
+		return ;
 	  }
 	  
 	  if (password !== confirmPassword) {
 		setErrorMessage('Passwords do not match');
+		return ;
 	  }
 
 	  setIsLoading(true);
