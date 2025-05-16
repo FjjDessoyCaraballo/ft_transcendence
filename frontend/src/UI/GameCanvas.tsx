@@ -2,11 +2,17 @@ import React, { useRef, useEffect } from 'react';
 import { GameStateManager, GameStates } from '../game/GameStates';
 import { StartScreen } from '../game/StartScreen';
 import { WALL_THICKNESS, FLOOR_THICKNESS } from '../game/Constants';
+import { User } from './UserManager';
 
 // GLOBAL GAME VARIABLES
 export let global_curUser: string | null = null;
 export function updateCurUser(newUser: string | null) {
   global_curUser = newUser;
+}
+
+export let global_allUserDataArr: User[] = [];
+export function updateAllUserDataArr(newData: User[]) {
+  global_allUserDataArr = newData;
 }
 
 // JUST A TEST until localHost is completely removed

@@ -1,13 +1,12 @@
 import { GameStates, IGameState } from "../game/GameStates";
 import { Button } from "./Button";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LIGHT_PURPLE } from "../game/Constants";
-import { global_stateManager, global_curUser } from "./GameCanvas";
+import { global_stateManager, global_curUser, global_allUserDataArr } from "./GameCanvas";
 import { UserHUB } from "./UserHUB";
 import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
 import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { MatchIntro } from "../game/MatchIntro";
-import { getAllUsers, getUserData } from "../services/userService";
 
 
 // BUTTONS
@@ -79,29 +78,13 @@ export class PongAiBtn extends Button
 		this.ctx = ctx;
 	}
 
-	async fetchUserData()
-	{
-		if (!global_curUser)
-			return ;
-
-		try {
-			
-			const userData = await getUserData(global_curUser);
-
-			global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, userData, null, null, null, GameType.PONG_AI));
-				
-		} catch (error) {
-			
-			console.error('Error while fetching user data');
-			alert('Error while fetching user data');
-		}
-	}
-
 	clickAction(): void {
 
-		if (global_curUser)
+		if (global_curUser && global_allUserDataArr)
 		{
-			this.fetchUserData();
+			const curUserData = global_allUserDataArr.find(user => user.username === global_curUser);
+			if (curUserData)
+				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserData, null, null, null, GameType.PONG_AI));
 		}
 
 	}

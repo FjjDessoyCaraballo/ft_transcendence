@@ -1,6 +1,6 @@
 // MatchStatsPopup.tsx
 import React from 'react';
-import { MatchData } from './PANU_TEST_DATA';
+import { MatchData } from './UserManager';
 
 interface MatchStatsPopupProps {
   match: MatchData;

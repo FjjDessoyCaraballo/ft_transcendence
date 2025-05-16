@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Dashboard } from './Dashboard'
-import { GameCanvas } from './GameCanvas';
+import { GameCanvas, global_curUser } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
+import { getUserData } from '../services/userService';
+import { User } from './UserManager';
 
 interface HeaderProps {
   onClick: () => void;
@@ -25,6 +27,7 @@ export const Header: React.FC<HeaderProps> = () => {
   const [isGameVisible, setIsGameVisible] = useState(true);
   const [buttonText, setButtonText] = useState('Dashboard');
   const [isDashboardVisible, setIsDashboardVisible] = useState(false);
+  const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
 
 
   useEffect(() => {
@@ -68,13 +71,25 @@ export const Header: React.FC<HeaderProps> = () => {
   }
 
   // Dashboard state change functions
-  const handleDashboardClick = () => {
-    setIsGameVisible(false);
-    setIsDashboardVisible(true);
-    setButtonText('To Game');
+  const handleDashboardClick = async () => {
+
+	if (!global_curUser)
+		return ;
+	
+	try {
+		const userData = await getUserData(global_curUser);
+		setDashboardUserData(userData);
+		setIsGameVisible(false);
+		setIsDashboardVisible(true);
+		setButtonText('To Game');
+	} catch {
+		alert("Error while fetching user data for Dashboard");
+		console.log("Error while fetching user data for Dashboard");
+	}
   };
 
   const handleBackToGameClick = () => {
+	setDashboardUserData(null);
     setIsGameVisible(true);
     setIsDashboardVisible(false);
     setButtonText('Dashboard');
@@ -167,7 +182,7 @@ export const Header: React.FC<HeaderProps> = () => {
 
 	<main className="pt-32"> {/* or adjust to match header height */}
 	{isGameVisible && <GameCanvas />}
-	{isDashboardVisible && <Dashboard />}
+	{isDashboardVisible && dashboardUserData && <Dashboard userData={dashboardUserData}/>}
 	</main>
 	
     </>

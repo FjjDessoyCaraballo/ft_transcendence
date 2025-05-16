@@ -1,6 +1,6 @@
 import { GameStates, IGameState } from "../GameStates";
-import { User, UserManager } from "../../UI/UserManager";
-import { global_stateManager } from "../../UI/GameCanvas";
+import { User } from "../../UI/UserManager";
+import { global_allUserDataArr, global_stateManager } from "../../UI/GameCanvas";
 import { EndScreen } from "../EndScreen";
 import { TournamentPlayer } from "../Tournament";
 import { GameType } from "../../UI/Types";
@@ -238,8 +238,8 @@ export class Pong implements IGameState {
     // const player2Score = this.player2.score;
 
     // Regular ending
-    const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
-    const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
+    const p1 = this.player1.user;
+	const p2 = this.player2.user;
 
     if (this.twoPlayerMode)
     {

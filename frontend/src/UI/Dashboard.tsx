@@ -13,7 +13,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Pie, Line, Bar } from 'react-chartjs-2';
-import { panuData, MatchData } from './PANU_TEST_DATA';
+import { panuMatchHistory } from './PANU_TEST_DATA';
+import { User, MatchData } from './UserManager';
 import MatchStatsPopup from './MatchStatsPopup';
 import 'chart.js/auto';
 
@@ -31,7 +32,6 @@ const chartBackgroundPlugin = {
   },
 };
 
-
 // Register chart components
 ChartJS.register(
   ArcElement,
@@ -46,12 +46,17 @@ ChartJS.register(
   chartBackgroundPlugin
 );
 
+type DashboardProps = {
+  userData: User;
+};
 
-
-
-export const Dashboard: React.FC = () => {
+export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   const [selectedMatch, setSelectedMatch] = useState<MatchData | null>(null);
-  const user = panuData;
+
+  // A test for now, because the match history API is not ready!!
+  userData.match_history = panuMatchHistory;
+
+  const user = userData;
   const matchHistory = user.match_history;
 
   // --- Win/Loss Pie Chart ---
@@ -176,9 +181,13 @@ export const Dashboard: React.FC = () => {
   const matchesPlayed = user.games_played_pong + user.games_played_blockbattle;
 
   // Calculate Average Games Per Day
-  const daysSinceJoined = Math.floor(
+  let daysSinceJoined = Math.floor(
     (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 3600 * 24)
   );
+
+  if (daysSinceJoined === 0)
+		daysSinceJoined++;
+
   const avgGamesPerDay = (matchesPlayed / daysSinceJoined).toFixed(2);
 
   // Determine Favorite Game
@@ -192,8 +201,8 @@ export const Dashboard: React.FC = () => {
           Welcome to Dashboard, <span className="font-semibold">{user.username}</span> 👋
         </h2>
         <div className="flex flex-wrap justify-center gap-12">
-          <div className="texts">🎖️ Current ranking: <strong>{user.ranking_points}</strong></div>
-          <div className="texts">📅 Joined: {user.created_at.toLocaleDateString()}</div>
+          <div className="texts">🎖️ Current ranking: <strong>{user.ranking_points.toFixed(2)}</strong></div>
+          <div className="texts">📅 Joined: {new Date(user.created_at).toLocaleDateString()}</div>
         </div>
       </div>
 

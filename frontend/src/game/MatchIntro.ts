@@ -47,6 +47,7 @@ export class MatchIntro implements IGameState
 				tournaments_played: 9999,
 				tournaments_won: 9999,
 				tournament_points: 9999,
+				match_history: [],
 				created_at: new Date(),
 				updated_at: new Date(),
 				deleted_at: null

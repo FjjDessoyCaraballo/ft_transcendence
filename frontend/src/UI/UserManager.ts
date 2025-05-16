@@ -1,9 +1,10 @@
 import { global_curUser } from "./GameCanvas"
-import { USER_ARR_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
+import { DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
 import { drawCenteredText } from "../game/StartScreen";
 import { Button } from "./Button";
+import { UserHubState, GameType } from "./Types";
 import { RankingHandler } from "../game/RankingPoints";
-import { GameType, UserHubState } from "./Types";
+import { updateUserStatsAPI } from "../services/userService";
 
 /*
 OLD VERSION
@@ -17,6 +18,47 @@ export interface User {
 	// Add match history here...? Or somewhere else?
 }
 	*/
+
+export interface PongData {
+	id: number;
+	match_id: number;
+	longest_rally: number;
+	avg_rally: number;
+	player1_points: number;
+	player2_points: number;
+}
+
+export interface BBData {
+	id: number;
+	match_id: number;
+	win_method: string; // KO or Coins
+	player1_weapon1: string;
+	player1_weapon2: string;
+	player1_damage_taken: number;
+	player1_damage_done: number;
+	player1_coins_collected: number;
+	player1_shots_fired: number;
+	player2_weapon1: string;
+	player2_weapon2: string;
+	player2_damage_taken: number;
+	player2_damage_done: number;
+	player2_coins_collected: number;
+	player2_shots_fired: number;	
+}
+
+export interface MatchData {
+	id: number;
+	date: Date;
+	player1_id: number;
+	player1_rank: number;
+	player2_id: number;
+	player2_rank: number;
+	winner_id: number;
+	game_duration: number;
+	game_type: string; // pong / blockbattle
+	created_at: Date;
+	game_data: PongData | BBData;
+}
 
 export interface User {
 	id: number;
@@ -36,7 +78,7 @@ export interface User {
 	created_at: Date;
 	updated_at: Date;
 	deleted_at: Date | null;
-//	match_history: MatchData[]; --> Needs to be added at some point maybe...?
+	match_history: MatchData[];
 }
 
 
@@ -85,7 +127,7 @@ export class TournamentButton extends Button
 
 export class UserManager {
 
-    static saveUserData(user: User): void 
+   /* static saveUserData(user: User): void 
 	{
         try 
 		{
@@ -100,43 +142,43 @@ export class UserManager {
 			else 
                 console.error("An error occurred while saving user data", e);
         }
-    }
-
-    static getUserData(username: string): User | null {
+    } */
 
 
-        const data = localStorage.getItem(username);
-        return data ? JSON.parse(data) : null; // Return null if no data is found
-
-		
-    }
-
-    static deleteUserData(username: string): void {
-        localStorage.removeItem(username);
-    }
-
-	static updateUserStats(winner: User, loser: User, type: GameType): void 
+	static async updateUserStats(winner: User, loser: User, type: GameType) 
 	{
+
 		if (type === GameType.BLOCK_BATTLE)
 		{
+			winner.games_played_blockbattle++;
 			winner.wins_blockbattle++;
+			loser.games_played_blockbattle++;
 			loser.losses_blockbattle++;
 		}
 		else if (type === GameType.PONG)
 		{
+			winner.games_played_pong++;
 			winner.wins_pong++;
+			loser.games_played_pong++;
 			loser.losses_pong++;
 		}
 		
 		RankingHandler.updateRanking(winner, loser);
 
-		this.updateUserData(winner.username, winner); // This does not necessarily need the username...?
-		this.updateUserData(loser.username, loser);			
+		try {
 
-	}
+			await updateUserStatsAPI(winner, loser, type);
+
+		} catch {
+
+			throw new Error('Failed to update user statistics'); // is this necessary...?
+
+		}
+
+	} 
 
 	// This could be more simple now that I have the whole User object in updateUserStats...?
-	static updateUserData(username: string, updatedData: Partial<User>): void 
+/*	static updateUserData(username: string, updatedData: Partial<User>): void 
 	{
 		try 
 		{
@@ -152,9 +194,9 @@ export class UserManager {
 		catch (e) {
 			console.error("An error occurred while updating user data", e);
 		}
-	}
+	} */
 
-	static cloneUser(user: User): User
+/*	static cloneUser(user: User): User
 	{
 		let newUser: User = {
 			id: user.id,
@@ -178,11 +220,11 @@ export class UserManager {
 		};
 
 		return newUser;
-	}
+	} */
 
 
 
-    static getAllUserData(): User[] {
+ /*   static getAllUserData(): User[] {
 
         const usersArr: User[] = [];
 		const usernames = localStorage.getItem(USER_ARR_KEY);
@@ -216,7 +258,7 @@ export class UserManager {
         }
 
         return usersArr;
-    }
+    } */
 
 
 	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
