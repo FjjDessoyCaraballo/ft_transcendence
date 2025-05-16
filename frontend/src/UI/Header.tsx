@@ -27,10 +27,10 @@ export const Header: React.FC<HeaderProps> = () => {
       console.log("Auth state:", authState);
       setIsLoggedIn(authState.isLoggedIn);
 
-      const localStorageLoggedIn = localStorage.getItem('logged-in') === 'true';
-      if (localStorageLoggedIn !== authState.isLoggedIn) {
-        console.log("Auth state mismatch with localStorage, using localStorage value");
-        setIsLoggedIn(localStorageLoggedIn);
+      const sessionStorageLoggedIn = sessionStorage.getItem('logged-in') === 'true';
+      if (sessionStorageLoggedIn !== authState.isLoggedIn) {
+        console.log("Auth state mismatch with sessionStorage, using sessionStorage value");
+        setIsLoggedIn(sessionStorageLoggedIn);
       }
     } catch (error) {
       console.error('Error checking authstate: ', error);
@@ -39,10 +39,8 @@ export const Header: React.FC<HeaderProps> = () => {
   };
 
   useEffect(() => {
-    // Check login status when component mounts
     checkLoginStatus();
 
-    // Set up event listener for login status changes
     const handleLoginChange = () => {
       console.log("Login status changed event triggered");
       checkLoginStatus();
@@ -73,8 +71,7 @@ export const Header: React.FC<HeaderProps> = () => {
     setShowSettings(true);
   }
 
-  // Debug render to help identify state
-  console.log("Rendering Header with isLoggedIn:", isLoggedIn);
+  console.warn("Rendering Header with isLoggedIn:", isLoggedIn);
 
   return (
     <>
@@ -131,8 +128,8 @@ export const Header: React.FC<HeaderProps> = () => {
           onAccept={() => {
             console.log('Login successful');
             setShowLogin(false);
-            setIsLoggedIn(true); // Set local state as well
-            localStorage.setItem('logged-in', 'true');
+            setIsLoggedIn(true);
+            sessionStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
             setWindowOpen(false);
           }}
@@ -148,7 +145,6 @@ export const Header: React.FC<HeaderProps> = () => {
           onClick={() => {
             console.log('Settings closed');
             setShowSettings(false);
-            // Check if we need to refresh login state after settings close
             checkLoginStatus();
           }}
         />

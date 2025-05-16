@@ -52,24 +52,20 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	}
 
 	const HandleLogout = async () => {
-	try {
-		await clearToken();
-		console.log("Token cleared");
-		
-		// Update logged in state in TokenService
-		await setLoggedInState(false, null);
-		
-		// Update localStorage for immediate UI feedback
-		// localStorage.setItem('logged-in', 'false');
-		
-		// Dispatch event for other components to react
-		console.log("Dispatching loginStatusChanged event from logout");
-		window.dispatchEvent(new Event('loginStatusChanged'));
-		
-		onClick();
-	} catch (error) {
-		console.error("Error during logout:", error);
-	}
+		try {
+			await clearToken()
+			.then(() => {
+				console.log("Token cleared");
+				return setLoggedInState(false, null);
+			})
+			.then(() => {				
+				sessionStorage.setItem('logged-in', 'false');			
+				window.dispatchEvent(new Event('loginStatusChanged'));
+				onClick();
+			})
+		} catch (error) {
+			console.error("Error during logout:", error);
+		}
 	};
 
 	const HandleChangePasswordClick = () => {
@@ -96,7 +92,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	}
 
 	const HandleClose = () => {
-		// On click is a void function, so it just closes the box/window
+		// under construction
 		onClick();
 	}
 

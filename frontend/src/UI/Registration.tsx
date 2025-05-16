@@ -17,17 +17,14 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  setPassword('');
 	  setConfirmPassword('');
 	  setErrorMessage('');
-	  localStorage.setItem('gdpr-accepted', 'false');
 	  onDecline();
 	};
   
 	const HandleGDPRAccept = () => {
-	  localStorage.setItem('gdpr-accepted', 'true');
 	  setShowRegistration(true);
 	};
   
 	const HandleGDPRDecline = () => {
-	  localStorage.setItem('gdpr-accepted', 'false');
 	  onDecline();
 	};
   

@@ -76,19 +76,19 @@ export const setToken = (token: string): Promise<boolean> => {
 	return sendMessage('setToken', token);
 };
 
-export const getToken = (): Promise<string | null> => {
+export const getToken = async (): Promise<string | null> => {
 	return sendMessage('getToken');
 };
 
-export const clearToken = (): Promise<boolean> => {
+export const clearToken = async (): Promise<boolean> => {
 	return sendMessage('clearToken');
 }
 
-export const setLoggedInState = (isLoggedIn: boolean, username?: string | null): Promise<boolean> => {
+export const setLoggedInState = async (isLoggedIn: boolean, username?: string | null): Promise<boolean> => {
 	return sendMessage('setLoggedIn', { status: isLoggedIn, username });
 };
 
-export const getAuthState = (): Promise<{ isLoggedIn: boolean, currentUser: string | null }> => {
+export const getAuthState = async (): Promise<{ isLoggedIn: boolean, currentUser: string | null }> => {
 	return sendMessage('getAuthState');
 };
 
