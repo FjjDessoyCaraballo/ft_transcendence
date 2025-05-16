@@ -8,6 +8,27 @@ interface SettingsProps {
 }
 
 const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void }> = ({onClose, onConfirm}) => {
+	const [] = useState(false);
+
+	const handleClose = () => {
+		onClose();
+	}
+
+	const handleConfirm = async () => {
+		try {
+			await deleteUserAccount()
+			.then(() => {
+				alert("Account successfully deleted");
+				sessionStorage.setItem('logged-in', 'false');
+				// return clearToken();
+			})
+		} catch (error) {
+			console.error("Error: ", error);
+		} finally {
+			onClose();
+		}
+	}
+	
 	return (
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 		<div className="bg-white rounded-lg shadow-lg w-[500px] max-w-[90%] overflow-hidden mx-auto">
@@ -20,13 +41,13 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 			</p>
 			<div className="flex justify-end gap-3">
 			  <button 
-				onClick={onClose}
+				onClick={handleClose}
 				className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300"
 			  >
 				Cancel
 			  </button>
 			  <button 
-				onClick={onConfirm}
+				onClick={handleConfirm}
 				className="px-5 py-2 rounded bg-red-600 text-white font-mono transition-colors hover:bg-red-700"
 			  >
 				Delete My Account
