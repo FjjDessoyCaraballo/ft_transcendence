@@ -20,11 +20,10 @@ class FriendRepository {
 	  `).run(userId, friendId);
 	}
   
-	// Reject friend request
+	// Reject friend request (delete it instead of marking as rejected)
 	rejectRequest(userId, friendId) {
 	  return this.db.prepare(`
-		UPDATE friends
-		SET status = 'rejected', updated_at = CURRENT_TIMESTAMP
+		DELETE FROM friends
 		WHERE friend_id = ? AND user_id = ? AND status = 'pending'
 	  `).run(userId, friendId);
 	}
@@ -53,12 +52,12 @@ class FriendRepository {
 	// Get all friends for a user
 	getFriends(userId) {
 	  return this.db.prepare(`
-		SELECT u.id, u.username, u.elo_rank, f.created_at as friends_since
+		SELECT u.id, u.username, u.ranking_points, f.created_at as friends_since
 		FROM users u
 		JOIN friends f ON f.friend_id = u.id
 		WHERE f.user_id = ? AND f.status = 'accepted'
 		UNION
-		SELECT u.id, u.username, u.elo_rank, f.created_at as friends_since
+		SELECT u.id, u.username, u.ranking_points, f.created_at as friends_since
 		FROM users u
 		JOIN friends f ON f.user_id = u.id
 		WHERE f.friend_id = ? AND f.status = 'accepted'

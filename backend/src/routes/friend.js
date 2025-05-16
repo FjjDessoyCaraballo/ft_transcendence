@@ -99,7 +99,7 @@ async function friendRoutes(fastify, options) {
     return { success: true, message: 'Friend request accepted' };
   });
 
-  // Reject friend request
+  // Reject friend request (deletes the request)
   fastify.put('/reject/:friendId', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
     const friendId = parseInt(request.params.friendId);
@@ -111,7 +111,7 @@ async function friendRoutes(fastify, options) {
       return { error: 'No pending request from this user' };
     }
     
-    return { success: true, message: 'Friend request rejected' };
+    return { success: true, message: 'Friend request rejected and deleted' };
   });
 
   // Remove friend
@@ -141,7 +141,7 @@ async function friendRoutes(fastify, options) {
 	}
 	
 	const users = fastify.db.prepare(`
-	  SELECT id, username, elo_rank 
+	  SELECT id, username, ranking_points 
 	  FROM users 
 	  WHERE username LIKE ? AND id != ? AND deleted_at IS NULL
 	  LIMIT 20
@@ -161,7 +161,7 @@ async function friendRoutes(fastify, options) {
       .map(friend => ({
         id: friend.id,
         username: friend.username,
-        elo_rank: friend.elo_rank
+        ranking_points: friend.ranking_points
       }));
     
     return { onlineFriends };
