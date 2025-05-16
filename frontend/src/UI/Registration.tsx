@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { WindowManager } from './Header';
+import { registerUser } from '../services/userService'
 
-export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
+export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	// State management
 	const [visible, setVisible] = useState(true);
 	const [showRegistration, setShowRegistration] = useState(false);
@@ -9,6 +10,7 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
   
 	const HandleCancel = () => {
 	  setUsername('');
@@ -29,57 +31,42 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	  onDecline();
 	};
   
-	const HandleRegistration = (e: React.FormEvent) => {
+	const HandleRegistration = async (e: React.FormEvent) => {
 	  e.preventDefault();
 	  
 	  if (!username || !password || !confirmPassword) {
 		setErrorMessage('All fields are required');
-		return;
+		return ;
 	  }
 	  
 	  if (password !== confirmPassword) {
 		setErrorMessage('Passwords do not match');
-		return;
+		return ;
 	  }
 
-	  if (localStorage.getItem(username)) {
-		setErrorMessage('Username already exists');
-		return;
-	  }
-	  
-	  try {
-		const userData = {
-		  username: username,
-		  password: password,
-		  wins: 0,
-		  losses: 0,
-		  rankingPoint: 1000,
-		};
-		
-		localStorage.setItem(username, JSON.stringify(userData));
-		
-		const userArrKey = 'registeredUsers';
-		const userArrData = localStorage.getItem(userArrKey);
-		
-		if (!userArrData) {
-		  let userArr: string[] = [username];
-		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
-		} else {
-		  let userArr: string[] = JSON.parse(userArrData);
-		  userArr.push(username);
-		  localStorage.setItem(userArrKey, JSON.stringify(userArr));
-		}
+	  setIsLoading(true);
 
-		localStorage.setItem('username', username);
-		localStorage.setItem('password', password);
+	try {
+		await registerUser({
+			username: username,
+			password: password
+		});
+
 		setVisible(false);
 		onAccept();
 		
-	  } catch (error) {
-		setErrorMessage('Registration failed. Please try again.');
+	} catch (error) {
+		if (error instanceof Error) {
+			setErrorMessage('Registration failed. Please try again.');
+			console.error('Registration error:', error);
+		} else {
+			setErrorMessage('Registration failed. Please try again.');
+		}
 		console.error('Registration error:', error);
+	  } finally {
+		setIsLoading(false);
 	  }
-	};
+	}
   
 	if (!visible) return null;
 
@@ -112,6 +99,7 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+			  disabled={isLoading}
             />
           </div>
           
@@ -129,6 +117,7 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+			  disabled={isLoading}
             />
           </div>
           
@@ -146,6 +135,7 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+			  disabled={isLoading}
             />
           </div>
           
@@ -154,13 +144,18 @@ export const GDPRPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
               type="button"
               className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300" 
               onClick={HandleCancel}
+			  disabled={isLoading}
             >
               Cancel
 		</button>
 		<button 
               type="submit"
-              className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]" 
+              className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]"
+			  disabled={isLoading}
 			>
+			{isLoading ? (
+				<span className="inline-block animate-spin mr-2">↻</span>
+			): null}
       		Register
           </button>
           </div>

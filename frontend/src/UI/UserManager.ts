@@ -1,11 +1,9 @@
-import { global_stateManager } from "./GameCanvas";
-import { global_curUser, updateCurUser } from "./GameCanvas"
-import { USER_ARR_KEY, LOGIN_CHECK_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
-import { drawCenteredText, StartScreen } from "../game/StartScreen";
-import { GameStates } from "../game/GameStates";
+import { global_curUser } from "./GameCanvas"
+import { USER_ARR_KEY, DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
+import { drawCenteredText } from "../game/StartScreen";
 import { Button } from "./Button";
 import { RankingHandler } from "../game/RankingPoints";
-import { UserHubState } from "./Types";
+import { GameType, UserHubState } from "./Types";
 
 // interface already present in /frontend/src/services/Auth.ts
 export interface User {
@@ -250,20 +248,7 @@ export class UserManager {
 
 	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
 	{
-		if (!global_curUser)
-		{
-			const loginUser = localStorage.getItem(LOGIN_CHECK_KEY);
-			if (!loginUser)
-			{
-				const curGameState: GameStates | null = global_stateManager.getStateName();
-				if (curGameState !== null && curGameState !== GameStates.START_SCREEN)
-					global_stateManager.changeState(new StartScreen(canvas, ctx));
-				return ;
-			}
-			else
-				updateCurUser(JSON.parse(loginUser));
-		}
-		else
+		if (global_curUser)
 		{
 			drawCenteredText(canvas, ctx, 'Currently logged in user: ', '22px arial', 'white', 30);
 			drawCenteredText(canvas, ctx, global_curUser, '28px arial', 'red', 60);

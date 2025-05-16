@@ -52,7 +52,6 @@ export const BUTTON_COLOR = '#800080'; // Purple theme (Same as DEEP_PURPLE)
 export const BUTTON_HOVER_COLOR = '#4B0082'; // Purple theme (Same as PURPLE)
 
 // Database test
-export const LOGIN_CHECK_KEY = 'LoggedIn';
 export const USER_ARR_KEY = 'registeredUsers';
 
 // COLOR PALETTE

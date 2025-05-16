@@ -9,30 +9,35 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 
 	const HandleDownloadData = () => {
 		// reserved for API call
-	}
-
-	const DeleteData = () => {
-		// reserved for API call
+		onClick();
 	}
 
 	const HandleLogout = () => {
 		// reserved for API call
 		localStorage.setItem('logged-in', 'false');
-		localStorage.removeItem('LoggedIn');
 		updateCurUser(null);
 		window.dispatchEvent(new Event('loginStatusChanged'));
 		onClick();
 	}
 
 	const DeleteAccount = () => {
+		// Data deletion needs an extra layer of confirmation. No one wants to
+		// delete their data by accident.
 		// reserved for API call
+		onClick();
 	}
 
 	const HandleClose = () => {
+		// On click is a void function, so it just closes the box/window
 		onClick();
 	}
 
 	const HandleContribute = () => {
+		// What noreferrer does:
+		// Prevents the browser from sending the Referer header
+		// Hides the URL of your site from the destination site
+		// Adds privacy by not revealing where the user came from
+		// Provides all the security benefits of noopener (plus additional privacy)
 		window.open('https://www.github.com/fjjdessoycaraballo/ft_transcendence', '_blank', 'noopener,noreferrer');
 	}
 
@@ -47,7 +52,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 			<button 
               type="submit"
               className="buttonsStyle"
-			  onClick={DeleteData}
+			  onClick={HandleDownloadData}
 			>
       		Download Data
           	</button>

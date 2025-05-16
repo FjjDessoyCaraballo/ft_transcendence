@@ -1,11 +1,10 @@
-// In Header.tsx
 import React, { useState, useEffect } from 'react';
 import { Dashboard } from './Dashboard'
 import { GameCanvas } from './GameCanvas';
-import { PlayerList } from './PlayerList'
-import { GDPRPopup } from './Registration';
+import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
+import { PlayerList } from './PlayerList'
 
 interface HeaderProps {
   onClick: () => void;
@@ -17,10 +16,11 @@ export interface WindowManager {
 }
 
 export const Header: React.FC<HeaderProps> = () => {
-  const [showGDPR, setShowGDPR] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [windowOpen, setWindowOpen] = useState(false);
 
 	// State management for Dashboard and Player List
   const [isGameVisible, setIsGameVisible] = useState(true);
@@ -30,32 +30,39 @@ export const Header: React.FC<HeaderProps> = () => {
 
 
   useEffect(() => {
-    const loginStatus = localStorage.getItem('logged-in');
-    setIsLoggedIn(loginStatus === 'true');
-    
-    // Add event listener to detect changes in localStorage
-    const handleStorageChange = () => {
-      const currentLoginStatus = localStorage.getItem('logged-in');
-      setIsLoggedIn(currentLoginStatus === 'true');
+    const checkLoginStatus = () => {
+      const loginStatus = localStorage.getItem('logged-in');
+      setIsLoggedIn(loginStatus === 'true');
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Custom event for login status changes within the same window
-    window.addEventListener('loginStatusChanged', handleStorageChange);
-    
+
+    checkLoginStatus();
+
+    const handleLoginChange = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('loginStatusChanged', handleLoginChange);
+    window.addEventListener('storage', handleLoginChange);
+
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('loginStatusChanged', handleStorageChange);
+      window.removeEventListener('loginStatusChanged', handleLoginChange);
+      window.removeEventListener('storage', handleLoginChange);
     };
   }, []);
 
   const HandleRegistrationClick = () => {
-    setShowGDPR(true);
+    if (windowOpen === false)
+    {
+      setWindowOpen(true);
+      setShowRegistration(true);
+    }
   };
 
   const HandleLoginClick = () => {
-    setShowLogin(true);
+  if (windowOpen === false) {
+      setWindowOpen(true)
+      setShowLogin(true);
+    }
   }
 
   const HandleSettingsClick = () => {
@@ -92,6 +99,9 @@ export const Header: React.FC<HeaderProps> = () => {
           <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
             Transcendence
           </h1>
+          <h4 className="p-5 pb-2 m-0 text-1xl font-mono font-bold text-[#4B0082]">
+            A Dads and Coders Inc. product
+          </h4>
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
 			<>
@@ -139,15 +149,17 @@ export const Header: React.FC<HeaderProps> = () => {
       </header>
       
       {/* Popups */}
-      {showGDPR && (
-        <GDPRPopup
+      {showRegistration && (
+        <RegistrationPopup
           onAccept={() => {
             console.log('GDPR accepted');
-            setShowGDPR(false);
+            setShowRegistration(false);
+            setWindowOpen(false);
           }}
           onDecline={() => {
             console.log('GDPR declined');
-            setShowGDPR(false);
+            setShowRegistration(false);
+            setWindowOpen(false);
           }}
         />
       )}
@@ -157,11 +169,14 @@ export const Header: React.FC<HeaderProps> = () => {
             console.log('Login successful');
             setShowLogin(false);
             setIsLoggedIn(true);
+            localStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
+            setWindowOpen(false);
           }}
           onDecline={() => {
             console.log('Login failed/canceled');
             setShowLogin(false);
+            setWindowOpen(false);
           }}
         />
       )}

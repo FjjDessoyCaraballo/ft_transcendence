@@ -4,7 +4,7 @@ import { User } from "../UI/UserManager";
 import { BlockBattle } from "./BlockBattle";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
-import { Pong } from "./Pong";
+import { Pong } from "./pong/Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
 import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE } from "./Constants";
 
