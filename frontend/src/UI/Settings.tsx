@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getUserDataForDownload, deleteUserAccount } from '../services/userService'; 
 import { PasswordChangePopup } from './PasswordChange'
+import { clearToken } from '../services/TokenService'
 
 interface SettingsProps {
 	onClick: () => void;
@@ -50,10 +51,18 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 		onClick();
 	}
 
-	const HandleLogout = () => {
-		sessionStorage.setItem('logged-in', 'false');
-		window.dispatchEvent(new Event('loginStatusChanged'));
-		onClick();
+	const HandleLogout = async () => {
+		try {
+			await clearToken()
+			.then(() => {
+				sessionStorage.setItem('logged-in', 'false');
+				console.log(`Action: user logged off. Status of logged-in: ${sessionStorage.getItem('logged-in')}`);
+				window.dispatchEvent(new Event('loginStatusChanged'));
+				onClick();
+			})
+		} catch (error) {
+			console.error("Error in logout: ", error);
+		}
 	}
 
 	const HandleChangePasswordClick = () => {
