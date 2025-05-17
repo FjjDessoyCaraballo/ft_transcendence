@@ -1,7 +1,6 @@
 import { GameStates, IGameState } from "../GameStates";
-import { canvas, ctx } from "../../components/Canvas";
-import { User, UserManager } from "../../UI/UserManager";
-import { stateManager } from "../../components";
+import { User } from "../../UI/UserManager";
+import { global_allUserDataArr, global_stateManager } from "../../UI/GameCanvas";
 import { EndScreen } from "../EndScreen";
 import { TournamentPlayer } from "../Tournament";
 import { GameType } from "../../UI/Types";
@@ -18,7 +17,6 @@ export const BUFFER = 15;
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
-  //gameState: 'menu' | 'playing' | 'result' | 'ai';
   gameState: 'playing' | 'result' | 'ai';
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
@@ -36,13 +34,16 @@ export class Pong implements IGameState {
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
+  canvas: HTMLCanvasElement;
   canvasWidth: number;
   canvasHeight: number;
+  ctx: CanvasRenderingContext2D;
   isStateReady: boolean;
 
-  constructor(user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
-    // Get canvas dimensions when constructor is called, not at module level
-    const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
+
+	this.canvas = canvas;
+	this.ctx = ctx;
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
     this.storedOpponentName = user2.username;
@@ -237,52 +238,52 @@ export class Pong implements IGameState {
     // const player2Score = this.player2.score;
 
     // Regular ending
-    const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
-    const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
+    const p1 = this.player1.user;
+	const p2 = this.player2.user;
 
     if (this.twoPlayerMode)
     {
       if (this.winner === this.player1)
-        stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG));
       else if (this.winner === this.player2)
-        stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG));
     }
     else
     {
       if (this.winner === this.player1)
-        stateManager.changeState(new EndScreen(canvas, p1, p2, null, null, GameType.PONG_AI));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG_AI));
       else if (this.winner === this.player2)
-        stateManager.changeState(new EndScreen(canvas, p2, p1, null, null, GameType.PONG_AI));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI));
 	  }
   }
 
   drawGame()
   {
     // Clear canvas
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.ctx.fillStyle = 'black';
+    this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     // Draw paddles
-    this.player1.paddle.draw(ctx);
-    this.player2.paddle.draw(ctx);
+    this.player1.paddle.draw(this.ctx);
+    this.player2.paddle.draw(this.ctx);
 
     // Draw centre line
     for (let i = 0; i < this.canvasHeight; i += this.canvasHeight / 20) {
-    ctx.fillRect(this.canvasWidth / 2, i, 3, this.canvasHeight / 40);
+    this.ctx.fillRect(this.canvasWidth / 2, i, 3, this.canvasHeight / 40);
     }
 
     // Draw ball
-    this.ball.draw(ctx);
+    this.ball.draw(this.ctx);
 
     // Draw scores
-    ctx.font = "50px 'Courier New', monospace";
+    this.ctx.font = "50px 'Courier New', monospace";
     const player1Text = `${this.player1.user.username}: ${this.player1.score}`;
-    const player1TextWidth = ctx.measureText(player1Text).width;
-    ctx.fillText(player1Text, (this.canvasWidth * 0.25) - (player1TextWidth / 2), 70);
+    const player1TextWidth = this.ctx.measureText(player1Text).width;
+    this.ctx.fillText(player1Text, (this.canvasWidth * 0.25) - (player1TextWidth / 2), 70);
 
     const player2Text = `${this.player2.user.username}: ${this.player2.score}`;
-    const player2TextWidth = ctx.measureText(player2Text).width;
-    ctx.fillText(player2Text, (this.canvasWidth * 0.75) - (player2TextWidth / 2), 70);
+    const player2TextWidth = this.ctx.measureText(player2Text).width;
+    this.ctx.fillText(player2Text, (this.canvasWidth * 0.75) - (player2TextWidth / 2), 70);
   }
 
   render(ctx: CanvasRenderingContext2D) {

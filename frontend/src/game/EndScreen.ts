@@ -1,10 +1,9 @@
 import { GameStates, IGameState } from "./GameStates";
 import { Button } from "../UI/Button";
-import { stateManager } from "../components/index";
-import { canvas, ctx } from "../components/Canvas";
+import { global_stateManager } from "../UI/GameCanvas";
 import { MainMenu } from "../UI/MainMenu";
 import { TEXT_PADDING } from "./Constants";
-import { UserManager, User } from "../UI/UserManager";
+import { User, UserManager } from "../UI/UserManager";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { drawCenteredText } from "./StartScreen";
@@ -12,27 +11,31 @@ import { drawCenteredText } from "./StartScreen";
 export class ReturnMainMenuButton extends Button
 {
 	private gameType: GameType;
+	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
 
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.gameType = gameType;
+		this.canvas = canvas;
+		this.ctx = ctx;
 	}
 
 	clickAction(): void {
 		
 		if (this.gameType === GameType.PONG_AI)
 			this.gameType = GameType.PONG;
-		stateManager.changeState(new MainMenu(canvas, this.gameType));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, this.gameType));
 
 	}
 }
 
 class ReturnToTournamentBtn extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 	}
 
 	clickAction(): void {
@@ -49,24 +52,28 @@ export class EndScreen implements IGameState
 	tournamentData1: TournamentPlayer | null;
 	tournamentData2: TournamentPlayer | null;
 	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
 	returnMenuButton: ReturnMainMenuButton;
 	returnToTournamentBtn: ReturnToTournamentBtn;
 	isStateReady: boolean;
+	savingDataToDB: boolean;
 	gameType: GameType;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
 	{
 		this.name = GameStates.END_SCREEN;
 
 		this.canvas = canvas;
+		this.ctx = ctx;
 		this.winner = winner;
 		this.loser = loser;
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		this.isStateReady = false;
 		this.gameType = gameType;
+		this.savingDataToDB = false;
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
@@ -77,14 +84,14 @@ export class EndScreen implements IGameState
 		const buttonX2 = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
 		const buttonY2 = (canvas.height / 2) - TEXT_PADDING;
 
-		this.returnMenuButton = new ReturnMainMenuButton(buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
-		this.returnToTournamentBtn = new ReturnToTournamentBtn(buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
+		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
 
 		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
-			UserManager.updateUserStats(winner, loser);
+			this.saveUserDataToDB();
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -127,6 +134,23 @@ export class EndScreen implements IGameState
 		this.canvas.removeEventListener('click', this.mouseClickBound);
 	}
 
+	async saveUserDataToDB()
+	{
+		this.savingDataToDB = true;
+
+		try {
+			await UserManager.updateUserStats(this.winner, this.loser, this.gameType);
+		} catch {
+
+			// Is this enough? Or do we need more error handling...?
+			alert('User data saving failed');
+			console.log('User data saving failed');
+		}
+
+		this.savingDataToDB = false;
+
+	}
+
 	update(deltaTime: number)
 	{
 	}
@@ -134,29 +158,33 @@ export class EndScreen implements IGameState
 	render(ctx: CanvasRenderingContext2D)
 	{
 		const text = this.winner.username + ' wins the game!';
-		drawCenteredText(text, '40px arial', '#1cc706', 200);
+		drawCenteredText(this.canvas, this.ctx, text, '40px arial', '#1cc706', 200);
 
 		if (this.gameType === GameType.PONG_AI)
 		{
 			if (this.winner.username === 'Computer')
-				drawCenteredText('Computers will rule the world... yikes!!', '30px arial', 'white', 300);
+				drawCenteredText(this.canvas, this.ctx, 'Computers will rule the world... yikes!!', '30px arial', 'white', 300);
 			else
-				drawCenteredText('Great job, humans ROCK!!', '30px arial', 'white', 300);
+				drawCenteredText(this.canvas, this.ctx, 'Great job, humans ROCK!!', '30px arial', 'white', 300);
 
 		}
 		else if (!this.tournamentData1)
 		{
-			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.rankingPoint.toFixed(2)}.`;
-			drawCenteredText(winnerRankText, '30px arial', 'white', 300);
+			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.ranking_points.toFixed(2)}.`;
+			drawCenteredText(this.canvas, this.ctx, winnerRankText, '30px arial', 'white', 300);
 			
-			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.rankingPoint.toFixed(2)}.`;
-			drawCenteredText(loserRankText, '30px arial', 'white', 340);
+			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.ranking_points.toFixed(2)}.`;
+			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 
-		if (!this.tournamentData1)
+		if (!this.tournamentData1 && !this.savingDataToDB)
 			this.returnMenuButton.draw(ctx);
-		else
+		else if (!this.savingDataToDB)
 			this.returnToTournamentBtn.draw(ctx);
+		else
+			drawCenteredText(this.canvas, this.ctx, 'Sending data to backend, please wait', '30px arial', 'white', this.canvas.height - 100);
+
+
 	}
 
 }

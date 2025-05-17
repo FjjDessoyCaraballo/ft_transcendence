@@ -1,6 +1,6 @@
 import { apiRequest } from './Api';
 import { User } from "../UI/UserManager"
-import { updateCurUser } from '../components';
+import { updateCurUser } from '../UI/GameCanvas';
 
 interface LoginData {
   username: string;
