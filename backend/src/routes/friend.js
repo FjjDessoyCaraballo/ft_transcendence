@@ -1,4 +1,5 @@
 const FriendRepository = require('../repositories/friendRepository');
+const socketManager = require('../utils/socketManager');
 
 async function friendRoutes(fastify, options) {
   const friendRepo = new FriendRepository(fastify.db);
