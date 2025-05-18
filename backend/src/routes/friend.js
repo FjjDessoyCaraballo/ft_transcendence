@@ -54,7 +54,7 @@ async function friendRoutes(fastify, options) {
       friendRepo.sendRequest(userId, friendId);
 
       // Emit notification to the target user
-      const friendSocket = fastify.io.sockets.get(friendId);
+      const friendSocket = socketManager.getSocket(friendId);
       if (friendSocket) {
         friendSocket.emit('friend_request_received', {
           from: userId,
@@ -88,7 +88,7 @@ async function friendRoutes(fastify, options) {
     }
 
     // Emit notification to the requester
-    const requesterSocket = fastify.io.sockets.get(friendId);
+    const requesterSocket = socketManager.getSocket(friendId);
     if (requesterSocket) {
       requesterSocket.emit('friend_request_accepted', {
         from: userId,
@@ -122,7 +122,7 @@ async function friendRoutes(fastify, options) {
     friendRepo.removeFriend(userId, friendId);
 
     // Notify the friend about the removal
-    const friendSocket = fastify.io.sockets.get(friendId);
+    const friendSocket = socketManager.getSocket(friendId);
     if (friendSocket) {
       friendSocket.emit('friend_removed', {
         from: userId,
@@ -154,7 +154,6 @@ async function friendRoutes(fastify, options) {
   fastify.get('/online', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
     const friends = friendRepo.getFriends(userId);
-    const socketManager = require('../utils/socketManager');
     
     const onlineFriends = friends
       .filter(friend => socketManager.isUserOnline(friend.id))

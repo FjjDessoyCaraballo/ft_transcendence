@@ -7,7 +7,7 @@ async function gameRoutes(fastify, options) {
     const friendId = parseInt(request.params.friendId);
 
     // Emit game invitation
-    const friendSocket = fastify.io.sockets.get(friendId);
+    const friendSocket = socketManager.getSocket(friendId);
     if (friendSocket) {
       friendSocket.emit('game_invitation', {
         from: userId,
