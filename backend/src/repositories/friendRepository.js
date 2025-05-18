@@ -13,12 +13,43 @@ class FriendRepository {
   
 	// Accept friend request
 	acceptRequest(userId, friendId) {
-	  return this.db.prepare(`
+		const transaction = this.db.transaction(() => {
+	  const result = this.db.prepare(`
 		UPDATE friends
 		SET status = 'accepted', updated_at = CURRENT_TIMESTAMP
 		WHERE friend_id = ? AND user_id = ? AND status = 'pending'
 	  `).run(userId, friendId);
-	}
+	  if (result.changes === 0) {
+		// No request found to accept
+		return { changes: 0 };
+	  }
+	  
+	  // Check if a reverse entry already exists (rare but possible)
+	  const reverseExists = this.db.prepare(`
+		SELECT COUNT(*) as count FROM friends
+		WHERE user_id = ? AND friend_id = ?
+	  `).get(userId, friendId).count > 0;
+	  
+	  // If no reverse entry exists, create one with 'accepted' status
+	  if (!reverseExists) {
+		this.db.prepare(`
+		  INSERT INTO friends (user_id, friend_id, status)
+		  VALUES (?, ?, 'accepted')
+		`).run(userId, friendId);
+	  } else {
+		// If it does exist, make sure it's also 'accepted'
+		this.db.prepare(`
+		  UPDATE friends
+		  SET status = 'accepted', updated_at = CURRENT_TIMESTAMP
+		  WHERE user_id = ? AND friend_id = ?
+		`).run(userId, friendId);
+	  }
+	  
+	  return result;
+	});
+	
+	return transaction();
+  }
   
 	// Reject friend request (delete it instead of marking as rejected)
 	rejectRequest(userId, friendId) {
