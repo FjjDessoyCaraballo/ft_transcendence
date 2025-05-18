@@ -1,4 +1,3 @@
-import { ctx } from "../components/Canvas";
 import { GameStates, IGameState, } from "./GameStates";
 import { TEXT_PADDING } from "./Constants";
 import { User } from "../UI/UserManager";
@@ -8,7 +7,7 @@ import { Button } from "../UI/Button";
 import { MatchIntro } from "./MatchIntro";
 import { EndScreen } from "./EndScreen";
 import { GameType } from "../UI/Types";
-import { Pong } from "./Pong";
+import { Pong } from "./pong/Pong";
 import { drawCenteredText } from "./StartScreen";
 
 export interface TournamentPlayer
@@ -34,9 +33,9 @@ const GameOrder: [number, number][] = [
 
 export class NextGameBtn extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 	}
 
 	clickAction(): void 
@@ -48,6 +47,7 @@ export class Tournament implements IGameState
 {
 	name: GameStates;
 	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
 	playerArr: TournamentPlayer [];
 	curMatch: MatchIntro | BlockBattle | Pong | EndScreen | null;
 	matchCounter: number;
@@ -59,10 +59,11 @@ export class Tournament implements IGameState
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, players: User[], type: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, players: User[], type: GameType)
 	{
 		this.name = GameStates.TOURNAMENT;
 		this.canvas = canvas;
+		this.ctx = ctx;
 		this.playerArr = [];
 		this.curMatch = null;
 		this.matchCounter = 0;
@@ -90,13 +91,13 @@ export class Tournament implements IGameState
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = 20;
 		const button1Y = 20;
-		this.returnMenuButton = new ReturnMainMenuButton(button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
+		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
 
 		let text2 = 'NEXT GAME';
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
 		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
 		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 240;
-		this.nextGameBtn = new NextGameBtn(button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial');
+		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -133,7 +134,7 @@ export class Tournament implements IGameState
 
 			if (player1 && player2)
 			{
-				this.curMatch = new MatchIntro(this.canvas, player1.user, player2.user, player1, player2, this.gameType);
+				this.curMatch = new MatchIntro(this.canvas, this.ctx, player1.user, player2.user, player1, player2, this.gameType);
 				this.curMatch.enter();
 			}
 		}
@@ -168,9 +169,9 @@ export class Tournament implements IGameState
 				{	
 
 					if (this.gameType === GameType.BLOCK_BATTLE)
-						this.curMatch = new BlockBattle(this.canvas, player1.user, player2.user, player1, player2);
+						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.user, player2.user, player1, player2);
 					else if (this.gameType === GameType.PONG)
-						this.curMatch = new Pong(player1.user, player2.user, player1, player2, 'playing');
+						this.curMatch = new Pong(this.canvas, this.ctx, player1.user, player2.user, player1, player2, 'playing');
 
 					this.curMatch.enter();
 				}
@@ -181,7 +182,7 @@ export class Tournament implements IGameState
 					const winner = player1.isWinner ? player1 : player2;
 					const loser = player1.isWinner ? player2 : player1;
 
-					this.curMatch = new EndScreen(this.canvas, winner.user, loser.user, winner, loser, this.gameType);
+					this.curMatch = new EndScreen(this.canvas, this.ctx, winner.user, loser.user, winner, loser, this.gameType);
 					
 					this.curMatch.enter();
 					player1.isWinner = false;
@@ -340,7 +341,7 @@ export class Tournament implements IGameState
 		if (!this.curMatch)
 		{
 			// Draw Header & Score Board
-			drawCenteredText('SCORE BOARD', '50px Impact', 'white', 100);
+			drawCenteredText(this.canvas, this.ctx, 'SCORE BOARD', '50px Impact', 'white', 100);
 			this.drawScoreBoard(ctx);
 	
 			// Draw Return button
@@ -363,7 +364,7 @@ export class Tournament implements IGameState
 
 				const nextGameNum = `Game no. ${(this.matchCounter + 1).toString()}/6`;
 				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 50;
-				drawCenteredText(nextGameNum, '30px arial', 'white', gameNumY);
+				drawCenteredText(this.canvas, this.ctx, nextGameNum, '30px arial', 'white', gameNumY);
 
 				const id1 = GameOrder[this.matchCounter][0];
 				const id2 = GameOrder[this.matchCounter][1];
@@ -373,20 +374,20 @@ export class Tournament implements IGameState
 				if (player1 && player2)
 					playerInfo = `(${player1.user.username} vs ${player2.user.username})`;
 				const playerInfoY = gameNumY + 26;
-				drawCenteredText(playerInfo, '25px arial', 'red', playerInfoY);
+				drawCenteredText(this.canvas, this.ctx, playerInfo, '25px arial', 'red', playerInfoY);
 
 			}
 			else
 			{
 				let y = (this.canvas.height / 2) - 20 - TEXT_PADDING + 270;
 
-				drawCenteredText('TOURNAMENT WINNER(s):', '50px Impact', 'green', y);
+				drawCenteredText(this.canvas, this.ctx, 'TOURNAMENT WINNER(s):', '50px Impact', 'green', y);
 				y += 40
 
 				for (const player of this.tournamentWinner)
 				{
 
-					drawCenteredText(player.user.username, '30px arial', 'white', y);
+					drawCenteredText(this.canvas, this.ctx, player.user.username, '30px arial', 'white', y);
 					y += 40;
 				}
 			}

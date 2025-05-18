@@ -14,7 +14,9 @@ const fastify = require('fastify')({
 
 // Register plugins
 fastify.register(require('@fastify/cors'), {
-  origin: config.corsOrigin,
+  // origin: config.corsOrigin,
+  origin: 'https://localhost:9000',
+  // origin: '*',
   credentials: true
 });
 
@@ -40,7 +42,9 @@ fastify.addHook('onReady', async () => {
 // Socket.IO setup
 fastify.register(require('fastify-socket.io'), {
   cors: {
-    origin: config.corsOrigin,
+    // origin: config.corsOrigin,
+    origin: 'https://localhost:9000',
+    // origin: '*',
     credentials: true
   }
 });

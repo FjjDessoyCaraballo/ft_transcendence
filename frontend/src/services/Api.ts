@@ -1,4 +1,4 @@
-const API_URL = 'https://localhost:3443';
+const API_URL = 'https://localhost:3443/api';
 
 // not sure if this is needed, but it is here for now
 interface ApiError {
@@ -16,6 +16,7 @@ interface ApiError {
  * @throws Error with message from API or generic error
  */
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+
   const token = localStorage.getItem('token');
   
   const headers: HeadersInit = {
@@ -28,6 +29,7 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
   }
   
   try {
+
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers

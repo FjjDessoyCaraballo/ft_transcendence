@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
+import { updateAllUserDataArr, updateCurUser } from './GameCanvas';
+import { getAllUsers, loginUser } from '../services/userService'
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
@@ -17,8 +19,8 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
   };
 
   // Handle API communication through here
-  const HandleLogin = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent form default submission
+  const HandleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
 	  console.log('Attempting login for:', username); // debug
     // Basic validation
@@ -27,32 +29,35 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
       return;
     }
 
-    // Here you would typically make an API call to validate credentials
-    // For now, using localStorage as a simple auth mechanism
-    const userData = localStorage.getItem(username);
-    console.log('User data from localStorage:', userData); // Debug
-    if (!userData) {
-      setErrorMessage('Invalid username or password');
-      return;
-    }
-    
     try {
-      const user = JSON.parse(userData);
-      
-      if (user.password !== password) {
-        setErrorMessage('Invalid username or password');
-        return;
-      }
-      
+      await loginUser({
+        username: username,
+        password: password
+      });
+
+		const userDataArr = await getAllUsers(); // Fetch all user data, JUST A TEST
+
+
       localStorage.setItem('logged-in', 'true');
-      localStorage.setItem('LoggedIn', JSON.stringify(username));
+	  updateCurUser(username);
+	  updateAllUserDataArr(userDataArr); // TEST
+	        
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
-      
     } catch (error) {
-      setErrorMessage('An error occurred during login');
-      console.error('Login error:', error);
+      setErrorMessage('Login failed.');
+      console.error('Login failed.');
+	  updateCurUser(null);
     }
+
+	try {
+
+	} catch (error) {
+      setErrorMessage('User data fetch failed. Please try again');
+      console.error('User data fetch failed.');
+	  updateCurUser(null);
+    }
+
   };
 
   return (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { updateCurUser } from './GameCanvas';
 
 interface SettingsProps {
 	onClick: () => void;
@@ -14,6 +15,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	const HandleLogout = () => {
 		// reserved for API call
 		localStorage.setItem('logged-in', 'false');
+		updateCurUser(null);
 		window.dispatchEvent(new Event('loginStatusChanged'));
 		onClick();
 	}

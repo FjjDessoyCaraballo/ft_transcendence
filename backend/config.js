@@ -14,6 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
 	dbPath: process.env.DB_PATH || '/app/data/database.sqlite',
 	
 	corsOrigin: process.env.FRONTEND_URL || 'https://localhost:9000'
-  };
-  
+};
+
+	
   module.exports = config;

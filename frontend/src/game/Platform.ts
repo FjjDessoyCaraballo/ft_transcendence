@@ -1,5 +1,5 @@
-import { PLATFORM_THICKNESS, PLATFORM_SPEED } from "./Constants";
-import { gameArea } from "./Environment";
+import { PLATFORM_THICKNESS, PLATFORM_SPEED, WALL_THICKNESS, FLOOR_THICKNESS } from "./Constants";
+import { global_gameArea } from "../UI/GameCanvas";
 import { CollisionShape, collType} from "./CollisionShape";
 
 export enum PlatformDir{
@@ -21,8 +21,9 @@ export class Platform {
 	range: number;
 	cShape: CollisionShape;
 	hasCoin: boolean;
+	canvas: HTMLCanvasElement;
 
-	constructor(x: number, y: number, width: number, dir: PlatformDir, range: number) {
+	constructor(canvas: HTMLCanvasElement, x: number, y: number, width: number, dir: PlatformDir, range: number) {
 		this.x = x;
 		this.y = y;
 		this.orig_x = x;
@@ -33,6 +34,7 @@ export class Platform {
 		this.dir = dir;
 		this.range = range;
 		this.hasCoin = false;
+		this.canvas = canvas;
 		
 		if (dir == PlatformDir.UP_DOWN)
 			this.velocity = { x: 0, y: -PLATFORM_SPEED };
@@ -43,25 +45,27 @@ export class Platform {
 
 		this.cShape = new CollisionShape(this.x, this.y, this.width, this.height, collType.PLATFORM, this);
 
+		
+
 	}
 
 	move(deltaTime: number) {
 		this.x += this.velocity.x * deltaTime;
 		this.y += this.velocity.y * deltaTime;
 
-		if (this.y >= gameArea.maxY - this.height)
+		if (this.y >= global_gameArea.maxY - this.height)
 		{
-			this.y = gameArea.maxY - this.height;
+			this.y = global_gameArea.maxY - this.height;
 			this.velocity.y = -PLATFORM_SPEED;
 		}
-		else if (this.x <= gameArea.minX)
+		else if (this.x <= global_gameArea.minX)
 		{
-			this.x = gameArea.minX;
+			this.x = global_gameArea.minX;
 			this.velocity.x = PLATFORM_SPEED;
 		}
-		else if (this.x >= gameArea.maxX - this.width)
+		else if (this.x >= global_gameArea.maxX - this.width)
 		{
-			this.x = gameArea.maxX - this.width;
+			this.x = global_gameArea.maxX - this.width;
 			this.velocity.x = -PLATFORM_SPEED;
 		}
 

@@ -1,5 +1,6 @@
 import { apiRequest } from './Api';
 import { User } from "../UI/UserManager"
+import { updateCurUser } from '../UI/GameCanvas';
 
 interface LoginData {
   username: string;
@@ -29,7 +30,7 @@ export const login = async (username: string, password: string): Promise<LoginRe
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     localStorage.setItem('logged-in', 'true');
-    localStorage.setItem('LoggedIn', JSON.stringify(username));
+	updateCurUser(data.username);
 
     window.dispatchEvent(new Event('loginStatusChanged'));
 
@@ -78,7 +79,7 @@ export const logout = async (): Promise<void> => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.setItem('logged-in', 'false');
-    localStorage.removeItem('LoggedIn');
+	updateCurUser(null);
     
     window.dispatchEvent(new Event('loginStatusChanged'));
   }
@@ -101,7 +102,7 @@ export const verifyToken = async (): Promise<boolean> => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.setItem('logged-in', 'false');
-    localStorage.removeItem('LoggedIn');
+	updateCurUser(null);
 
     window.dispatchEvent(new Event('loginStatusChanged'));
 

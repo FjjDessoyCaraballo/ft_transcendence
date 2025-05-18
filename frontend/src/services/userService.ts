@@ -1,5 +1,6 @@
 import { apiRequest } from './Api';
 import { User } from '../UI/UserManager'
+import { GameType } from '../UI/Types';
 
 interface RegisterData {
   username: string;
@@ -19,40 +20,8 @@ interface RegisterResponse {
  * @returns Promise with the API response
  */
 export const registerUser = async (registerData: RegisterData): Promise<RegisterResponse> => {
-  try {
-    // For local development when backend is not available yet
-    // Check if we're in development mode without backend connectivity
-    // const newUser = {
-    //   username: registerData.username,
-    //   password: registerData.password,
-    //   wins: 0,
-    //   losses: 0,
-    //   rankingPoint: 1000,
-    // };
-    
-    // localStorage.setItem(registerData.username, JSON.stringify(newUser));
-    
-    // const userArrKey = 'registeredUsers';
-    // const userArrData = localStorage.getItem(userArrKey);
-    
-    // if (!userArrData) {
-    //   let userArr: string[] = [registerData.username];
-    //   localStorage.setItem(userArrKey, JSON.stringify(userArr));
-    // } else {
-    //   let userArr: string[] = JSON.parse(userArrData);
-    //   userArr.push(registerData.username);
-    //   localStorage.setItem(userArrKey, JSON.stringify(userArr));
-    // }
-    
-    // // Mock response for development
-    // return {
-    //   user: newUser as User,
-    //   token: "mock-token-for-dev",
-    //   message: "Registration successful"
-    // };
-    
-    // Real API implementation (uncomment when backend is ready)
-    return await apiRequest('/api/users/register', {
+  try {    
+    return await apiRequest('/users/register', {
       method: 'POST',
       body: JSON.stringify(registerData)
     });
@@ -64,6 +33,25 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
 };
 
 /**
+ * Login user
+ * 
+ * @param userData User registration data
+ * @returns Promise with user data
+ */
+export const loginUser = async (registerData: RegisterData): Promise<User> => {
+  try {
+    return await apiRequest('/users/login', {
+      method: 'POST',
+      body: JSON.stringify(registerData)
+    });
+  } catch (error) {
+    if (error instanceof Error) 
+      throw error;
+    throw new Error('Failed to fetch user data.');
+  }
+};
+
+/**
  * Get user data from the API
  * 
  * @param username Username to fetch
@@ -71,16 +59,9 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
  */
 export const getUserData = async (username: string): Promise<User> => {
   try {
-    // Development fallback
-    const userData = localStorage.getItem(username);
-    if (userData) {
-      return JSON.parse(userData);
-    }
-    
-    // When backend is ready:
-    // return await apiRequest(`/users/${username}`);
-    
-    throw new Error('User not found');
+
+    return await apiRequest(`/users/${username}`);
+
   } catch (error) {
     if (error instanceof Error) 
       throw error;
@@ -95,28 +76,7 @@ export const getUserData = async (username: string): Promise<User> => {
  */
 export const getAllUsers = async (): Promise<User[]> => {
   try {
-    // Development fallback
-    const userArrKey = 'registeredUsers';
-    const userArrData = localStorage.getItem(userArrKey);
-    
-    if (userArrData) {
-      const usernames: string[] = JSON.parse(userArrData);
-      const users: User[] = [];
-      
-      for (const username of usernames) {
-        const userData = localStorage.getItem(username);
-        if (userData) {
-          users.push(JSON.parse(userData));
-        }
-      }
-      
-      return users;
-    }
-    
-    // When backend is ready:
-    // return await apiRequest('/users');
-    
-    return [];
+    return await apiRequest('/users');    
   } catch (error) {
     if (error instanceof Error)
       throw error;
@@ -131,19 +91,19 @@ export const getAllUsers = async (): Promise<User[]> => {
  * @param loser Loser user data
  * @returns Promise with the updated user data
  */
-export const updateUserStats = async (winner: User, loser: User): Promise<{ winner: User, loser: User }> => {
+export const updateUserStatsAPI = async (winner: User, loser: User, gameType: GameType): Promise<{ winner: User, loser: User }> => {
   try {
-    // Development fallback
-    localStorage.setItem(winner.username, JSON.stringify(winner));
-    localStorage.setItem(loser.username, JSON.stringify(loser));
-    
-    // When backend is ready:
-    // return await apiRequest('/users/update-stats', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ winner, loser })
-    // });
-    
-    return { winner, loser };
+
+	let gameTypeString = '';
+	if (gameType === GameType.BLOCK_BATTLE)
+		gameTypeString = 'blockbattle';
+	else if (gameType === GameType.PONG)
+		gameTypeString = 'pong';
+
+    return await apiRequest('/users/update-stats', {
+      method: 'POST',
+      body: JSON.stringify({ winner, loser, gameTypeString })
+    });    
   } catch (error) {
     if (error instanceof Error)
       throw error;
@@ -158,28 +118,9 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
  */
 export const deleteUserAccount = async (): Promise<{ success: boolean, message: string }> => {
   try {
-    // Development fallback
-    const username = localStorage.getItem('username');
-    if (username) {
-      localStorage.removeItem(username);
-      
-      // Also remove from the registered users array
-      const userArrKey = 'registeredUsers';
-      const userArrData = localStorage.getItem(userArrKey);
-      
-      if (userArrData) {
-        let userArr: string[] = JSON.parse(userArrData);
-        userArr = userArr.filter(u => u !== username);
-        localStorage.setItem(userArrKey, JSON.stringify(userArr));
-      }
-    }
-    
-    // When backend is ready:
-    // return await apiRequest('users/delete', {
-    //   method: 'DELETE'
-    // });
-    
-    return { success: true, message: 'Account deleted successfully' };
+    return await apiRequest('/users/delete', {
+      method: 'DELETE'
+    });    
   } catch (error) {
     if (error instanceof Error)
       throw error;
@@ -194,19 +135,7 @@ export const deleteUserAccount = async (): Promise<{ success: boolean, message: 
  */
 export const getUserDataForDownload = async (): Promise<any> => {
   try {
-    // Development fallback
-    const username = localStorage.getItem('username');
-    if (username) {
-      const userData = localStorage.getItem(username);
-      if (userData) {
-        return JSON.parse(userData);
-      }
-    }
-    
-    // When backend is ready:
-    // return await apiRequest('/users/data-download');
-    
-    throw new Error('No user data found');
+    return await apiRequest('/users/data-download');    
   } catch (error) {
     if (error instanceof Error)
       throw error;

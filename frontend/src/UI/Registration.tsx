@@ -36,17 +36,15 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  
 	  if (!username || !password || !confirmPassword) {
 		setErrorMessage('All fields are required');
+		return ;
 	  }
 	  
 	  if (password !== confirmPassword) {
 		setErrorMessage('Passwords do not match');
+		return ;
 	  }
 
 	  setIsLoading(true);
-
-	  if (localStorage.getItem(username)) {
-		setErrorMessage('Username already exists');
-	  }
 
 	try {
 		await registerUser({
@@ -54,8 +52,6 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			password: password
 		});
 
-		// remove for end-product, otherwise this can be a security concern
-		localStorage.setItem('username', username);
 		setVisible(false);
 		onAccept();
 		

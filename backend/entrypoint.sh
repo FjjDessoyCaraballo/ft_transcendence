@@ -4,6 +4,7 @@ set -e
 # Generate SSL certificates if they don't exist
 if [ ! -f /app/certs/cert.pem ] || [ ! -f /app/certs/key.pem ]; then
   echo "Generating SSL certificates..."
+  mkdir -p /app/certs
   cd /app/certs
   openssl genrsa -out key.pem 2048
   openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj '/CN=localhost'
