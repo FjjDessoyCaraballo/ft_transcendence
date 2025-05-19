@@ -64,7 +64,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   
 
     const loggedInUserString = typeof window !== 'undefined' ? localStorage.getItem('LoggedIn') : null;
-    console.log('logged in user:', loggedInUserString);
     const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
     const pendingRequests = players.filter(player => player.friendshipStatus === 'pending');
 
@@ -102,9 +101,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {players.map((player) => {
                 const isLoggedInUser = player.username === loggedInUser;
-                console.log(isLoggedInUser);
-                console.log(player.username);
-                console.log(loggedInUser);
     
                 return (
                   <div
