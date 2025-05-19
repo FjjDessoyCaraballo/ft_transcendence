@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, UserManager } from "./UserManager"; // need to get rid of this? Everything from backend
+import { User } from "./UserManager";
 import { getAllUsers } from '../services/userService';
 
 interface ExtendedUser extends User {
