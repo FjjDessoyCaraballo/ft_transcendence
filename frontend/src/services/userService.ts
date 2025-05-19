@@ -1,5 +1,6 @@
 import { apiRequest } from './Api';
 import { User } from '../UI/UserManager'
+import { GameType } from '../UI/Types';
 
 interface RegisterData {
   username: string;
@@ -37,7 +38,7 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
  * @param userData User registration data
  * @returns Promise with user data
  */
-export const loginUser = async (registerData: RegisterData): Promise<RegisterData> => {
+export const loginUser = async (registerData: RegisterData): Promise<User> => {
   try {
     return await apiRequest('/users/login', {
       method: 'POST',
@@ -58,7 +59,9 @@ export const loginUser = async (registerData: RegisterData): Promise<RegisterDat
  */
 export const getUserData = async (username: string): Promise<User> => {
   try {
+
     return await apiRequest(`/users/${username}`);
+
   } catch (error) {
     if (error instanceof Error) 
       throw error;
@@ -88,11 +91,18 @@ export const getAllUsers = async (): Promise<User[]> => {
  * @param loser Loser user data
  * @returns Promise with the updated user data
  */
-export const updateUserStats = async (winner: User, loser: User): Promise<{ winner: User, loser: User }> => {
+export const updateUserStatsAPI = async (winner: User, loser: User, gameType: GameType): Promise<{ winner: User, loser: User }> => {
   try {
+
+	let gameTypeString = '';
+	if (gameType === GameType.BLOCK_BATTLE)
+		gameTypeString = 'blockbattle';
+	else if (gameType === GameType.PONG)
+		gameTypeString = 'pong';
+
     return await apiRequest('/users/update-stats', {
       method: 'POST',
-      body: JSON.stringify({ winner, loser })
+      body: JSON.stringify({ winner, loser, gameTypeString })
     });    
   } catch (error) {
     if (error instanceof Error)

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Dashboard } from './Dashboard'
-import { GameCanvas } from './GameCanvas';
+import { GameCanvas, global_curUser } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
+import { getUserData } from '../services/userService';
+import { User } from './UserManager';
 import { PlayerList } from './PlayerList'
 
 interface HeaderProps {
@@ -22,10 +24,11 @@ export const Header: React.FC<HeaderProps> = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
 
-	// State management for Dashboard and Player List
+  // State management for Dashboard
   const [isGameVisible, setIsGameVisible] = useState(true);
   const [buttonText, setButtonText] = useState('Dashboard');
   const [isDashboardVisible, setIsDashboardVisible] = useState(false);
+  const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
   const [isPlayerListVisible, setIsPlayerListVisible] = useState(false);
 
 
@@ -78,14 +81,26 @@ export const Header: React.FC<HeaderProps> = () => {
   };
 
   // Dashboard state change functions
-  const handleDashboardClick = () => {
-    setIsGameVisible(false);
-    setIsDashboardVisible(true);
+  const handleDashboardClick = async () => {
+
+	if (!global_curUser)
+		return ;
+	
+	try {
+		const userData = await getUserData(global_curUser);
+		setDashboardUserData(userData);
+		setIsGameVisible(false);
+		setIsDashboardVisible(true);
     setIsPlayerListVisible(false);
-    setButtonText('To Game');
+		setButtonText('To Game');
+	} catch {
+		alert("Error while fetching user data for Dashboard");
+		console.log("Error while fetching user data for Dashboard");
+	}
   };
 
   const handleBackToGameClick = () => {
+	setDashboardUserData(null);
     setIsGameVisible(true);
     setIsDashboardVisible(false);
     setIsPlayerListVisible(false);
@@ -191,7 +206,7 @@ export const Header: React.FC<HeaderProps> = () => {
 
 	<main className="pt-32"> {/* or adjust to match header height */}
 	{isGameVisible && <GameCanvas />}
-	{isDashboardVisible && <Dashboard />}
+	{isDashboardVisible && dashboardUserData && <Dashboard userData={dashboardUserData}/>}
   {isPlayerListVisible && <PlayerList onShowDashboard={handleDashboardClick} />}
 	</main>
 	

@@ -3,10 +3,10 @@ import { Player2 } from './Player2';
 import { Platform, PlatformDir } from './Platform';
 import { collType } from './CollisionShape';
 import { drawGround, drawWalls} from './Environment';
-import { global_stateManager } from '../UI/GameCanvas';
+import { global_stateManager, global_allUserDataArr } from '../UI/GameCanvas';
 import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
-import { User, UserManager } from '../UI/UserManager';
+import { User } from '../UI/UserManager';
 import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
@@ -274,12 +274,12 @@ export class BlockBattle implements IGameState
 			if (this.player1.userData && this.player2.userData)
 			{
 				// Regular ending
-				const p1 = UserManager.cloneUser(this.player1.userData); // this might not be needed...
-				const p2 = UserManager.cloneUser(this.player2.userData); // this might not be needed...
+				const p1 = global_allUserDataArr.find(user => user.username === this.player1.userData?.username);
+				const p2 = global_allUserDataArr.find(user => user.username === this.player2.userData?.username);
 	
-				if (this.player1.health.amount === 0 || this.player2.hasWon)
+				if (p1 && p2 && (this.player1.health.amount === 0 || this.player2.hasWon))
 					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.BLOCK_BATTLE));
-				else if (this.player2.health.amount === 0 || this.player1.hasWon)
+				else if (p1 && p2 && (this.player2.health.amount === 0 || this.player1.hasWon))
 					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.BLOCK_BATTLE));
 			}
 		}

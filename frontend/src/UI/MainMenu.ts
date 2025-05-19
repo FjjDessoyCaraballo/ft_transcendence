@@ -1,7 +1,7 @@
 import { GameStates, IGameState } from "../game/GameStates";
 import { Button } from "./Button";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LIGHT_PURPLE } from "../game/Constants";
-import { global_stateManager, global_curUser } from "./GameCanvas";
+import { global_stateManager, global_curUser, global_allUserDataArr } from "./GameCanvas";
 import { UserHUB } from "./UserHUB";
 import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
@@ -80,14 +80,11 @@ export class PongAiBtn extends Button
 
 	clickAction(): void {
 
-		if (global_curUser)
+		if (global_curUser && global_allUserDataArr)
 		{
-			const curUserData = localStorage.getItem(global_curUser);
+			const curUserData = global_allUserDataArr.find(user => user.username === global_curUser);
 			if (curUserData)
-			{
-				const curUserObj = JSON.parse(curUserData);
-				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserObj, null, null, null, GameType.PONG_AI));
-			}
+				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserData, null, null, null, GameType.PONG_AI));
 		}
 
 	}

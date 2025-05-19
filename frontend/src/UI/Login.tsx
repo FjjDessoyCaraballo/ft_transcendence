@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
-import { updateCurUser } from './GameCanvas';
-import { loginUser } from '../services/userService'
+import { updateAllUserDataArr, updateCurUser } from './GameCanvas';
+import { getAllUsers, loginUser } from '../services/userService'
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
@@ -35,9 +35,13 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
         password: password
       });
 
+		const userDataArr = await getAllUsers(); // Fetch all user data, JUST A TEST
+
+
       localStorage.setItem('logged-in', 'true');
       localStorage.setItem('LoggedIn', JSON.stringify(username)); // delete later?
 	  updateCurUser(username);
+	  updateAllUserDataArr(userDataArr); // TEST
 	        
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
@@ -46,6 +50,15 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
       console.error('Login failed.');
 	  updateCurUser(null);
     }
+
+	try {
+
+	} catch (error) {
+      setErrorMessage('User data fetch failed. Please try again');
+      console.error('User data fetch failed.');
+	  updateCurUser(null);
+    }
+
   };
 
   return (

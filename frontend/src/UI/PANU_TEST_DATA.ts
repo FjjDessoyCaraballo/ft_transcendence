@@ -1,3 +1,5 @@
+import { MatchData } from "./UserManager";
+
 // INTERFACES
 
 export interface DashboardUserData {
@@ -21,50 +23,10 @@ export interface DashboardUserData {
 	match_history: MatchData[];
 }
 
-export interface PongData {
-	id: number;
-	match_id: number;
-	longest_rally: number;
-	avg_rally: number;
-	player1_points: number;
-	player2_points: number;
-}
-
-export interface BBData {
-	id: number;
-	match_id: number;
-	win_method: string; // KO or Coins
-	player1_weapon1: string;
-	player1_weapon2: string;
-	player1_damage_taken: number;
-	player1_damage_done: number;
-	player1_coins_collected: number;
-	player1_shots_fired: number;
-	player2_weapon1: string;
-	player2_weapon2: string;
-	player2_damage_taken: number;
-	player2_damage_done: number;
-	player2_coins_collected: number;
-	player2_shots_fired: number;	
-}
-
-export interface MatchData {
-	id: number;
-	date: Date;
-	player1_id: number;
-	player1_rank: number;
-	player2_id: number;
-	player2_rank: number;
-	winner_id: number;
-	game_duration: number;
-	game_type: string; // pong / blockbattle
-	created_at: Date;
-	game_data: PongData | BBData;
-}
 
 // MATCH HISTORY DATA
 
-const panuMatchHistory: MatchData[] = [
+export const panuMatchHistory: MatchData[] = [
     // Pong game - Player 0 wins (5-3)
     {
         id: 1,

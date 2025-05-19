@@ -124,8 +124,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                     <h3 className="font-mono text-lg text-[#4B0082]">
                       {isLoggedInUser ? 'You' : player.username}
                     </h3>
-                    <p className="texts mb-4">🎮 Wins / Losses: <strong>{player.wins} / {player.losses}</strong></p>
-                    <p className="texts mb-4">🏆 Ranking Points: <strong>{player.rankingPoint}</strong></p>
+                    <p className="texts mb-4">🎮 Wins / Losses: <strong>TEMP / TEMP</strong></p>
+                    <p className="texts mb-4">🏆 Ranking Points: <strong>TEMP</strong></p>
     
                     <div className="flex gap-2 mt-auto">
                       {!isLoggedInUser && (

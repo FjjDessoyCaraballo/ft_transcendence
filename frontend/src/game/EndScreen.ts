@@ -3,7 +3,7 @@ import { Button } from "../UI/Button";
 import { global_stateManager } from "../UI/GameCanvas";
 import { MainMenu } from "../UI/MainMenu";
 import { TEXT_PADDING } from "./Constants";
-import { UserManager, User } from "../UI/UserManager";
+import { User, UserManager } from "../UI/UserManager";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { drawCenteredText } from "./StartScreen";
@@ -56,6 +56,7 @@ export class EndScreen implements IGameState
 	returnMenuButton: ReturnMainMenuButton;
 	returnToTournamentBtn: ReturnToTournamentBtn;
 	isStateReady: boolean;
+	savingDataToDB: boolean;
 	gameType: GameType;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
@@ -72,6 +73,7 @@ export class EndScreen implements IGameState
 		this.tournamentData2 = tData2;
 		this.isStateReady = false;
 		this.gameType = gameType;
+		this.savingDataToDB = false;
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
@@ -89,7 +91,7 @@ export class EndScreen implements IGameState
         this.mouseClickBound = () => this.mouseClickCallback();
 
 		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
-			UserManager.updateUserStats(winner, loser);
+			this.saveUserDataToDB();
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -132,6 +134,23 @@ export class EndScreen implements IGameState
 		this.canvas.removeEventListener('click', this.mouseClickBound);
 	}
 
+	async saveUserDataToDB()
+	{
+		this.savingDataToDB = true;
+
+		try {
+			await UserManager.updateUserStats(this.winner, this.loser, this.gameType);
+		} catch {
+
+			// Is this enough? Or do we need more error handling...?
+			alert('User data saving failed');
+			console.log('User data saving failed');
+		}
+
+		this.savingDataToDB = false;
+
+	}
+
 	update(deltaTime: number)
 	{
 	}
@@ -151,17 +170,21 @@ export class EndScreen implements IGameState
 		}
 		else if (!this.tournamentData1)
 		{
-			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.rankingPoint.toFixed(2)}.`;
+			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, winnerRankText, '30px arial', 'white', 300);
 			
-			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.rankingPoint.toFixed(2)}.`;
+			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 
-		if (!this.tournamentData1)
+		if (!this.tournamentData1 && !this.savingDataToDB)
 			this.returnMenuButton.draw(ctx);
-		else
+		else if (!this.savingDataToDB)
 			this.returnToTournamentBtn.draw(ctx);
+		else
+			drawCenteredText(this.canvas, this.ctx, 'Sending data to backend, please wait', '30px arial', 'white', this.canvas.height - 100);
+
+
 	}
 
 }

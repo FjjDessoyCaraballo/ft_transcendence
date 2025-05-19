@@ -1,6 +1,6 @@
 import { GameStates, IGameState } from "../GameStates";
-import { User, UserManager } from "../../UI/UserManager";
-import { global_stateManager } from "../../UI/GameCanvas";
+import { User } from "../../UI/UserManager";
+import { global_allUserDataArr, global_stateManager } from "../../UI/GameCanvas";
 import { EndScreen } from "../EndScreen";
 import { TournamentPlayer } from "../Tournament";
 import { GameType } from "../../UI/Types";
@@ -17,7 +17,6 @@ export const BUFFER = 15;
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
-  //gameState: 'menu' | 'playing' | 'result' | 'ai';
   gameState: 'playing' | 'result' | 'ai';
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
@@ -42,8 +41,8 @@ export class Pong implements IGameState {
   isStateReady: boolean;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
-    // Get canvas dimensions when constructor is called, not at module level
-    this.canvas = canvas;
+
+	  this.canvas = canvas;
 	  this.ctx = ctx;
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
@@ -239,8 +238,8 @@ export class Pong implements IGameState {
     // const player2Score = this.player2.score;
 
     // Regular ending
-    const p1 = UserManager.cloneUser(this.player1.user); // this might not be needed...
-    const p2 = UserManager.cloneUser(this.player2.user); // this might not be needed...
+    const p1 = this.player1.user;
+	const p2 = this.player2.user;
 
     if (this.twoPlayerMode)
     {
@@ -259,7 +258,7 @@ export class Pong implements IGameState {
   }
   drawGame()
   {
-    // Clear canvasthis.
+    // Clear canvas
     this.ctx.fillStyle = 'black';
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
