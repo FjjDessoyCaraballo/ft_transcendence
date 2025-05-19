@@ -121,11 +121,11 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                       alt={`${player.username}'s avatar`}
                       className="w-24 h-24 rounded-full mb-4 border-2 border-purple-300 shadow-md"
                     />
-                    <h3 className="font-mono text-lg text-[#4B0082]">
+                    <h3 className="font-mono text-xl text-[#4B0082] font-bold">
                       {isLoggedInUser ? 'You' : player.username}
                     </h3>
-                    <p className="texts mb-4">🎮 Wins / Losses: <strong>TEMP / TEMP</strong></p>
-                    <p className="texts mb-4">🏆 Ranking Points: <strong>TEMP</strong></p>
+                    <p className="texts mb-4 text-sm">🏓 Pong games played: <strong>{player.games_played_pong}</strong></p>
+                    <p className="texts mb-4 text-sm">🟩 Block Battle games played: <strong>{player.games_played_blockbattle}</strong></p>
     
                     <div className="flex gap-2 mt-auto">
                       {!isLoggedInUser && (
