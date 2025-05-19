@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = () => {
 
   useEffect(() => {
     const checkLoginStatus = () => {
-      const loginStatus = localStorage.getItem('logged-in');
+      const loginStatus = sessionStorage.getItem('logged-in');
       setIsLoggedIn(loginStatus === 'true');
     };
 

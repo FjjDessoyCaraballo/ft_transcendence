@@ -99,6 +99,33 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
 };
 
 /**
+ * Update user statistics after a game
+ * 
+ * @param winner Winner user data
+ * @param loser Loser user data
+ * @returns Promise with the updated user data
+ */
+export const updateUserStatsAPI = async (winner: User, loser: User, gameType: GameType): Promise<{ winner: User, loser: User }> => {
+  try {
+
+	let gameTypeString = '';
+	if (gameType === GameType.BLOCK_BATTLE)
+		gameTypeString = 'blockbattle';
+	else if (gameType === GameType.PONG)
+		gameTypeString = 'pong';
+
+    return await apiRequest('/users/update-stats', {
+      method: 'POST',
+      body: JSON.stringify({ winner, loser, gameTypeString })
+    });    
+  } catch (error) {
+    if (error instanceof Error)
+      throw error;
+    throw new Error('Failed to update user statistics');
+  }
+};
+
+/**
  * Delete a user account
  * 
  * @returns Promise with the deletion confirmation
