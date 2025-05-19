@@ -4,7 +4,7 @@ import { getAllUsers } from '../services/userService';
 
 interface ExtendedUser extends User {
   friendshipStatus: 'none' | 'pending' | 'accepted';
-  avatarUrl: string;
+  //avatarUrl: string;
 }
 
 interface PlayerListProps {
@@ -22,7 +22,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             const extendedUsers: ExtendedUser[] = fetchedUsers.map((user) => ({
                 ...user,
                 friendshipStatus: 'none',
-                avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.username}`,
+                //avatarUrl: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.username}`,
             }));
 
             setPlayers(extendedUsers);
@@ -62,7 +62,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     };
   
-  
 
     const loggedInUserString = typeof window !== 'undefined' ? localStorage.getItem('LoggedIn') : null;
     console.log('logged in user:', loggedInUserString);
@@ -79,7 +78,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
               {pendingRequests.map((player) => (
                 <div key={player.username} className="flex items-center gap-4 p-3 bg-white border border-yellow-300 rounded-lg shadow-sm">
                   <img
-                    src={player.avatarUrl}
+                    src={player.avatar_url}
                     alt={`${player.username}'s avatar`}
                     className="w-12 h-12 rounded-full border-2 border-yellow-300 shadow-md"
                   />
@@ -117,7 +116,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                     }`}
                   >
                     <img
-                      src={player.avatarUrl}
+                      src={player.avatar_url}
                       alt={`${player.username}'s avatar`}
                       className="w-24 h-24 rounded-full mb-4 border-2 border-purple-300 shadow-md"
                     />
