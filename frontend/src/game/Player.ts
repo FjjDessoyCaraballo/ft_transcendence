@@ -1,10 +1,10 @@
 import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT, BB_LEFT_1, BB_RIGHT_1, BB_UP_1, BB_DOWN_1, BB_SHOOT_1} from "./Constants";
 import { Projectile } from "./Projectiles";
-import { gameArea } from "./Environment";
 import { CollisionShape, collType } from "./CollisionShape";
 import { Platform, PlatformDir } from "./Platform";
 import { Health } from "./Health";
-import { User, UserManager } from "../UI/UserManager";
+import { User } from "../UI/UserManager";
+import { global_gameArea } from "../UI/GameCanvas";
 
 export class Player {
     x: number;
@@ -87,24 +87,24 @@ export class Player {
     }
 
 	checkGroundCollision(){
-		if (this.y >= gameArea.maxY - this.height)
+		if (this.y >= global_gameArea.maxY - this.height)
 		{
 			this.isOnGround = true;
-			this.y = gameArea.maxY - this.height;
+			this.y = global_gameArea.maxY - this.height;
 			this.velocity.y = 0;
 			this.cShape.move(this.x + this.cShapeOffset, this.y + this.cShapeOffset);
 		}
 	}
 
 	checkWallCollision(){
-		if (this.x <= gameArea.minX)
+		if (this.x <= global_gameArea.minX)
 		{
-			this.x = gameArea.minX;
+			this.x = global_gameArea.minX;
 			this.velocity.x = 0;
 		}
-		else if (this.x >= gameArea.maxX - this.width)
+		else if (this.x >= global_gameArea.maxX - this.width)
 		{
-			this.x = gameArea.maxX - this.width;
+			this.x = global_gameArea.maxX - this.width;
 			this.velocity.x = 0;
 		}
 		this.cShape.move(this.x + this.cShapeOffset, this.y + this.cShapeOffset);

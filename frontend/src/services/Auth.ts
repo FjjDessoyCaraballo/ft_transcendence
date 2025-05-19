@@ -1,6 +1,7 @@
 import { apiRequest } from './Api';
 import { User } from "../UI/UserManager"
 import { clearToken } from './TokenService';
+import { updateCurUser } from '../UI/GameCanvas';
 
 interface LoginData {
   username: string;
@@ -27,8 +28,10 @@ export const login = async (username: string, password: string): Promise<LoginRe
       body: JSON.stringify({ username, password })
     });
 
-    localStorage.setItem('logged-in', 'true');
-    localStorage.setItem('LoggedIn', JSON.stringify(username));
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    sessionStorage.setItem('logged-in', 'true');
+	  updateCurUser(data.username);
 
     window.dispatchEvent(new Event('loginStatusChanged'));
 
@@ -41,8 +44,8 @@ export const login = async (username: string, password: string): Promise<LoginRe
   } finally {
     await clearToken();
 
-    localStorage.setItem('logged-in', 'false');
-    localStorage.removeItem('LoggedIn');
+    sessionStorage.setItem('logged-in', 'false');
+    sessionStorage.removeItem('LoggedIn');
     
     window.dispatchEvent(new Event('loginStatusChanged'));
   }
@@ -81,8 +84,11 @@ export const logout = async (): Promise<void> => {
     console.error('Error during logout API call:', error);
     // even if this fails, we logout locally from localStorage
   } finally {
-    localStorage.setItem('logged-in', 'false');
-    localStorage.removeItem('LoggedIn');   
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.setItem('logged-in', 'false');
+	  updateCurUser(null);
+    
     window.dispatchEvent(new Event('loginStatusChanged'));
   }
 };
@@ -102,8 +108,9 @@ export const verifyToken = async (): Promise<boolean> => {
     return (true);
   } catch (error) {
     localStorage.removeItem('token');
-    localStorage.setItem('logged-in', 'false');
-    localStorage.removeItem('LoggedIn');
+    localStorage.removeItem('user');
+    sessionStorage.setItem('logged-in', 'false');
+	  updateCurUser(null);
 
     window.dispatchEvent(new Event('loginStatusChanged'));
 

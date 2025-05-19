@@ -22,6 +22,9 @@ RUN npm install --save-dev webpack webpack-cli webpack-dev-server html-webpack-p
 # Install React and TypeScript definitions
 RUN npm install react react-dom @types/react @types/react-dom --save
 
+# Install Chart.js for Dashboard data graphs
+RUN npm install chart.js react-chartjs-2
+
 # Create certificates directory
 RUN mkdir -p /app/certs
 

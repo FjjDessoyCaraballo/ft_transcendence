@@ -3,11 +3,10 @@ import { Player2 } from './Player2';
 import { Platform, PlatformDir } from './Platform';
 import { collType } from './CollisionShape';
 import { drawGround, drawWalls} from './Environment';
-import { stateManager } from '../components/index';
-import { ctx } from '../components/Canvas';
+import { global_stateManager, global_allUserDataArr } from '../UI/GameCanvas';
 import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
-import { User, UserManager } from '../UI/UserManager';
+import { User } from '../UI/UserManager';
 import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
@@ -25,11 +24,12 @@ export class BlockBattle implements IGameState
 	keys: { [key: string]: boolean };
 	platforms: Platform[];
 	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
 	coinHandler: CoinHandler;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
 	{
 		this.name = GameStates.BLOCK_BATTLE;
 		this.isStateReady = false;
@@ -43,20 +43,20 @@ export class BlockBattle implements IGameState
 
 
 		this.platforms = [
-			new Platform(900, 550, 80, PlatformDir.UP_DOWN, 80),
-			new Platform(220, 550, 80, PlatformDir.UP_DOWN, 80),
-			new Platform(500, 500, 200, PlatformDir.STILL, 0), // mid long
-			new Platform(320, 700, 80, PlatformDir.STILL, 0), // close to p1 start
-			new Platform(800, 700, 80, PlatformDir.STILL, 0), // close to p2 start
-			new Platform(800, 340, 40, PlatformDir.STILL, 0), // between move & mid long (right)
-			new Platform(350, 340, 40, PlatformDir.STILL, 0), // between move & mid long (left)
-			new Platform(900, 200, 80, PlatformDir.LEFT_RIGHT, 110),
-			new Platform(220, 200, 80, PlatformDir.LEFT_RIGHT, 110),
-			new Platform(550, 300, 100, PlatformDir.UP_DOWN, 80), // above mid
+			new Platform(canvas, 900, 550, 80, PlatformDir.UP_DOWN, 80),
+			new Platform(canvas, 220, 550, 80, PlatformDir.UP_DOWN, 80),
+			new Platform(canvas, 500, 500, 200, PlatformDir.STILL, 0), // mid long
+			new Platform(canvas, 320, 700, 80, PlatformDir.STILL, 0), // close to p1 start
+			new Platform(canvas, 800, 700, 80, PlatformDir.STILL, 0), // close to p2 start
+			new Platform(canvas, 800, 340, 40, PlatformDir.STILL, 0), // between move & mid long (right)
+			new Platform(canvas, 350, 340, 40, PlatformDir.STILL, 0), // between move & mid long (left)
+			new Platform(canvas, 900, 200, 80, PlatformDir.LEFT_RIGHT, 110),
+			new Platform(canvas, 220, 200, 80, PlatformDir.LEFT_RIGHT, 110),
+			new Platform(canvas, 550, 300, 100, PlatformDir.UP_DOWN, 80), // above mid
 
-			new Platform(1120, 280, 20, PlatformDir.STILL, 0), // mini right
-			new Platform(60, 280, 20, PlatformDir.STILL, 0), // mini left
-			new Platform(590, 80, 20, PlatformDir.STILL, 0), // mini top
+			new Platform(canvas, 1120, 280, 20, PlatformDir.STILL, 0), // mini right
+			new Platform(canvas, 60, 280, 20, PlatformDir.STILL, 0), // mini left
+			new Platform(canvas, 590, 80, 20, PlatformDir.STILL, 0), // mini top
 
 		]
 		
@@ -65,6 +65,7 @@ export class BlockBattle implements IGameState
 		this.coinHandler.start();
 
 		this.canvas = canvas;
+		this.ctx = ctx;
 
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
@@ -101,85 +102,85 @@ export class BlockBattle implements IGameState
 		// PLAYER 1
 
 		// Draw background
-		ctx.fillStyle = 'rgba(140, 185, 87, 0.75)';
-		ctx.fillRect(0, 0, screenW, screenH);
+		this.ctx.fillStyle = 'rgba(140, 185, 87, 0.75)';
+		this.ctx.fillRect(0, 0, screenW, screenH);
 
 		// Draw outlines
-		ctx.strokeStyle = 'white';
-		ctx.lineWidth = 2;
-		ctx.strokeRect(0, 0, screenW, screenH);
+		this.ctx.strokeStyle = 'white';
+		this.ctx.lineWidth = 2;
+		this.ctx.strokeRect(0, 0, screenW, screenH);
 
-		ctx.font = '20px arial';
-		ctx.fillStyle = 'white';
+		this.ctx.font = '20px arial';
+		this.ctx.fillStyle = 'white';
 		const name = `${this.player1.userData?.username}`;
-		const nameX = screenW / 2 - (ctx.measureText(name).width / 2);
-		ctx.fillText(name, nameX, 20);
+		const nameX = screenW / 2 - (this.ctx.measureText(name).width / 2);
+		this.ctx.fillText(name, nameX, 20);
 
 		// Draw coin count & Current weapon texts
-		ctx.font = '20px arial';
-		ctx.fillStyle = 'white';
+		this.ctx.font = '20px arial';
+		this.ctx.fillStyle = 'white';
 		const coinText = 'Coins collected:';
-		const coinTextW = ctx.measureText(coinText).width;
+		const coinTextW = this.ctx.measureText(coinText).width;
 		const coinTextX = 40;
-		ctx.fillText(coinText, coinTextX, 52);
+		this.ctx.fillText(coinText, coinTextX, 52);
 
 		const weaponText = 'Current weapon:';
-		const WeaponW = ctx.measureText(weaponText).width;
+		const WeaponW = this.ctx.measureText(weaponText).width;
 		const WeaponX = coinTextX + coinTextW + 30;
-		ctx.fillText(weaponText, WeaponX, 52);
+		this.ctx.fillText(weaponText, WeaponX, 52);
 
 		// Draw coin count & Current weapon values
-		ctx.font = '30px arial';
-		ctx.fillStyle = 'white';
+		this.ctx.font = '30px arial';
+		this.ctx.fillStyle = 'white';
 		const coinNum = `${this.player1.coinCount}`;
-		const coinNumX = coinTextX + (coinTextW / 2) - (ctx.measureText(coinNum).width / 2);
-		ctx.fillText(coinNum, coinNumX, 80);
+		const coinNumX = coinTextX + (coinTextW / 2) - (this.ctx.measureText(coinNum).width / 2);
+		this.ctx.fillText(coinNum, coinNumX, 80);
 
 		const curWeapon = `Pistol`;
-		const curWeaponX = WeaponX + (WeaponW / 2) - (ctx.measureText(curWeapon).width / 2);
-		ctx.fillText(curWeapon, curWeaponX, 80);
+		const curWeaponX = WeaponX + (WeaponW / 2) - (this.ctx.measureText(curWeapon).width / 2);
+		this.ctx.fillText(curWeapon, curWeaponX, 80);
 
 		// PLAYER 2
 		
 		// Draw background
-		ctx.fillStyle = 'rgba(211, 94, 91, 0.75)';
+		this.ctx.fillStyle = 'rgba(211, 94, 91, 0.75)';
 		const screenX = this.canvas.width - screenW;
-		ctx.fillRect(screenX, 0, screenW, screenH);
+		this.ctx.fillRect(screenX, 0, screenW, screenH);
 
 		// Draw outlines
-		ctx.strokeStyle = 'white'; // Can maybe be removed
-		ctx.lineWidth = 2; // Can maybe be removed
-		ctx.strokeRect(screenX, 0, screenW, screenH);
+		this.ctx.strokeStyle = 'white'; // Can maybe be removed
+		this.ctx.lineWidth = 2; // Can maybe be removed
+		this.ctx.strokeRect(screenX, 0, screenW, screenH);
 
-		ctx.font = '20px arial';
-		ctx.fillStyle = 'white';
+		this.ctx.font = '20px arial';
+		this.ctx.fillStyle = 'white';
 		const name2 = `${this.player2.userData?.username}`;
-		const nameX2 = screenX + (screenW / 2) - (ctx.measureText(name2).width / 2);
-		ctx.fillText(name2, nameX2, 20);
+		const nameX2 = screenX + (screenW / 2) - (this.ctx.measureText(name2).width / 2);
+		this.ctx.fillText(name2, nameX2, 20);
 
 		// Draw coin count & Current weapon texts
-		ctx.font = '20px arial';
-		ctx.fillStyle = 'white';
+		this.ctx.font = '20px arial';
+		this.ctx.fillStyle = 'white';
 		const coinText2 = 'Coins collected:';
-		const coinTextW2 = ctx.measureText(coinText2).width;
+		const coinTextW2 = this.ctx.measureText(coinText2).width;
 		const coinTextX2 = screenX + 40;
-		ctx.fillText(coinText2, coinTextX2, 52);
+		this.ctx.fillText(coinText2, coinTextX2, 52);
 
 		const weaponText2 = 'Current weapon:';
-		const WeaponW2 = ctx.measureText(weaponText2).width;
+		const WeaponW2 = this.ctx.measureText(weaponText2).width;
 		const WeaponX2 = coinTextX2 + coinTextW2 + 30;
-		ctx.fillText(weaponText2, WeaponX2, 52);
+		this.ctx.fillText(weaponText2, WeaponX2, 52);
 
 		// Draw coin count & Current weapon values
-		ctx.font = '30px arial';
-		ctx.fillStyle = 'white';
+		this.ctx.font = '30px arial';
+		this.ctx.fillStyle = 'white';
 		const coinNum2 = `${this.player2.coinCount}`;
-		const coinNumX2 = coinTextX2 + (coinTextW2 / 2) - (ctx.measureText(coinNum2).width / 2);
-		ctx.fillText(coinNum2, coinNumX2, 80);
+		const coinNumX2 = coinTextX2 + (coinTextW2 / 2) - (this.ctx.measureText(coinNum2).width / 2);
+		this.ctx.fillText(coinNum2, coinNumX2, 80);
 
 		const curWeapon2 = `Pistol`;
-		const curWeaponX2 = WeaponX2 + (WeaponW2 / 2) - (ctx.measureText(curWeapon2).width / 2);
-		ctx.fillText(curWeapon2, curWeaponX2, 80);
+		const curWeaponX2 = WeaponX2 + (WeaponW2 / 2) - (this.ctx.measureText(curWeapon2).width / 2);
+		this.ctx.fillText(curWeapon2, curWeaponX2, 80);
 
 	}
 
@@ -273,13 +274,13 @@ export class BlockBattle implements IGameState
 			if (this.player1.userData && this.player2.userData)
 			{
 				// Regular ending
-				const p1 = UserManager.cloneUser(this.player1.userData); // this might not be needed...
-				const p2 = UserManager.cloneUser(this.player2.userData); // this might not be needed...
+				const p1 = global_allUserDataArr.find(user => user.username === this.player1.userData?.username);
+				const p2 = global_allUserDataArr.find(user => user.username === this.player2.userData?.username);
 	
-				if (this.player1.health.amount === 0 || this.player2.hasWon)
-					stateManager.changeState(new EndScreen(this.canvas, p2, p1, null, null, GameType.BLOCK_BATTLE));
-				else if (this.player2.health.amount === 0 || this.player1.hasWon)
-					stateManager.changeState(new EndScreen(this.canvas, p1, p2, null, null, GameType.BLOCK_BATTLE));
+				if (p1 && p2 && (this.player1.health.amount === 0 || this.player2.hasWon))
+					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.BLOCK_BATTLE));
+				else if (p1 && p2 && (this.player2.health.amount === 0 || this.player1.hasWon))
+					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.BLOCK_BATTLE));
 			}
 		}
 
@@ -287,8 +288,8 @@ export class BlockBattle implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		drawGround(ctx);
-		drawWalls(ctx);
+		drawGround(this.canvas, ctx);
+		drawWalls(this.canvas, ctx);
 
 		for (const platform of this.platforms) {
 			platform.draw(ctx);

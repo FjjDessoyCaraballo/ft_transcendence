@@ -15,10 +15,10 @@ export class RankingHandler {
 
 	public static getPlayerRankEffects(player1: User, player2: User): [number, number]
 	{
-		const playerExpected = this.expectedScore(player1.rankingPoint, player2.rankingPoint);
+		const playerExpected = this.expectedScore(player1.ranking_points, player2.ranking_points);
 
-		const winEffect = player1.rankingPoint + this.K * (1 - playerExpected);
-		const loseEffect = player1.rankingPoint + this.K * (0 - playerExpected);
+		const winEffect = player1.ranking_points + this.K * (1 - playerExpected);
+		const loseEffect = player1.ranking_points + this.K * (0 - playerExpected);
 
 		return [winEffect, loseEffect];
 	}
@@ -26,11 +26,11 @@ export class RankingHandler {
 	// resultOfP1 == How game went for player1 (win = 1, lose = 0)
     public static updateRanking(winner: User, loser: User)
 	{
-		const winnerExpected = this.expectedScore(winner.rankingPoint, loser.rankingPoint);
+		const winnerExpected = this.expectedScore(winner.ranking_points, loser.ranking_points);
         const loserExpected = 1 - winnerExpected;
 
-        winner.rankingPoint = winner.rankingPoint + this.K * (1 - winnerExpected);
-        loser.rankingPoint = loser.rankingPoint + this.K * (0 - loserExpected);
+        winner.ranking_points = winner.ranking_points + this.K * (1 - winnerExpected);
+        loser.ranking_points = loser.ranking_points + this.K * (0 - loserExpected);
 
     }
 }

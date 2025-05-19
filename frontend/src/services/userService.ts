@@ -1,5 +1,6 @@
 import { apiRequest } from './Api';
 import { User } from '../UI/UserManager'
+import { GameType } from '../UI/Types';
 
 interface RegisterData {
   username: string;

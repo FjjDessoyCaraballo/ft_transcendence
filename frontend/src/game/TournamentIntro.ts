@@ -1,3 +1,5 @@
+/*
+
 import { GameStates, IGameState } from "./GameStates";
 import { ReturnMainMenuButton } from "./EndScreen";
 import { ctx, canvas } from "../components/Canvas";
@@ -134,3 +136,4 @@ export class TournamenIntro implements IGameState
 	
 
 }
+	*/

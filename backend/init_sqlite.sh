@@ -24,7 +24,7 @@ sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,          -- Unique identifier for each user
   username TEXT NOT NULL UNIQUE,                 -- Unique username of the user
   password TEXT NOT NULL,                        -- Hashed password of the user
-  ranking_points INTEGER DEFAULT 0,              -- User's ranking points
+  ranking_points INTEGER DEFAULT 1000,              -- User's ranking points
   avatar_url TEXT DEFAULT '/public/avatars/bee.png', -- URL to the user's avatar
   games_played_pong INTEGER DEFAULT 0,           -- Total number of Pong games played
   wins_pong INTEGER DEFAULT 0,                   -- Total number of Pong games won
