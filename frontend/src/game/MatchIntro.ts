@@ -7,6 +7,7 @@ import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
 import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE } from "./Constants";
+import { Bazooka, Pistol, Weapon } from "./Weapons";
 
 
 export class MatchIntro implements IGameState
@@ -23,6 +24,7 @@ export class MatchIntro implements IGameState
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	gameType: GameType;
+	weapons: Weapon[] = [new Pistol(), new Bazooka()]; // add new weapons here
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
@@ -124,6 +126,41 @@ export class MatchIntro implements IGameState
 		}
 	}
 
+	drawWeaponMenu(ctx: CanvasRenderingContext2D)
+	{
+
+		// PLAYER 1
+
+		let i = 0;
+		ctx.font = '30px arial';
+		ctx.fillStyle = 'white';
+		let weaponX = 140; // Same as P1X
+		const weaponY = 540; // 100 more than P1Y
+
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.strokeRect(20, 580, 500, 150);
+
+		// Weapon icons
+		for (const weapon of this.weapons)
+		{
+			let weaponLetter = this.weapons[i].name[0];
+			ctx.fillText(weaponLetter, weaponX, weaponY);
+
+			weaponX += 40;
+			i++;
+		}
+
+		// Weapon info
+		const name = 'Pistol';
+		const nameX = 20 + 250 - ctx.measureText(name).width / 2;
+		const nameY = 580 + 40;
+		ctx.fillText(name, nameX, nameY);
+
+		// Add damage and speed information here
+	}
+
+
 	render(ctx: CanvasRenderingContext2D)
 	{
 		const p1FillColor = this.p1IsReady ? 'green' : 'red';
@@ -142,6 +179,7 @@ export class MatchIntro implements IGameState
 			infoText = `Press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
 		drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
 
+		// PLAYER 1
 		let p1Text = this.player1.username;
 		let p1X = 140;
 		drawText(this.ctx, p1Text, '55px arial', p1FillColor, p1X, 440);
@@ -162,6 +200,7 @@ export class MatchIntro implements IGameState
 
 		drawCenteredText(this.canvas, this.ctx, 'VS', '60px arial', 'white', 440);
 
+		// PLAYER 2
 		const p2Text = this.player2.username;
 		const p2X = this.canvas.width - ctx.measureText(p2Text).width - 140;
 		drawText(this.ctx, p2Text, '55px arial', p2FillColor, p2X, 440);
@@ -179,6 +218,8 @@ export class MatchIntro implements IGameState
 		ctx.fillStyle = 'white';
 		const rank2X = p2X + halfOfP2Text - ctx.measureText(p2Rank).width / 2;
 		ctx.fillText(p2Rank, rank2X, 480);
+
+		this.drawWeaponMenu(ctx);
 
 	}
 

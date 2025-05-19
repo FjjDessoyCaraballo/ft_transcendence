@@ -11,6 +11,7 @@ import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
+import { Bazooka, Pistol } from './Weapons';
 
 
 export class BlockBattle implements IGameState
@@ -36,8 +37,8 @@ export class BlockBattle implements IGameState
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		
-		this.player1 = new Player(100, 745, 'green', user1); // Check the color later!!
-		this.player2 = new Player2(1100, 745, 'red', user2); // Check the color later!!
+		this.player1 = new Player(100, 745, 'green', user1, new Pistol(), new Bazooka());
+		this.player2 = new Player2(1100, 745, 'red', user2, new Pistol(), new Bazooka());
 
 		this.keys = {}; // Maybe in enter() ?
 
@@ -48,8 +49,8 @@ export class BlockBattle implements IGameState
 			new Platform(canvas, 500, 500, 200, PlatformDir.STILL, 0), // mid long
 			new Platform(canvas, 320, 700, 80, PlatformDir.STILL, 0), // close to p1 start
 			new Platform(canvas, 800, 700, 80, PlatformDir.STILL, 0), // close to p2 start
-			new Platform(canvas, 800, 340, 40, PlatformDir.STILL, 0), // between move & mid long (right)
-			new Platform(canvas, 350, 340, 40, PlatformDir.STILL, 0), // between move & mid long (left)
+			new Platform(canvas, 770, 370, 40, PlatformDir.STILL, 0), // between move & mid long (right)
+			new Platform(canvas, 380, 370, 40, PlatformDir.STILL, 0), // between move & mid long (left)
 			new Platform(canvas, 900, 200, 80, PlatformDir.LEFT_RIGHT, 110),
 			new Platform(canvas, 220, 200, 80, PlatformDir.LEFT_RIGHT, 110),
 			new Platform(canvas, 550, 300, 100, PlatformDir.UP_DOWN, 80), // above mid
@@ -110,11 +111,11 @@ export class BlockBattle implements IGameState
 		this.ctx.lineWidth = 2;
 		this.ctx.strokeRect(0, 0, screenW, screenH);
 
-		this.ctx.font = '20px arial';
+		this.ctx.font = '30px arial';
 		this.ctx.fillStyle = 'white';
 		const name = `${this.player1.userData?.username}`;
 		const nameX = screenW / 2 - (this.ctx.measureText(name).width / 2);
-		this.ctx.fillText(name, nameX, 20);
+		this.ctx.fillText(name, nameX, 25);
 
 		// Draw coin count & Current weapon texts
 		this.ctx.font = '20px arial';
@@ -136,7 +137,7 @@ export class BlockBattle implements IGameState
 		const coinNumX = coinTextX + (coinTextW / 2) - (this.ctx.measureText(coinNum).width / 2);
 		this.ctx.fillText(coinNum, coinNumX, 80);
 
-		const curWeapon = `Pistol`;
+		const curWeapon = this.player1.curWeapon.name;
 		const curWeaponX = WeaponX + (WeaponW / 2) - (this.ctx.measureText(curWeapon).width / 2);
 		this.ctx.fillText(curWeapon, curWeaponX, 80);
 
@@ -152,11 +153,11 @@ export class BlockBattle implements IGameState
 		this.ctx.lineWidth = 2; // Can maybe be removed
 		this.ctx.strokeRect(screenX, 0, screenW, screenH);
 
-		this.ctx.font = '20px arial';
+		this.ctx.font = '30px arial';
 		this.ctx.fillStyle = 'white';
 		const name2 = `${this.player2.userData?.username}`;
 		const nameX2 = screenX + (screenW / 2) - (this.ctx.measureText(name2).width / 2);
-		this.ctx.fillText(name2, nameX2, 20);
+		this.ctx.fillText(name2, nameX2, 25);
 
 		// Draw coin count & Current weapon texts
 		this.ctx.font = '20px arial';
@@ -178,7 +179,7 @@ export class BlockBattle implements IGameState
 		const coinNumX2 = coinTextX2 + (coinTextW2 / 2) - (this.ctx.measureText(coinNum2).width / 2);
 		this.ctx.fillText(coinNum2, coinNumX2, 80);
 
-		const curWeapon2 = `Pistol`;
+		const curWeapon2 = this.player2.curWeapon.name;
 		const curWeaponX2 = WeaponX2 + (WeaponW2 / 2) - (this.ctx.measureText(curWeapon2).width / 2);
 		this.ctx.fillText(curWeapon2, curWeaponX2, 80);
 
@@ -225,17 +226,9 @@ export class BlockBattle implements IGameState
 			this.player2.isDead = true;
 
 		// PROJECTILES
-		for (const projectile of this.player1.projectiles) {
-			projectile.update(this.canvas, deltaTime);
-			projectile.cShape.checkBulletCollision(this.player2.cShape);
-		}
-		for (const projectile of this.player2.projectiles) {
-			projectile.update(this.canvas, deltaTime);
-			projectile.cShape.checkBulletCollision(this.player1.cShape);
-		}
 
-		this.player1.projectiles = this.player1.projectiles.filter(projectile => projectile.isValid);
-		this.player2.projectiles = this.player2.projectiles.filter(projectile => projectile.isValid);
+		this.player1.updateWeapons(this.canvas, deltaTime, this.player2);
+		this.player2.updateWeapons(this.canvas, deltaTime, this.player1);
 
 		// COINS
 		if (this.coinHandler.platformsFull && this.coinHandler.intervalId)

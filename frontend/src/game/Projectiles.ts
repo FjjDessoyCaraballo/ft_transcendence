@@ -11,14 +11,14 @@ export class Projectile {
 	cShape: CollisionShape;
 	isValid: boolean;
 
-    constructor(x: number, y: number, velocity: { x: number, y: number }) {
+    constructor(x: number, y: number, velocity: { x: number, y: number }, color: string, width: number, height: number) {
         this.x = x;
         this.y = y;
 
         this.velocity = velocity;
-        this.width = 10; // Add to constants?
-        this.height = 5; // Add to constants?
-        this.color = 'red';
+        this.width = width;
+        this.height = height;
+        this.color = color;
 		this.cShape = new CollisionShape(x, y, this.width, this.height, collType.BULLET, this);
 		this.isValid = true;
     }
@@ -30,7 +30,7 @@ export class Projectile {
 		this.cShape.move(this.x, this.y);
 
 		if (this.x <= WALL_THICKNESS || this.x >= canvas.width - WALL_THICKNESS - this.width || 
-			this.y <= 0 || this.y >= canvas.height - FLOOR_THICKNESS - this.width)
+			this.y <= 0 || this.y >= canvas.height - FLOOR_THICKNESS - this.height)
 		{
 			this.isValid = false;
 		}
