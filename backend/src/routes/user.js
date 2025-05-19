@@ -37,6 +37,9 @@ async function userRoutes(fastify, options) {
     return users;
   });
 
+
+
+  
   // GET user by ID
   fastify.get('/:id', async (request, reply) => {
     const user = fastify.db.prepare(`
