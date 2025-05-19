@@ -20,7 +20,8 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 			.then(() => {
 				alert("Account successfully deleted");
 				sessionStorage.setItem('logged-in', 'false');
-				// return clearToken();
+				window.dispatchEvent(new Event('loginStatusChanged'));
+				onConfirm();
 			})
 		} catch (error) {
 			console.error("Error: ", error);
@@ -96,8 +97,8 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 
 	const confirmDeleteAccount = async () => {
 		try {
-			await deleteUserAccount();
-			HandleLogout();
+			await deleteUserAccount()
+			await HandleLogout();
 		} catch (error) {
 			throw new Error('Could not delete data. Try again later or contact data protection officer.');
 		}
