@@ -182,7 +182,7 @@ async function gameRoutes(fastify, options) {
               UPDATE users 
               SET games_played_pong = games_played_pong + 1,
                   wins_pong = wins_pong + 1,
-                  ranking_points = ?,  // Use frontend-provided ranking points
+                  ranking_points = ?,
                   updated_at = CURRENT_TIMESTAMP
               WHERE id = ?
             `).run(
@@ -195,7 +195,7 @@ async function gameRoutes(fastify, options) {
               UPDATE users 
               SET games_played_blockbattle = games_played_blockbattle + 1,
                   wins_blockbattle = wins_blockbattle + 1,
-                  ranking_points = ?,  // Use frontend-provided ranking points
+                  ranking_points = ?,
                   updated_at = CURRENT_TIMESTAMP
               WHERE id = ?
             `).run(
@@ -210,7 +210,7 @@ async function gameRoutes(fastify, options) {
               UPDATE users 
               SET games_played_pong = games_played_pong + 1,
                   losses_pong = losses_pong + 1,
-                  ranking_points = ?,  // Use frontend-provided ranking points
+                  ranking_points = ?,
                   updated_at = CURRENT_TIMESTAMP
               WHERE id = ?
             `).run(
@@ -222,7 +222,7 @@ async function gameRoutes(fastify, options) {
               UPDATE users 
               SET games_played_blockbattle = games_played_blockbattle + 1,
                   losses_blockbattle = losses_blockbattle + 1,
-                  ranking_points = ?,  // Use frontend-provided ranking points
+                  ranking_points = ?,
                   updated_at = CURRENT_TIMESTAMP
               WHERE id = ?
             `).run(
