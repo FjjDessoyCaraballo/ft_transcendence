@@ -35,10 +35,8 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
   }
 };
 
-export const updateAvatar = async (avatar: Blob): Promise<{AvatarUrl: string}> => {
+export const updateAvatar = async (avatar: Blob): Promise<{AvatarUrl: Blob}> => {
   try {
-    const base64Data = await fileToBase64(file); 
-
     const response = await apiRequest('users/avatar', {
       method: 'POST',
       body: avatar
