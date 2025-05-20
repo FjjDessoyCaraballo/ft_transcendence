@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 // import { updateAvatar } from '../services/userService' // under work
 
 export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) => {
 	const [errorMessage, setErrorMessage] = useState('');
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const HandleNewAvatar = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -23,11 +24,16 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		  </div>
 
 		<div className="buttonsDiv">
-
-			<form onClick={HandleNewAvatar}
-			className="buttonsDiv">
-				<input type="file" id="myFile" name="filename"/>
-				<input type="submit"/>
+			<form onSubmit={HandleNewAvatar}
+			className="p-6">
+				<label htmlFor="avatar" className="buttons">Avatar</label>
+				<input 
+				type="file"
+				id="avatar" 
+				name="avatar"
+				ref={fileInputRef}
+				accept="image/*"
+				/>
 			</form>
 		</div>
 
