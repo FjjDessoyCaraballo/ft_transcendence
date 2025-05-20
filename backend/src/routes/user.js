@@ -270,6 +270,11 @@ async function userRoutes(fastify, options) {
       return { error: 'Avatar image is required' };
     }
     
+    if (request.body.avatar.size > 2 * 1024 * 1024) {
+      reply.code(400);
+      return { error: 'File size exceeds 2MB' };
+    }
+
     try {
       // Decode base64 image
       const imageData = Buffer.from(request.body.avatar.data, 'base64');

@@ -123,14 +123,6 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 		setShowAvatarChange(true);
 	}
 
-	const confirmAvatarChange = async () => {
-		try {
-			// reserved for API call
-		} catch (error) {
-			console.error(`Could not change avatar. ${error}`)
-		}
-	}
-
 	const HandleClose = () => {
 		onClick();
 	}

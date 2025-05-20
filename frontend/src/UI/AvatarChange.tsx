@@ -3,21 +3,50 @@ import React, { useState, useRef } from 'react'
 
 export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) => {
 	const [errorMessage, setErrorMessage] = useState('');
+	const [preview, setPreview] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	// const [showMeasures, setShowMeasures] = useState('');
 
-	const showMeasures = 'Files must be in jpg or png format no bigger than 20MB';
-	// setShowMeasures();
+	const showMeasures = 'Files must be in jpg or png format no bigger than 2MB';
+	
 	const HandleNewAvatar = async (event: React.FormEvent) => {
 		event.preventDefault();
 
 		setErrorMessage('');
+		setIsLoading(true);
+		try {
+			// reserved for API request
+		} catch (error) {
+			console.error(`${error}`);
+		} finally {
+			setIsLoading(false);
+		}
+
 		onClick();
+	}
+
+	const HandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = event.target.files;
+
+		setIsLoading(true);
+		if (!files || files.length === 0)
+			return ;
+		const file = files[0];
+
+		if (!file.type.startsWith('image/')) {
+			setErrorMessage('Please select an image file');
+			return ;
+		}
+
+		setPreview(URL.createObjectURL(file));
+		setIsLoading(false);
 	}
 
 	const HandleClose = () => {
 		onClick();
 	}
+
+
 
 	return (
 	<div className="fixed inset-0 w-full h-full bg-black bg-opacity-70 flex justify-center items-center z-[9999]">
@@ -45,14 +74,25 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 				name="avatar"
 				ref={fileInputRef}
 				accept="image/*"
+				onChange={HandleChange}
 				/>
 			</form>
+			
+			{preview && (
+			<div className="mb-4 flex justify-center">
+			<img
+				src={preview}
+				alt="Avatar preview"
+				className="max-h-48 max-w-full object-contain rounded border border-gray-300"
+			/>
+			</div>)}
 		</div>
 
         <div className="buttonsDiv">
             <button 
               type="button"
-              className="buttonsStyle bg-gray-200 text-gray-800 transition-colors hover:bg-gray-300" 
+              className="buttonsStyle bg-gray-200 text-gray-800 transition-colors hover:bg-gray-300"
+			  disabled={isLoading}
               onClick={HandleClose}
             >
               Cancel
@@ -62,11 +102,3 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 	  </div>	
 	);
 };
-
-			{/* <button 
-              type="submit"
-              className="buttonsStyle"
-			  onClick={HandleNewAvatar}
-			>
-      		Upload
-          	</button> */}
