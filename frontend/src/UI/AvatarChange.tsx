@@ -21,35 +21,34 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		  <div className="p-6 bg-[#4B0082] text-white">
 			<h2 className="text-2xl font-bold font-mono">Avatar Change</h2>
 		  </div>
-		  
-		  <form onClick={HandleNewAvatar} className="p-6">
-			{errorMessage && (
-			  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-				{errorMessage}
-			  </div>
-			)}
 
 		<div className="buttonsDiv">
-			<button 
-              type="submit"
-              className="buttonsStyle"
-			  onClick={HandleNewAvatar}
-			>
-      		Upload
-          	</button>
+
+			<form onClick={HandleNewAvatar}
+			className="buttonsDiv">
+				<input type="file" id="myFile" name="filename"/>
+				<input type="submit"/>
+			</form>
 		</div>
 
-        <div className="flex justify-center gap-3">
+        <div className="buttonsDiv">
             <button 
               type="button"
-              className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300" 
+              className="buttonsStyle bg-gray-200 text-gray-800 transition-colors hover:bg-gray-300" 
               onClick={HandleClose}
             >
               Cancel
 			</button>
 		</div>
-		  </form>
 		</div>
 	  </div>	
 	);
 };
+
+			{/* <button 
+              type="submit"
+              className="buttonsStyle"
+			  onClick={HandleNewAvatar}
+			>
+      		Upload
+          	</button> */}
