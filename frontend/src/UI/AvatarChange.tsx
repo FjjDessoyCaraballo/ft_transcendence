@@ -4,7 +4,10 @@ import React, { useState, useRef } from 'react'
 export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) => {
 	const [errorMessage, setErrorMessage] = useState('');
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	// const [showMeasures, setShowMeasures] = useState('');
 
+	const showMeasures = 'Files must be in jpg or png format no bigger than 20MB';
+	// setShowMeasures();
 	const HandleNewAvatar = async (event: React.FormEvent) => {
 		event.preventDefault();
 
@@ -22,6 +25,14 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		  <div className="p-6 bg-[#4B0082] text-white">
 			<h2 className="text-2xl font-bold font-mono">Avatar Change</h2>
 		  </div>
+		{showMeasures && 
+				<div className="mx-6 mt-4 p-3 font-mono rounded-md">
+			{showMeasures}
+		</div>}
+		{errorMessage &&
+		<div className="mx-6 mt-4 p-3 bg-red-100 text-red-700 rounded-md">
+			{errorMessage}
+		</div>}
 
 		<div className="buttonsDiv">
 			<form onSubmit={HandleNewAvatar}
