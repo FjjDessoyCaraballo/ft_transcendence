@@ -6,6 +6,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 	const [preview, setPreview] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [base64, setBase64] = useState<string>('');
+	const [fileSize, setFileSize] = useState<number>(0);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const showMeasures = 'Files must be in jpg or png format no bigger than 2MB';
@@ -16,9 +17,13 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		setErrorMessage('');
 		setIsLoading(true);
 		try {
-			await updateAvatar(base64.split(',')[1]);
+			await updateAvatar({
+				data: base64.split(',')[1],
+				size: fileSize
+			});
 		} catch (error) {
 			console.error(`${error}`);
+			alert("Failed to load image!");
 		} finally {
 			setIsLoading(false);
 		}
@@ -38,6 +43,8 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 			setErrorMessage('Please select an image file');
 			return ;
 		}
+
+		setFileSize(file.size);
 
 		setPreview(URL.createObjectURL(file));
 		const reader = new FileReader();
@@ -103,6 +110,14 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
             >
               Cancel
 			</button>
+            <button 
+              type="submit"
+              className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]" 
+			  disabled={isLoading}
+			  onClick={HandleNewAvatar}
+            >
+              Update
+            </button>
 		</div>
 		</div>
 	  </div>	

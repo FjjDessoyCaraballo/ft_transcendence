@@ -8,6 +8,11 @@ interface RegisterData {
   password: string;
 }
 
+interface AvatarData {
+  data: string;
+  size: number;
+}
+
 interface RegisterResponse {
   user: User;
   token: string;
@@ -36,11 +41,11 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
   }
 };
 
-export const updateAvatar = async (avatar_url: string): Promise<{AvatarUrl: string}> => {
+export const updateAvatar = async (avatar: AvatarData): Promise<{AvatarUrl: string}> => {
   try {
-    return await apiRequest('users/avatar', {
+    return await apiRequest('/users/avatar', {
       method: 'POST',
-      body: avatar_url
+      body: JSON.stringify({avatar})
     });
   } catch (error) {
     throw error;
