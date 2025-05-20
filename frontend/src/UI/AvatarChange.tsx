@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react'
-// import { updateAvatar } from '../services/userService' // under work
+import { updateAvatar } from '../services/userService' // under work
 
 export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) => {
 	const [errorMessage, setErrorMessage] = useState('');
 	const [preview, setPreview] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [base64, setBase64] = useState<string>('');
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const showMeasures = 'Files must be in jpg or png format no bigger than 2MB';
@@ -15,7 +16,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		setErrorMessage('');
 		setIsLoading(true);
 		try {
-			// reserved for API request
+			await updateAvatar(base64.split(',')[1]);
 		} catch (error) {
 			console.error(`${error}`);
 		} finally {
@@ -39,7 +40,12 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		}
 
 		setPreview(URL.createObjectURL(file));
-		setIsLoading(false);
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setBase64(reader.result as string);
+			setIsLoading(false);
+		};
+		reader.readAsDataURL(file);
 	}
 
 	const HandleClose = () => {

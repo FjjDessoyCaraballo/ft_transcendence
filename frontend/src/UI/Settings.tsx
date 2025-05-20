@@ -16,21 +16,21 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 		onClose();
 	}
 
-	// const handleConfirm = async () => {
-	// 	try {
-	// 		await deleteUserAccount()
-	// 		.then(() => {
-	// 			alert("Account successfully deleted");
-	// 			sessionStorage.setItem('logged-in', 'false');
-	// 			window.dispatchEvent(new Event('loginStatusChanged'));
-	// 			onConfirm();
-	// 		})
-	// 	} catch (error) {
-	// 		console.error(`${error}`);
-	// 	} finally {
-	// 		handleClose();
-	// 	}
-	// }
+	const handleConfirm = async () => {
+		try {
+			await deleteUserAccount()
+			.then(() => {
+				alert("Account successfully deleted");
+				sessionStorage.setItem('logged-in', 'false');
+				window.dispatchEvent(new Event('loginStatusChanged'));
+				onConfirm();
+			})
+		} catch (error) {
+			console.error(`${error}`);
+		} finally {
+			handleClose();
+		}
+	}
 	
 	return (
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -50,7 +50,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 				Cancel
 			  </button>
 			  <button 
-				// onClick={handleConfirm}
+				onClick={handleConfirm}
 				className="px-5 py-2 rounded bg-red-600 text-white font-mono transition-colors hover:bg-red-700"
 			  >
 				Delete My Account
@@ -111,7 +111,6 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 
 	const confirmDeleteAccount = async () => {
 		try {
-			await deleteUserAccount()
 			await HandleLogout();
 		} catch (error) {
 			throw new Error('Could not delete data. Try again later or contact data protection officer.');

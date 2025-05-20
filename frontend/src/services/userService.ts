@@ -1,6 +1,7 @@
 import { apiRequest } from './Api';
 import { User } from '../UI/UserManager'
 import { GameType } from '../UI/Types';
+import { Buffer } from 'node:buffer'
 
 interface RegisterData {
   username: string;
@@ -35,11 +36,11 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
   }
 };
 
-export const updateAvatar = async (avatar: Blob): Promise<{AvatarUrl: Blob}> => {
+export const updateAvatar = async (avatar_url: string): Promise<{AvatarUrl: string}> => {
   try {
-    const response = await apiRequest('users/avatar', {
+    return await apiRequest('users/avatar', {
       method: 'POST',
-      body: avatar
+      body: avatar_url
     });
   } catch (error) {
     throw error;
