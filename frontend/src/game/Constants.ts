@@ -36,6 +36,11 @@ export const BAZOOKA_COOLDOWN = 800; // ms
 export const BAZOOKA_BULLET_SPEED = 500;
 export const BAZOOKA_DMG = 50;
 
+export const MINE_COOLDOWN = 800; // ms
+export const MINE_BULLET_SPEED = 0;
+export const MINE_DMG = 40;
+export const MAX_MINE = 2;
+
 // ENVIRONMENT
 export const FLOOR_THICKNESS = 30;
 export const WALL_THICKNESS = 20;

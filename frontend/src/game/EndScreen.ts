@@ -75,6 +75,11 @@ export class EndScreen implements IGameState
 		this.gameType = gameType;
 		this.savingDataToDB = false;
 
+		if (this.tournamentData1)
+			this.tournamentData1.bbWeapons.length = 0;
+		if (this.tournamentData2)
+			this.tournamentData2.bbWeapons.length = 0;
+
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
 		const buttonX1 = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;

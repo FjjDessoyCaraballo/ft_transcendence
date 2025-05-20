@@ -11,7 +11,7 @@ import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
-import { Bazooka, Pistol } from './Weapons';
+import { Bazooka, Pistol, Weapon } from './Weapons';
 
 
 export class BlockBattle implements IGameState
@@ -30,15 +30,16 @@ export class BlockBattle implements IGameState
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, 
+		tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, p1Weapons: Weapon[], p2Weapons: Weapon[])
 	{
 		this.name = GameStates.BLOCK_BATTLE;
 		this.isStateReady = false;
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		
-		this.player1 = new Player(100, 745, 'green', user1, new Pistol(), new Bazooka());
-		this.player2 = new Player2(1100, 745, 'red', user2, new Pistol(), new Bazooka());
+		this.player1 = new Player(100, 745, 'green', user1, p1Weapons[0], p1Weapons[1]);
+		this.player2 = new Player2(1100, 745, 'red', user2, p2Weapons[0], p2Weapons[1]);
 
 		this.keys = {}; // Maybe in enter() ?
 

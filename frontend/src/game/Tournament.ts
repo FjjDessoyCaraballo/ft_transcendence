@@ -9,6 +9,7 @@ import { EndScreen } from "./EndScreen";
 import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
 import { drawCenteredText } from "./StartScreen";
+import { Weapon } from "./Weapons";
 
 export interface TournamentPlayer
 {
@@ -19,6 +20,7 @@ export interface TournamentPlayer
 	coinsCollected: number;
 	pongPointsScored: number;
 	isWinner: boolean;
+	bbWeapons: Weapon [];
 }
 
 const GameOrder: [number, number][] = [
@@ -81,7 +83,8 @@ export class Tournament implements IGameState
 				tournamentPoints: 0,
 				coinsCollected: 0,
 				pongPointsScored: 0,
-				isWinner: false
+				isWinner: false,
+				bbWeapons: []
 			};
 
 			this.playerArr.push(tournamentObj);
@@ -169,7 +172,7 @@ export class Tournament implements IGameState
 				{	
 
 					if (this.gameType === GameType.BLOCK_BATTLE)
-						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.user, player2.user, player1, player2);
+						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.user, player2.user, player1, player2, player1.bbWeapons, player2.bbWeapons);
 					else if (this.gameType === GameType.PONG)
 						this.curMatch = new Pong(this.canvas, this.ctx, player1.user, player2.user, player1, player2, 'playing');
 

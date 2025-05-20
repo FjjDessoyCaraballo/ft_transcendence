@@ -6,8 +6,8 @@ import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
-import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE } from "./Constants";
-import { Bazooka, Pistol, Weapon } from "./Weapons";
+import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE, BB_LEFT_1, BB_RIGHT_1, BB_UP_1, BB_LEFT_2, BB_RIGHT_2, BB_UP_2 } from "./Constants";
+import { Bazooka, LandMine, Pistol, Weapon } from "./Weapons";
 
 
 export class MatchIntro implements IGameState
@@ -24,7 +24,17 @@ export class MatchIntro implements IGameState
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	gameType: GameType;
-	weapons: Weapon[] = [new Pistol(), new Bazooka()]; // add new weapons here
+	weaponOptions: Weapon[] = [new Pistol(), new Bazooka(), new LandMine()]; // add new weapons here
+	p1Weapons: Weapon [] = [];
+	p2Weapons: Weapon [] = [];
+	weaponIdx1: number;
+	weaponIdx2: number;
+	p1SelectDown: boolean = false;
+	p1LeftDown: boolean = false;
+	p1RightDown: boolean = false;
+	p2SelectDown: boolean = false;
+	p2LeftDown: boolean = false;
+	p2RightDown: boolean = false;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
@@ -70,6 +80,8 @@ export class MatchIntro implements IGameState
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		this.isStateReady = false;
+		this.weaponIdx1 = 0;
+		this.weaponIdx2 = 0;
 
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
@@ -84,6 +96,20 @@ export class MatchIntro implements IGameState
 	keyUpCallback(event: KeyboardEvent)
 	{
 		this.keys[event.key] = false;
+
+		if (event.key === BB_UP_1 && this.p1SelectDown)
+			this.p1SelectDown = false;
+		else if (event.key === BB_LEFT_1 && this.p1LeftDown)
+			this.p1LeftDown = false;
+		else if (event.key === BB_RIGHT_1 && this.p1RightDown)
+			this.p1RightDown = false;
+
+		if (event.key === BB_UP_2 && this.p2SelectDown)
+			this.p2SelectDown = false;
+		else if (event.key === BB_LEFT_2 && this.p2LeftDown)
+			this.p2LeftDown = false;
+		else if (event.key === BB_RIGHT_2 && this.p2RightDown)
+			this.p2RightDown = false;
 	}
 
 	enter()
@@ -100,64 +126,218 @@ export class MatchIntro implements IGameState
 
 	update(deltaTime: number)
 	{
-		if (this.keys[BB_SHOOT_1] && this.gameType === GameType.BLOCK_BATTLE)
-			this.p1IsReady = true;
-		else if (this.keys[PONG_UP_1] && (this.gameType === GameType.PONG || this.gameType === GameType.PONG_AI))
+		// PONG
+		if (this.keys[PONG_UP_1] && (this.gameType === GameType.PONG || this.gameType === GameType.PONG_AI))
 			this.p1IsReady = true;
 
-		if (this.keys[BB_SHOOT_2] && this.gameType === GameType.BLOCK_BATTLE)
-			this.p2IsReady = true;
-		else if (this.keys[PONG_UP_2] && this.gameType === GameType.PONG)
+		if (this.keys[PONG_UP_2] && this.gameType === GameType.PONG)
 			this.p2IsReady = true;
 
+		// BLOCK BATTLE (PLAYER 1)
+		if (this.keys[BB_LEFT_1] && this.weaponIdx1 > 0 && !this.p1LeftDown)
+		{
+			this.weaponIdx1--;
+			this.p1LeftDown = true;
+		}
+		if (this.keys[BB_RIGHT_1] && this.weaponIdx1 < this.weaponOptions.length - 1 && !this.p1RightDown)
+		{
+			this.weaponIdx1++;
+			this.p1RightDown = true;
+		}
+		if (this.keys[BB_UP_1] && !this.p1SelectDown)
+		{			
+			if (this.p1Weapons.some(weapon => weapon.name === this.weaponOptions[this.weaponIdx1].name))
+			{
+				this.p1Weapons = this.p1Weapons.filter(weapon => weapon.name !== this.weaponOptions[this.weaponIdx1].name)
+				if (this.p1IsReady)
+					this.p1IsReady = false;
+			}
+			else if (this.p1Weapons.length < 2)
+				this.p1Weapons.push(this.weaponOptions[this.weaponIdx1].clone());
+			this.p1SelectDown = true;
+
+			if (this.p1Weapons.length === 2)
+				this.p1IsReady = true;
+		}
+
+		// BLOCK BATTLE (PLAYER 2)
+		if (this.keys[BB_LEFT_2] && this.weaponIdx2 > 0 && !this.p2LeftDown)
+		{
+			this.weaponIdx2--;
+			this.p2LeftDown = true;
+		}
+		if (this.keys[BB_RIGHT_2] && this.weaponIdx2 < this.weaponOptions.length - 1 && !this.p2RightDown)
+		{
+			this.weaponIdx2++;
+			this.p2RightDown = true;
+		}
+		if (this.keys[BB_UP_2] && !this.p2SelectDown)
+		{			
+			if (this.p2Weapons.some(weapon => weapon.name === this.weaponOptions[this.weaponIdx2].name))
+			{
+				this.p2Weapons = this.p2Weapons.filter(weapon => weapon.name !== this.weaponOptions[this.weaponIdx2].name)
+				if (this.p2IsReady)
+					this.p2IsReady = false;
+			}
+			else if (this.p2Weapons.length < 2)
+				this.p2Weapons.push(this.weaponOptions[this.weaponIdx2].clone());
+			this.p2SelectDown = true;
+
+			if (this.p2Weapons.length === 2)
+				this.p2IsReady = true;
+		}
+
+		// CHECK GAME START
 		if (this.p1IsReady && this.p2IsReady)
 		{
 			if (!this.tournamentData1)
 			{
 				if (this.gameType === GameType.BLOCK_BATTLE)
-					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.player1, this.player2, null, null));
+					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.player1, this.player2, null, null, this.p1Weapons, this.p2Weapons));
 				else if (this.gameType === GameType.PONG)
 					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'playing'));
 				else if (this.gameType === GameType.PONG_AI)
 					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'ai'));
 			}
 			else
+			{
 				this.isStateReady = true;
+				this.tournamentData1.bbWeapons.push(this.p1Weapons[0].clone());
+				this.tournamentData1.bbWeapons.push(this.p1Weapons[1].clone());
+
+				if (this.tournamentData2)
+				{
+					this.tournamentData2.bbWeapons.push(this.p2Weapons[0].clone());
+					this.tournamentData2.bbWeapons.push(this.p2Weapons[1].clone());
+				}
+			}
 		}
 	}
 
 	drawWeaponMenu(ctx: CanvasRenderingContext2D)
 	{
 
-		// PLAYER 1
+		const infoBoxW = 500;
+		const infoBoxH = 150;
+		const infoBox1X = this.canvas.width / 4 - infoBoxW / 2;
 
-		let i = 0;
+		// PLAYER 1
 		ctx.font = '30px arial';
 		ctx.fillStyle = 'white';
-		let weaponX = 140; // Same as P1X
+		let weaponX = infoBox1X;
 		const weaponY = 540; // 100 more than P1Y
 
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = 2;
-		ctx.strokeRect(20, 580, 500, 150);
+		ctx.strokeRect(infoBox1X, 580, infoBoxW, infoBoxH);
 
 		// Weapon icons
-		for (const weapon of this.weapons)
+		for (let i = 0; i < this.weaponOptions.length; i++)
 		{
-			let weaponLetter = this.weapons[i].name[0];
-			ctx.fillText(weaponLetter, weaponX, weaponY);
+			let weaponName = this.weaponOptions[i].name;
+			ctx.fillText(weaponName, weaponX, weaponY);
 
-			weaponX += 40;
-			i++;
+			if (this.p1Weapons.some(weapon => weapon.name === this.weaponOptions[i].name))
+			{
+				// Draw green box
+				ctx.strokeStyle = 'green';
+				ctx.lineWidth = 4;
+				ctx.strokeRect(weaponX - 10, weaponY - 30, ctx.measureText(weaponName).width + 20, 40);
+			}
+
+			if (this.weaponIdx1 === i)
+			{
+				// Draw selector
+				ctx.strokeStyle = 'white';
+				ctx.lineWidth = 2;
+				ctx.strokeRect(weaponX - 10, weaponY - 30, ctx.measureText(weaponName).width + 20, 40);
+			}
+
+			weaponX += ctx.measureText(weaponName).width + 30;
 		}
 
 		// Weapon info
-		const name = 'Pistol';
-		const nameX = 20 + 250 - ctx.measureText(name).width / 2;
+
+		const curWeapon = this.weaponOptions[this.weaponIdx1];
+
+		const name = curWeapon.name;
+		const nameX = infoBox1X + infoBoxW / 2 - ctx.measureText(name).width / 2;
 		const nameY = 580 + 40;
 		ctx.fillText(name, nameX, nameY);
 
-		// Add damage and speed information here
+		ctx.font = '24px arial';
+		const descript = curWeapon.description;
+		const descriptX = infoBox1X + infoBoxW / 2 - ctx.measureText(descript).width / 2;
+		const descriptY = nameY + 40;
+		ctx.fillText(descript, descriptX, descriptY);
+
+		const damage = `DAMAGE: ${curWeapon.damage}`;
+		const damageX = infoBox1X + 20;
+		const damageY = descriptY + 50;
+		ctx.fillText(damage, damageX, damageY);
+
+		const cooldown = `COOLDOWN: ${curWeapon.cooldown / 1000}s`;
+		const cooldownX = infoBox1X + infoBoxW - 20 - ctx.measureText(cooldown).width;
+		ctx.fillText(cooldown, cooldownX, damageY);
+
+
+		const infoBox2X = this.canvas.width * 0.75 - infoBoxW / 2;
+
+		// PLAYER 2
+		ctx.font = '30px arial';
+		ctx.fillStyle = 'white';
+		let weapon2X = infoBox2X;
+
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.strokeRect(infoBox2X, 580, infoBoxW, infoBoxH);
+
+		// Weapon icons
+		for (let i = 0; i < this.weaponOptions.length; i++)
+		{
+			let weaponName = this.weaponOptions[i].name;
+			ctx.fillText(weaponName, weapon2X, weaponY);
+
+			if (this.p2Weapons.some(weapon => weapon.name === this.weaponOptions[i].name))
+			{
+				// Draw green box
+				ctx.strokeStyle = 'green';
+				ctx.lineWidth = 4;
+				ctx.strokeRect(weapon2X - 10, weaponY - 30, ctx.measureText(weaponName).width + 20, 40);
+			}
+
+			if (this.weaponIdx2 === i)
+			{
+				// Draw selector
+				ctx.strokeStyle = 'white';
+				ctx.lineWidth = 2;
+				ctx.strokeRect(weapon2X - 10, weaponY - 30, ctx.measureText(weaponName).width + 20, 40);
+			}
+
+			weapon2X += ctx.measureText(weaponName).width + 25;
+		}
+
+		// Weapon info
+
+		const curWeapon2 = this.weaponOptions[this.weaponIdx2];
+
+		const name2 = curWeapon2.name;
+		const nameX2 = infoBox2X + infoBoxW / 2 - ctx.measureText(name2).width / 2;
+		ctx.fillText(name2, nameX2, nameY);
+
+		ctx.font = '24px arial';
+		const descript2 = curWeapon2.description;
+		const descript2X = infoBox2X + infoBoxW / 2 - ctx.measureText(descript2).width / 2;
+		ctx.fillText(descript2, descript2X, descriptY);
+
+		const damage2 = `DAMAGE: ${curWeapon2.damage}`;
+		const damage2X = infoBox2X + 20;
+		ctx.fillText(damage2, damage2X, damageY);
+
+		const cooldown2 = `COOLDOWN: ${curWeapon2.cooldown / 1000}s`;
+		const cooldown2X = infoBox2X + infoBoxW - 20 - ctx.measureText(cooldown2).width;
+		ctx.fillText(cooldown2, cooldown2X, damageY);
+
 	}
 
 
@@ -179,10 +359,12 @@ export class MatchIntro implements IGameState
 			infoText = `Press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
 		drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
 
+		const playerNamesY = 340;
+		const rankingPointsY = 380;
 		// PLAYER 1
 		let p1Text = this.player1.username;
-		let p1X = 140;
-		drawText(this.ctx, p1Text, '55px arial', p1FillColor, p1X, 440);
+		let p1X = this.canvas.width / 4 - this.ctx.measureText(p1Text).width / 2;
+		drawText(this.ctx, p1Text, '55px arial', p1FillColor, p1X, playerNamesY);
 
 		let p1Rank;
 		if (!this.tournamentData1)
@@ -196,14 +378,14 @@ export class MatchIntro implements IGameState
 		ctx.font = '30px arial';
 		ctx.fillStyle = 'white';
 		const rank1X = p1X + halfOfP1Text - ctx.measureText(p1Rank).width / 2;
-		ctx.fillText(p1Rank, rank1X, 480);
+		ctx.fillText(p1Rank, rank1X, rankingPointsY);
 
-		drawCenteredText(this.canvas, this.ctx, 'VS', '60px arial', 'white', 440);
+		drawCenteredText(this.canvas, this.ctx, 'VS', '60px arial', 'white', playerNamesY);
 
 		// PLAYER 2
 		const p2Text = this.player2.username;
-		const p2X = this.canvas.width - ctx.measureText(p2Text).width - 140;
-		drawText(this.ctx, p2Text, '55px arial', p2FillColor, p2X, 440);
+		const p2X = this.canvas.width * 0.75 - ctx.measureText(p2Text).width / 2;
+		drawText(this.ctx, p2Text, '55px arial', p2FillColor, p2X, playerNamesY);
 
 		let p2Rank;
 		if (!this.tournamentData2)
@@ -217,7 +399,7 @@ export class MatchIntro implements IGameState
 		ctx.font = '30px arial';
 		ctx.fillStyle = 'white';
 		const rank2X = p2X + halfOfP2Text - ctx.measureText(p2Rank).width / 2;
-		ctx.fillText(p2Rank, rank2X, 480);
+		ctx.fillText(p2Rank, rank2X, rankingPointsY);
 
 		this.drawWeaponMenu(ctx);
 

@@ -81,6 +81,8 @@ export class CollisionShape
 		if (obj.type != collType.PLAYER || this.type != collType.BULLET)
 			return false;
 
+		console.log('We got a hit! With player: ', obj.master);
+
 		// The 'obj' has to be of type PLAYER and this has to be of type BULLET
 		obj.master.health.takeDmg(damage);
 		this.master.isValid = false;
