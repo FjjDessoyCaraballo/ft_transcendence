@@ -35,6 +35,8 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
   }
 };
 
+// export const updateAvatar = async (): Promise<>
+
 /**
  * Login user
  * 

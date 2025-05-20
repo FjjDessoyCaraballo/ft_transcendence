@@ -95,7 +95,7 @@ export const Header: React.FC<HeaderProps> = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[9999] shadow-md">
+      <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[200] shadow-md">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
             Transcendence

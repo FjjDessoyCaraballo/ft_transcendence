@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getUserDataForDownload, deleteUserAccount } from '../services/userService'; 
 import { PasswordChangePopup } from './PasswordChange'
+import { AvatarChangePopup } from './AvatarChange'
 import { clearToken } from '../services/TokenService'
 import { updateCurUser } from './GameCanvas';
 
@@ -15,21 +16,21 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 		onClose();
 	}
 
-	const handleConfirm = async () => {
-		try {
-			await deleteUserAccount()
-			.then(() => {
-				alert("Account successfully deleted");
-				sessionStorage.setItem('logged-in', 'false');
-				window.dispatchEvent(new Event('loginStatusChanged'));
-				onConfirm();
-			})
-		} catch (error) {
-			console.error(`${error}`);
-		} finally {
-			handleClose();
-		}
-	}
+	// const handleConfirm = async () => {
+	// 	try {
+	// 		await deleteUserAccount()
+	// 		.then(() => {
+	// 			alert("Account successfully deleted");
+	// 			sessionStorage.setItem('logged-in', 'false');
+	// 			window.dispatchEvent(new Event('loginStatusChanged'));
+	// 			onConfirm();
+	// 		})
+	// 	} catch (error) {
+	// 		console.error(`${error}`);
+	// 	} finally {
+	// 		handleClose();
+	// 	}
+	// }
 	
 	return (
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -49,7 +50,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 				Cancel
 			  </button>
 			  <button 
-				onClick={handleConfirm}
+				// onClick={handleConfirm}
 				className="px-5 py-2 rounded bg-red-600 text-white font-mono transition-colors hover:bg-red-700"
 			  >
 				Delete My Account
@@ -64,6 +65,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 	const [showChangePassword, setShowChangePassword] = useState(false);
+	const [showAvatarChange, setShowAvatarChange] = useState(false);
 
 	const HandleDownloadData = async () => {
 		try {
@@ -118,12 +120,18 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 	}
 
 	const HandleAvatarChange = async () => {
-		// under construction
-		onClick();
+		setShowAvatarChange(true);
+	}
+
+	const confirmAvatarChange = async () => {
+		try {
+			// reserved for API call
+		} catch (error) {
+			console.error(`Could not change avatar. ${error}`)
+		}
 	}
 
 	const HandleClose = () => {
-		// On click is a void function, so it just closes the box/window
 		onClick();
 	}
 
@@ -234,6 +242,13 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
         <DeleteAccountPopup 
           onClose={() => setShowDeleteAccount(false)} 
           onConfirm={confirmDeleteAccount}
+        />
+      )}
+
+      {/* Render the avatar change popup when needed */}
+      {showAvatarChange && (
+        <AvatarChangePopup 
+          onClick={() => setShowAvatarChange(false)}
         />
       )}
     </>
