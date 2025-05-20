@@ -54,8 +54,8 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 		
 	} catch (error) {
 		if (error) {
-			setErrorMessage('Registration failed. Please try again.');
-			console.error('Registration error:', error);
+			setErrorMessage(`Registration failed. ${error}`);
+			console.error(`${error}`);
 		}
 	  } finally {
 		setIsLoading(false);

@@ -25,7 +25,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 				onConfirm();
 			})
 		} catch (error) {
-			console.error("Error: ", error);
+			console.error(`${error}`);
 		} finally {
 			handleClose();
 		}
