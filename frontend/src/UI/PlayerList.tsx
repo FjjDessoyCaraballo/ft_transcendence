@@ -106,7 +106,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                   }`}
                 >
                   <img
-                    src={player.avatar_url}
+                    //src={player.avatar_url} THIS DOESN"T WORK
+                    src={'https://localhost:3443/public/avatars/bee.png'}
                   />
                   <h3 className="font-mono text-xl text-[#4B0082] font-bold">
                     {isLoggedInUser ? 'You' : player.username}
