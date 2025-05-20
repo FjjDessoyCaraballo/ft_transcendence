@@ -17,17 +17,14 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	  setPassword('');
 	  setConfirmPassword('');
 	  setErrorMessage('');
-	  localStorage.setItem('gdpr-accepted', 'false');
 	  onDecline();
 	};
   
 	const HandleGDPRAccept = () => {
-	  localStorage.setItem('gdpr-accepted', 'true');
 	  setShowRegistration(true);
 	};
   
 	const HandleGDPRDecline = () => {
-	  localStorage.setItem('gdpr-accepted', 'false');
 	  onDecline();
 	};
   
@@ -56,13 +53,10 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 		onAccept();
 		
 	} catch (error) {
-		if (error instanceof Error) {
+		if (error) {
 			setErrorMessage('Registration failed. Please try again.');
 			console.error('Registration error:', error);
-		} else {
-			setErrorMessage('Registration failed. Please try again.');
 		}
-		console.error('Registration error:', error);
 	  } finally {
 		setIsLoading(false);
 	  }
@@ -95,11 +89,13 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
             <input 
               type="text"
               id="username"
-              placeholder="Choose a username"
+              placeholder="Choose a username (max 20 characters)"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
 			  disabled={isLoading}
+			  required
+			  maxLength={20}
             />
           </div>
           
@@ -118,6 +114,8 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
               value={password}
               onChange={(e) => setPassword(e.target.value)}
 			  disabled={isLoading}
+			  required
+			  minLength={8}
             />
           </div>
           
@@ -136,6 +134,8 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
 			  disabled={isLoading}
+			  required
+			  minLength={8}
             />
           </div>
           
