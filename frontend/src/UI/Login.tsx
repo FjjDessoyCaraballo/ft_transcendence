@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
+import { setToken } from '../services/TokenService';
 import { updateAllUserDataArr, updateCurUser } from './GameCanvas';
 import { getAllUsers, loginUser } from '../services/userService'
 
@@ -14,7 +15,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     setUsername('');
     setPassword('');
     setErrorMessage('');
-    localStorage.setItem('logged-in', 'false');
+    sessionStorage.setItem('logged-in', 'false');
     onDecline();
   };
 
@@ -30,24 +31,27 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
     }
 
     try {
-      await loginUser({
+      const response = await loginUser({
         username: username,
         password: password
       });
 
-		const userDataArr = await getAllUsers(); // Fetch all user data, JUST A TEST
-
-
-      localStorage.setItem('logged-in', 'true');
-	  updateCurUser(username);
-	  updateAllUserDataArr(userDataArr); // TEST
+      if (response && response.token) {
+        await setToken(response.token);
+      } else {
+        console.error('No token received from server.')
+      }
+		  const userDataArr = await getAllUsers(); // Fetch all user data, JUST A TEST
+      sessionStorage.setItem('logged-in', 'true');
+	    updateCurUser(username);
+	    updateAllUserDataArr(userDataArr); // TEST
 	        
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
     } catch (error) {
       setErrorMessage('Login failed.');
       console.error('Login failed.');
-	  updateCurUser(null);
+	    updateCurUser(null);
     }
 
 	try {

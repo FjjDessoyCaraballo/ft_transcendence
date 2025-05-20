@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = () => {
 
   useEffect(() => {
     const checkLoginStatus = () => {
-      const loginStatus = localStorage.getItem('logged-in');
+      const loginStatus = sessionStorage.getItem('logged-in');
       setIsLoggedIn(loginStatus === 'true');
     };
 
@@ -43,11 +43,9 @@ export const Header: React.FC<HeaderProps> = () => {
     };
 
     window.addEventListener('loginStatusChanged', handleLoginChange);
-    window.addEventListener('storage', handleLoginChange);
 
     return () => {
       window.removeEventListener('loginStatusChanged', handleLoginChange);
-      window.removeEventListener('storage', handleLoginChange);
     };
   }, []);
 
@@ -160,7 +158,7 @@ export const Header: React.FC<HeaderProps> = () => {
             console.log('Login successful');
             setShowLogin(false);
             setIsLoggedIn(true);
-            localStorage.setItem('logged-in', 'true');
+            sessionStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
             setWindowOpen(false);
           }}
