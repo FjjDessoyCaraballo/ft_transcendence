@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from "./UserManager";
 import { getAllUsers } from '../services/userService';
+import { global_curUser } from './GameCanvas';
 
 interface ExtendedUser extends User {
   friendshipStatus: 'none' | 'pending' | 'accepted';
@@ -62,8 +63,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     );
   };
 
-  const loggedInUserString = typeof window !== 'undefined' ? localStorage.getItem('LoggedIn') : null;
-  const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+  const loggedInUser = typeof window !== 'undefined' ? global_curUser : null;
+  console.log('Logged in user:', loggedInUser);
   const pendingRequests = players.filter(player => player.friendshipStatus === 'pending');
 
   return (
