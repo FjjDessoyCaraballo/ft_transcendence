@@ -12,6 +12,8 @@ interface PlayerListProps {
 
 export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   const [players, setPlayers] = useState<ExtendedUser[]>([]);
+  const backendBaseUrl = 'https://localhost:3443';
+
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -73,9 +75,11 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             {pendingRequests.map((player) => (
               <div key={player.username} className="flex items-center gap-4 p-3 bg-white border border-yellow-300 rounded-lg shadow-sm">
                 <img
-                  //src={player.avatar_url} THIS DOESN"T WORK
-                  src={'https://localhost:3443/public/avatars/bee.png'}
+                  src={`${backendBaseUrl}${player.avatar_url}`}
+                  alt={`${player.username}'s avatar`}
+                  className="w-16 h-auto object-contain"
                 />
+
                 <span className="font-mono text-md text-yellow-800">{player.username}</span>
                 <button
                   onClick={() => acceptFriendRequest(player.username)}
@@ -107,9 +111,11 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                   }`}
                 >
                   <img
-                    //src={player.avatar_url} THIS DOESN"T WORK
-                    src={'https://localhost:3443/public/avatars/bee.png'}
+                    src={`${backendBaseUrl}${player.avatar_url}`}
+                    alt={`${player.username}'s avatar`}
+                    className="w-32 object-contain mb-4"
                   />
+
                   <h3 className="font-mono text-xl text-[#4B0082] font-bold">
                     {isLoggedInUser ? 'You' : player.username}
                   </h3>
