@@ -11,6 +11,7 @@ export class Projectile {
     color: string;
 	cShape: CollisionShape;
 	isValid: boolean;
+	creationTime: number = Date.now(); // ms
 	onPlatform: Platform | null = null;
 
     constructor(x: number, y: number, velocity: { x: number, y: number }, color: string, width: number, height: number, platform: Platform | null) {
@@ -53,8 +54,17 @@ export class Projectile {
 		}
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D, playerColor: string | null) {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
+
+		if (playerColor)
+		{
+			ctx.fillStyle = playerColor;
+			const boxSize = 8;
+			const pColorBoxX = this.x + this.width / 2 - boxSize / 2;
+			const pColorBoxY = this.y + this.height / 2 - boxSize / 2;
+			ctx.fillRect(pColorBoxX, pColorBoxY, boxSize, boxSize);
+		}
     }
 }

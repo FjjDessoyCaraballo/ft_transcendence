@@ -1,4 +1,4 @@
-import { BAZOOKA_BULLET_SPEED, BAZOOKA_COOLDOWN, BAZOOKA_DMG, MINE_BULLET_SPEED, MINE_COOLDOWN, MINE_DMG, PISTOL_BULLET_SPEED, PISTOL_COOLDOWN, PISTOL_DMG, PLAYER_SIZE } from "./Constants";
+import { BAZOOKA_BULLET_SPEED, BAZOOKA_COOLDOWN, BAZOOKA_DMG, MINE_BULLET_SPEED, MINE_COOLDOWN, MINE_DMG, MINE_LIFESPAN, PISTOL_BULLET_SPEED, PISTOL_COOLDOWN, PISTOL_DMG, PLAYER_SIZE } from "./Constants";
 import { Platform } from "./Platform";
 import { Player } from "./Player";
 import { Projectile } from "./Projectiles";
@@ -19,18 +19,17 @@ export abstract class Weapon
 	projectileArr: Projectile[] = [];
 	lastFired: number = 0;
 
-
 	canFire(): boolean {
         const currentTime = Date.now();
         return currentTime - this.lastFired >= this.cooldown;
     }
 
-	shoot(x: number, y: number, direction: string, isOnGround: boolean, playerPlatform: Platform | null)
+	shoot(x: number, y: number, direction: string, isOnGround: boolean, playerPlatform: Platform | null) : boolean
 	{
 		if (!this.canFire())
-			return ;
+			return false;
 		if (this.name === 'Land Mine' && !isOnGround)
-			return ;
+			return false;
 
 		let velocity = {x: this.projSpeed, y: 0};
 
@@ -51,6 +50,8 @@ export abstract class Weapon
 
 		this.projectileArr.push(new Projectile(startX, startY, velocity, this.projColor, this.projW, this.projH, platform));
 		this.lastFired = Date.now();
+
+		return true;
 	}
 
 	update(canvas: HTMLCanvasElement, deltaTime: number, enemy: Player)
@@ -59,14 +60,19 @@ export abstract class Weapon
 		{
 			projectile.update(canvas, deltaTime, this.name === 'Land Mine');
 			projectile.cShape.checkBulletCollision(enemy.cShape, this.damage);
+			if (this.name === 'Land Mine')
+			{
+				if (Date.now() - projectile.creationTime >= MINE_LIFESPAN)
+					projectile.isValid = false;
+			}
 		}
 		this.projectileArr = this.projectileArr.filter(projectile => projectile.isValid);
 	}
 
-	draw(ctx: CanvasRenderingContext2D)
+	draw(ctx: CanvasRenderingContext2D, playerColor: string | null)
 	{
 		for (const projectile of this.projectileArr)
-			projectile.draw(ctx);
+			projectile.draw(ctx, playerColor);
 	}
 }
 

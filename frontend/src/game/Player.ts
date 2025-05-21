@@ -5,6 +5,7 @@ import { Health } from "./Health";
 import { User } from "../UI/UserManager";
 import { global_gameArea } from "../UI/GameCanvas";
 import { Weapon } from "./Weapons";
+import { bbMatchData } from "./BlockBattle";
 
 export class Player {
     x: number;
@@ -165,7 +166,7 @@ export class Player {
 		this.cShape.move(this.x + this.cShapeOffset, this.y + this.cShapeOffset);
 	}
 
-	checkKeyEvents(keys: { [key: string]: boolean }) {
+	checkKeyEvents(keys: { [key: string]: boolean }, statsObj: bbMatchData) {
 		this.velocity.x = 0;
 
         if (keys[BB_UP_1] && this.isOnGround) {
@@ -183,7 +184,8 @@ export class Player {
         }
 
 		if (keys[BB_SHOOT_1]) {
-			this.curWeapon.shoot(this.x, this.y, this.direction, this.isOnGround, this.onPlatform);
+			if (this.curWeapon.shoot(this.x, this.y, this.direction, this.isOnGround, this.onPlatform))
+				statsObj.player1_shots_fired++;
         }
 		
 		if (keys[BB_CHANGE_WEAPON_1] && !this.weaponIsChanging){
@@ -213,8 +215,15 @@ export class Player {
 		let offsetY = this.y - HEALT_HEIGHT - 10; // random 10 :D
 		this.health.draw(ctx, offsetX, offsetY);
 
-        this.weapons[0].draw(ctx);
-		this.weapons[1].draw(ctx);
+		if (this.weapons[0].name === 'Land Mine')
+        	this.weapons[0].draw(ctx, this.color);
+		else
+        	this.weapons[0].draw(ctx, null);
+
+		if (this.weapons[1].name === 'Land Mine')
+        	this.weapons[1].draw(ctx, this.color);
+		else
+        	this.weapons[1].draw(ctx, null);
 
 
 

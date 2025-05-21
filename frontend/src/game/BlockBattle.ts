@@ -11,7 +11,30 @@ import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
-import { Bazooka, Pistol, Weapon } from './Weapons';
+import { Weapon } from './Weapons';
+
+export interface bbMatchData {
+	date: Date;
+	startTime: number;
+	player1_id: number;
+	player1_rank: number;
+	player2_id: number;
+	player2_rank: number;
+	game_duration: number; // in seconds
+	win_method: string; // KO or Coins
+	player1_weapon1: string;
+	player1_weapon2: string;
+	player1_damage_taken: number;
+	player1_damage_done: number;
+	player1_coins_collected: number;
+	player1_shots_fired: number;
+	player2_weapon1: string;
+	player2_weapon2: string;
+	player2_damage_taken: number;
+	player2_damage_done: number;
+	player2_coins_collected: number;
+	player2_shots_fired: number;	
+}
 
 
 export class BlockBattle implements IGameState
@@ -27,6 +50,7 @@ export class BlockBattle implements IGameState
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	coinHandler: CoinHandler;
+	gameStats: bbMatchData;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
@@ -43,17 +67,16 @@ export class BlockBattle implements IGameState
 
 		this.keys = {}; // Maybe in enter() ?
 
-
 		this.platforms = [
 			new Platform(canvas, 900, 550, 80, PlatformDir.UP_DOWN, 80),
 			new Platform(canvas, 220, 550, 80, PlatformDir.UP_DOWN, 80),
 			new Platform(canvas, 500, 500, 200, PlatformDir.STILL, 0), // mid long
 			new Platform(canvas, 320, 700, 80, PlatformDir.STILL, 0), // close to p1 start
 			new Platform(canvas, 800, 700, 80, PlatformDir.STILL, 0), // close to p2 start
-			new Platform(canvas, 770, 370, 40, PlatformDir.STILL, 0), // between move & mid long (right)
-			new Platform(canvas, 380, 370, 40, PlatformDir.STILL, 0), // between move & mid long (left)
-			new Platform(canvas, 900, 200, 80, PlatformDir.LEFT_RIGHT, 110),
-			new Platform(canvas, 220, 200, 80, PlatformDir.LEFT_RIGHT, 110),
+			new Platform(canvas, 770, 370, 60, PlatformDir.STILL, 0), // between move & mid long (right)
+			new Platform(canvas, 380, 370, 60, PlatformDir.STILL, 0), // between move & mid long (left)
+			new Platform(canvas, 900, 220, 80, PlatformDir.LEFT_RIGHT, 110),
+			new Platform(canvas, 220, 220, 80, PlatformDir.LEFT_RIGHT, 110),
 			new Platform(canvas, 550, 300, 100, PlatformDir.UP_DOWN, 80), // above mid
 
 			new Platform(canvas, 1120, 280, 20, PlatformDir.STILL, 0), // mini right
@@ -62,6 +85,30 @@ export class BlockBattle implements IGameState
 
 		]
 		
+
+		this.gameStats = {
+			date: new Date(),
+			startTime: Date.now(),
+			player1_id: user1.id,
+			player1_rank: user1.ranking_points,
+			player2_id: user2.id,
+			player2_rank: user2.ranking_points,
+			game_duration: -1,
+			win_method: '', // KO or Coins
+			player1_weapon1: p1Weapons[0].name,
+			player1_weapon2: p1Weapons[1].name,
+			player1_damage_taken: 0,
+			player1_damage_done: 0,
+			player1_coins_collected: 0,
+			player1_shots_fired: 0,
+			player2_weapon1: p2Weapons[0].name,
+			player2_weapon2: p2Weapons[1].name,
+			player2_damage_taken: 0,
+			player2_damage_done: 0,
+			player2_coins_collected: 0,
+			player2_shots_fired: 0
+		}
+
 
 		this.coinHandler = new CoinHandler(COIN_SPAWN_TIME, this.platforms);
 		this.coinHandler.start();
@@ -140,7 +187,10 @@ export class BlockBattle implements IGameState
 
 		const curWeapon = this.player1.curWeapon.name;
 		const curWeaponX = WeaponX + (WeaponW / 2) - (this.ctx.measureText(curWeapon).width / 2);
+		this.ctx.fillStyle = this.player1.curWeapon.canFire() ? '#24f03f' : '#544848';
 		this.ctx.fillText(curWeapon, curWeaponX, 80);
+		this.ctx.fillStyle = 'white';
+
 
 		// PLAYER 2
 		
@@ -182,7 +232,9 @@ export class BlockBattle implements IGameState
 
 		const curWeapon2 = this.player2.curWeapon.name;
 		const curWeaponX2 = WeaponX2 + (WeaponW2 / 2) - (this.ctx.measureText(curWeapon2).width / 2);
+		this.ctx.fillStyle = this.player2.curWeapon.canFire() ? '#24f03f' : '#544848';
 		this.ctx.fillText(curWeapon2, curWeaponX2, 80);
+		this.ctx.fillStyle = 'white';
 
 	}
 
@@ -194,7 +246,7 @@ export class BlockBattle implements IGameState
 			}
 
 		// PLAYER 1
-		this.player1.checkKeyEvents(this.keys);
+		this.player1.checkKeyEvents(this.keys, this.gameStats);
 		let player1PrevPos: { x: number, y: number } = { x: this.player1.x, y: this.player1.y};
 		this.player1.move(this.keys, deltaTime);
 		for (const platform of this.platforms)
@@ -207,11 +259,9 @@ export class BlockBattle implements IGameState
 				break ;
 			}
 		}
-		if (this.player1.health.amount === 0)
-			this.player1.isDead = true;
 
 		// PLAYER 2
-		this.player2.checkKeyEvents(this.keys);
+		this.player2.checkKeyEvents(this.keys, this.gameStats);
 		let player2PrevPos: { x: number, y: number } = { x: this.player2.x, y: this.player2.y};
 		this.player2.move(this.keys, deltaTime);
 		for (const platform of this.platforms)
@@ -223,12 +273,32 @@ export class BlockBattle implements IGameState
 				break ;
 			}
 		}
-		if (this.player2.health.amount === 0)
-			this.player2.isDead = true;
 
 		// PROJECTILES
+
+		const preHealth1 = this.player1.health.amount;
+		const preHealth2 = this.player2.health.amount;
+
 		this.player1.updateWeapons(this.canvas, deltaTime, this.player2);
 		this.player2.updateWeapons(this.canvas, deltaTime, this.player1);
+
+		if (preHealth1 !== this.player1.health.amount)
+		{
+			const healthDiff = preHealth1 - this.player1.health.amount;
+			this.gameStats.player1_damage_taken += healthDiff;
+			this.gameStats.player2_damage_done += healthDiff;
+		}
+		if (preHealth2 !== this.player2.health.amount)
+		{
+			const healthDiff = preHealth2 - this.player2.health.amount;
+			this.gameStats.player2_damage_taken += healthDiff;
+			this.gameStats.player1_damage_done += healthDiff;
+		}
+
+		if (this.player1.health.amount === 0)
+			this.player1.isDead = true;
+		if (this.player2.health.amount === 0)
+			this.player2.isDead = true;
 
 		// COINS
 		if (this.coinHandler.platformsFull && this.coinHandler.intervalId)
@@ -236,13 +306,37 @@ export class BlockBattle implements IGameState
 		else if (!this.coinHandler.platformsFull && !this.coinHandler.intervalId)
 			this.coinHandler.start();
 
+		const preCoins1 = this.player1.coinCount;
+		const preCoins2 = this.player2.coinCount;
+
 		this.coinHandler.checkCoinCollision(this.player1);
 		this.coinHandler.checkCoinCollision(this.player2);
+
+		if (preCoins1 !== this.player1.coinCount)
+		{
+			const coinDiff = this.player1.coinCount - preCoins1;
+			this.gameStats.player1_coins_collected += coinDiff;
+		}
+		if (preCoins2 !== this.player2.coinCount)
+		{
+			const coinDiff = this.player2.coinCount - preCoins2;
+			this.gameStats.player2_coins_collected += coinDiff;
+		}
 
 		// VICTORY CONDITION CHECK
 		if ((this.player1.isDead || this.player2.isDead || this.player1.hasWon || this.player2.hasWon) 
 			&& !this.isStateReady)
 		{
+			// Update stats
+			this.gameStats.game_duration = (Date.now() - this.gameStats.startTime) / 1000; // in seconds
+			if (this.player1.isDead || this.player2.isDead)
+				this.gameStats.win_method = 'KO';
+			else
+				this.gameStats.win_method = 'Coins';
+
+			console.log("GAME STATS:")
+			console.log(this.gameStats);
+
 			// Tournament ending
 			if (this.tournamentData1 && this.tournamentData2)
 			{

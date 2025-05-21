@@ -415,7 +415,8 @@ export class MatchIntro implements IGameState
 		const rank2X = p2X + halfOfP2Text - ctx.measureText(p2Rank).width / 2;
 		ctx.fillText(p2Rank, rank2X, rankingPointsY);
 
-		this.drawWeaponMenu(ctx);
+		if (this.gameType === GameType.BLOCK_BATTLE)
+			this.drawWeaponMenu(ctx);
 
 	}
 
