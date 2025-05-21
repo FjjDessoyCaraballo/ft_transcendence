@@ -1,5 +1,6 @@
 import { CollisionShape, collType } from "./CollisionShape";
 import { WALL_THICKNESS, FLOOR_THICKNESS } from "./Constants";
+import { Platform, PlatformDir } from "./Platform";
 
 export class Projectile {
     x: number;
@@ -10,8 +11,9 @@ export class Projectile {
     color: string;
 	cShape: CollisionShape;
 	isValid: boolean;
+	onPlatform: Platform | null = null;
 
-    constructor(x: number, y: number, velocity: { x: number, y: number }, color: string, width: number, height: number) {
+    constructor(x: number, y: number, velocity: { x: number, y: number }, color: string, width: number, height: number, platform: Platform | null) {
         this.x = x;
         this.y = y;
 
@@ -21,9 +23,24 @@ export class Projectile {
         this.color = color;
 		this.cShape = new CollisionShape(x, y, this.width, this.height, collType.BULLET, this);
 		this.isValid = true;
+		this.onPlatform = platform;
     }
 
-    update(canvas: HTMLCanvasElement, deltaTime: number) {
+    update(canvas: HTMLCanvasElement, deltaTime: number, isMine: boolean) {
+
+		if (isMine && !this.onPlatform)
+			return ;
+		else if (this.onPlatform)
+		{
+			if (this.onPlatform.dir === PlatformDir.UP_DOWN)
+				this.y = this.onPlatform.y - this.height;
+
+			this.x += this.onPlatform.velocity.x * deltaTime;
+
+			this.cShape.move(this.x, this.y);
+			return ;
+		}
+
         this.x += this.velocity.x * deltaTime;
         this.y += this.velocity.y * deltaTime;
 

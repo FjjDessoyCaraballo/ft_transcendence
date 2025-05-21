@@ -227,7 +227,6 @@ export class BlockBattle implements IGameState
 			this.player2.isDead = true;
 
 		// PROJECTILES
-
 		this.player1.updateWeapons(this.canvas, deltaTime, this.player2);
 		this.player2.updateWeapons(this.canvas, deltaTime, this.player1);
 
@@ -289,10 +288,10 @@ export class BlockBattle implements IGameState
 			platform.draw(ctx);
 		}
 		
-		this.coinHandler.renderCoins(ctx);
-		
 		this.player1.draw(ctx);
 		this.player2.draw(ctx);
+		
+		this.coinHandler.renderCoins(ctx);
 		
 		this.drawStatScreen();
 		

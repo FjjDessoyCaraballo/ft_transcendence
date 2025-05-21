@@ -1,4 +1,5 @@
 import { BAZOOKA_BULLET_SPEED, BAZOOKA_COOLDOWN, BAZOOKA_DMG, MINE_BULLET_SPEED, MINE_COOLDOWN, MINE_DMG, PISTOL_BULLET_SPEED, PISTOL_COOLDOWN, PISTOL_DMG, PLAYER_SIZE } from "./Constants";
+import { Platform } from "./Platform";
 import { Player } from "./Player";
 import { Projectile } from "./Projectiles";
 
@@ -13,20 +14,22 @@ export abstract class Weapon
 	abstract projColor: string;
 	abstract projW: number;
 	abstract projH: number;
+	abstract clone(): Weapon;
 	
 	projectileArr: Projectile[] = [];
 	lastFired: number = 0;
 
-	abstract clone(): Weapon;
 
 	canFire(): boolean {
         const currentTime = Date.now();
         return currentTime - this.lastFired >= this.cooldown;
     }
 
-	shoot(x: number, y: number, direction: string)
+	shoot(x: number, y: number, direction: string, isOnGround: boolean, playerPlatform: Platform | null)
 	{
 		if (!this.canFire())
+			return ;
+		if (this.name === 'Land Mine' && !isOnGround)
 			return ;
 
 		let velocity = {x: this.projSpeed, y: 0};
@@ -34,10 +37,19 @@ export abstract class Weapon
 		if (direction === 'left')
 			velocity.x *= -1;
 
-		const startX = x + PLAYER_SIZE / 2 - this.projW / 2;
-		const startY = y + PLAYER_SIZE / 2 - this.projH / 2;
+		let startX = x + PLAYER_SIZE / 2 - this.projW / 2;
+		let startY = y + PLAYER_SIZE / 2 - this.projH / 2;
+		let platform: Platform | null = null;
 
-		this.projectileArr.push(new Projectile(startX, startY, velocity, this.projColor, this.projW, this.projH));
+		if (this.name === 'Land Mine')
+		{
+			startY = y + PLAYER_SIZE - this.projH;
+			if (playerPlatform)
+				platform = playerPlatform;
+		}
+
+
+		this.projectileArr.push(new Projectile(startX, startY, velocity, this.projColor, this.projW, this.projH, platform));
 		this.lastFired = Date.now();
 	}
 
@@ -45,7 +57,7 @@ export abstract class Weapon
 	{
 		for (const projectile of this.projectileArr)
 		{
-			projectile.update(canvas, deltaTime);
+			projectile.update(canvas, deltaTime, this.name === 'Land Mine');
 			projectile.cShape.checkBulletCollision(enemy.cShape, this.damage);
 		}
 		this.projectileArr = this.projectileArr.filter(projectile => projectile.isValid);

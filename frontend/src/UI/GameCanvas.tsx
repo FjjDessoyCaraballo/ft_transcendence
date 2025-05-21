@@ -69,6 +69,7 @@ export const GameCanvas: React.FC = () => {
       id="gameCanvas"
       width="1200"
       height="800"
+	  className="m-4"
     />
   );
 };

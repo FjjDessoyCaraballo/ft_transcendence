@@ -6,7 +6,7 @@ import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
-import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE, BB_LEFT_1, BB_RIGHT_1, BB_UP_1, BB_LEFT_2, BB_RIGHT_2, BB_UP_2 } from "./Constants";
+import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE, BB_LEFT_1, BB_RIGHT_1, BB_LEFT_2, BB_RIGHT_2 } from "./Constants";
 import { Bazooka, LandMine, Pistol, Weapon } from "./Weapons";
 
 
@@ -97,14 +97,14 @@ export class MatchIntro implements IGameState
 	{
 		this.keys[event.key] = false;
 
-		if (event.key === BB_UP_1 && this.p1SelectDown)
+		if (event.key === BB_SHOOT_1 && this.p1SelectDown)
 			this.p1SelectDown = false;
 		else if (event.key === BB_LEFT_1 && this.p1LeftDown)
 			this.p1LeftDown = false;
 		else if (event.key === BB_RIGHT_1 && this.p1RightDown)
 			this.p1RightDown = false;
 
-		if (event.key === BB_UP_2 && this.p2SelectDown)
+		if (event.key === BB_SHOOT_2 && this.p2SelectDown)
 			this.p2SelectDown = false;
 		else if (event.key === BB_LEFT_2 && this.p2LeftDown)
 			this.p2LeftDown = false;
@@ -144,7 +144,7 @@ export class MatchIntro implements IGameState
 			this.weaponIdx1++;
 			this.p1RightDown = true;
 		}
-		if (this.keys[BB_UP_1] && !this.p1SelectDown)
+		if (this.keys[BB_SHOOT_1] && !this.p1SelectDown)
 		{			
 			if (this.p1Weapons.some(weapon => weapon.name === this.weaponOptions[this.weaponIdx1].name))
 			{
@@ -171,7 +171,7 @@ export class MatchIntro implements IGameState
 			this.weaponIdx2++;
 			this.p2RightDown = true;
 		}
-		if (this.keys[BB_UP_2] && !this.p2SelectDown)
+		if (this.keys[BB_SHOOT_2] && !this.p2SelectDown)
 		{			
 			if (this.p2Weapons.some(weapon => weapon.name === this.weaponOptions[this.weaponIdx2].name))
 			{
@@ -227,14 +227,19 @@ export class MatchIntro implements IGameState
 		let weaponX = infoBox1X;
 		const weaponY = 540; // 100 more than P1Y
 
+		// Weapon info box && BG
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = 2;
 		ctx.strokeRect(infoBox1X, 580, infoBoxW, infoBoxH);
+		ctx.fillStyle = 'rgba(178, 93, 217, 0.5)';
+		ctx.fillRect(infoBox1X, 580, infoBoxW, infoBoxH);
+
 
 		// Weapon icons
 		for (let i = 0; i < this.weaponOptions.length; i++)
 		{
 			let weaponName = this.weaponOptions[i].name;
+			ctx.fillStyle = 'white';
 			ctx.fillText(weaponName, weaponX, weaponY);
 
 			if (this.p1Weapons.some(weapon => weapon.name === this.weaponOptions[i].name))
@@ -291,11 +296,14 @@ export class MatchIntro implements IGameState
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = 2;
 		ctx.strokeRect(infoBox2X, 580, infoBoxW, infoBoxH);
+		ctx.fillStyle = 'rgba(178, 93, 217, 0.5)';
+		ctx.fillRect(infoBox2X, 580, infoBoxW, infoBoxH);
 
 		// Weapon icons
 		for (let i = 0; i < this.weaponOptions.length; i++)
 		{
 			let weaponName = this.weaponOptions[i].name;
+			ctx.fillStyle = 'white';
 			ctx.fillText(weaponName, weapon2X, weaponY);
 
 			if (this.p2Weapons.some(weapon => weapon.name === this.weaponOptions[i].name))
@@ -354,10 +362,16 @@ export class MatchIntro implements IGameState
 		if (this.gameType != GameType.BLOCK_BATTLE)
 		{
 			infoText = `Press the up key (${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play`;
+			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
+
 		}
 		else
-			infoText = `Press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
-		drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
+		{
+			infoText = 'Use LEFT and RIGHT keys to navigate through weapons.';
+			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
+			infoText = 'Use SHOOT key to equip/unequip them.';
+			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 185);
+		}
 
 		const playerNamesY = 340;
 		const rankingPointsY = 380;

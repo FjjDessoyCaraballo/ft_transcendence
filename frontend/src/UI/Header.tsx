@@ -39,7 +39,14 @@ export const Header: React.FC<HeaderProps> = () => {
     checkLoginStatus();
 
     const handleLoginChange = () => {
-      checkLoginStatus();
+      	checkLoginStatus();
+
+		if (!isLoggedIn)
+		{
+			setDashboardUserData(null);
+			setIsGameVisible(true);
+			setIsDashboardVisible(false);
+		}
     };
 
     window.addEventListener('loginStatusChanged', handleLoginChange);

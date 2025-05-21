@@ -27,8 +27,7 @@ export class Player {
 	weaponIsChanging: boolean;
 	coinCount: number;
 	userData: User | null;
-
-	onPlatform?: Platform;
+	onPlatform: Platform | null;
 
     constructor(x: number, y: number, color: string, user: User, weapon1: Weapon, weapon2: Weapon) {
         this.x = x;
@@ -52,6 +51,7 @@ export class Player {
 		this.coinCount = 0;
 		this.hasWon = false;
 		this.userData = user;
+		this.onPlatform = null;
     }
 
     move(keys: { [key: string]: boolean }, deltaTime: number) {
@@ -121,7 +121,7 @@ export class Player {
 		)
 		{
 			this.isOnGround = false;
-			this.onPlatform = undefined;
+			this.onPlatform = null;
 		}
 	}
 
@@ -171,7 +171,7 @@ export class Player {
         if (keys[BB_UP_1] && this.isOnGround) {
             this.velocity.y = JUMP_POWER;
 			this.isOnGround = false;
-			this.onPlatform = undefined;
+			this.onPlatform = null;
         }
         if (keys[BB_LEFT_1]) {
             this.velocity.x = -PLAYER_SPEED;
@@ -183,7 +183,7 @@ export class Player {
         }
 
 		if (keys[BB_SHOOT_1]) {
-			this.curWeapon.shoot(this.x, this.y, this.direction);
+			this.curWeapon.shoot(this.x, this.y, this.direction, this.isOnGround, this.onPlatform);
         }
 		
 		if (keys[BB_CHANGE_WEAPON_1] && !this.weaponIsChanging){

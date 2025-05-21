@@ -51,7 +51,7 @@ export class Player2 extends Player {
         if (keys[BB_UP_2] && this.isOnGround) { 
             this.velocity.y = JUMP_POWER;
             this.isOnGround = false;
-            this.onPlatform = undefined;
+            this.onPlatform = null;
         }
         if (keys[BB_LEFT_2]) { 
             this.velocity.x = -PLAYER_SPEED;
@@ -62,7 +62,7 @@ export class Player2 extends Player {
             this.direction = 'right';
         }
         if (keys[BB_SHOOT_2]) { 
-			this.curWeapon.shoot(this.x, this.y, this.direction);
+			this.curWeapon.shoot(this.x, this.y, this.direction, this.isOnGround, this.onPlatform);
         }
 		if (keys[BB_CHANGE_WEAPON_2] && !this.weaponIsChanging){
 			if (this.curWeapon.name === this.weapons[0].name)
