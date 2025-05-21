@@ -72,12 +72,18 @@ function sendMessage(action: string, payload?: any): Promise<any> {
 	});
 }
 
-export const setToken = (token: string): Promise<boolean> => {
+let cachedToken: string | null = null;
+
+export const setToken = async (token: string): Promise<boolean> => {
+	cachedToken = token;
 	return sendMessage('setToken', token);
 };
 
-export const getToken = (): Promise<string | null> => {
-	return sendMessage('getToken');
+export const getToken = async (): Promise<string | null> => {
+	if (cachedToken) return cachedToken;
+	const token = await sendMessage('getToken');
+	cachedToken = token;
+	return token;
 };
 
 export const clearToken = (): Promise<boolean> => {
