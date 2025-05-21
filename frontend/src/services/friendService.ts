@@ -43,7 +43,8 @@ export const getPendingRequests = async (): Promise<User[]> => {
 export const sendFriendRequest = async (friendId: number): Promise<FriendResponse> => {
   try {
     return await apiRequest(`/friends/request/${friendId}`, {
-      method: 'POST'
+      method: 'POST',
+      body: JSON.stringify({ targetUserId: friendId }) // ADDED THIS!!
     });
   } catch (error) {
     throw new Error('Failed to send friend request.');
