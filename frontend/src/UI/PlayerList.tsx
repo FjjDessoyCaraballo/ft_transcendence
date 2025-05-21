@@ -73,7 +73,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             {pendingRequests.map((player) => (
               <div key={player.username} className="flex items-center gap-4 p-3 bg-white border border-yellow-300 rounded-lg shadow-sm">
                 <img
-                  //src={player.avatar_url}
+                  //src={player.avatar_url} THIS DOESN"T WORK
                   src={'https://localhost:3443/public/avatars/bee.png'}
                 />
                 <span className="font-mono text-md text-yellow-800">{player.username}</span>
