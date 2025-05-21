@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { User } from "./UserManager";
 import { getAllUsers } from '../services/userService';
 import { global_curUser } from './GameCanvas';
-import { 
-  getFriends, 
-  getPendingRequests, 
-  sendFriendRequest, 
-  acceptFriendRequest as acceptRequest, 
-  rejectFriendRequest, 
-  removeFriend 
-} from '../services/friendService'; // Import your friend service functions
+import {
+  getFriends,
+  getPendingRequests,
+  sendFriendRequest,
+  acceptFriendRequest as acceptRequest,
+  rejectFriendRequest,
+  removeFriend
+} from '../services/friendService';
 
 interface ExtendedUser extends User {
   friendshipStatus: 'none' | 'friend' | 'pending_sent' | 'pending_received';
@@ -29,39 +29,50 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
-        // Fetch all data in parallel
         const [allUsers, friendsList, pendingRequests] = await Promise.all([
           getAllUsers(),
           getFriends().catch(() => []),
           getPendingRequests().catch(() => [])
         ]);
-        
-        // Create a map of friend IDs for easier lookup
+
+        console.log('All users:', allUsers);
+        console.log('Friends list:', friendsList);
+        console.log('Pending requests raw:', pendingRequests);
+
         const friendIds = new Set(friendsList.map(friend => friend.id));
-        
-        // Create maps for pending requests
-        const pendingReceivedIds = new Set(pendingRequests.map(request => request.id));
-        
-        // Transform users with friendship status
+
+        // Try logging a sample of what pendingRequests look like
+        if (pendingRequests.length > 0) {
+          console.log('Sample pending request:', pendingRequests[0]);
+        }
+
+        // Check if pendingRequests contains users or user objects inside another object
+        let pendingReceivedIds = new Set<number>();
+        try {
+          pendingReceivedIds = new Set(pendingRequests.map(request => request.id));
+        } catch (e) {
+          console.error('Error parsing pending request IDs. Structure may be invalid.', e);
+        }
+
         const extendedUsers: ExtendedUser[] = allUsers.map((user) => {
-          let status: 'none' | 'friend' | 'pending_sent' | 'pending_received' = 'none';
-          
+          let status: ExtendedUser['friendshipStatus'] = 'none';
+
           if (friendIds.has(user.id)) {
             status = 'friend';
           } else if (pendingReceivedIds.has(user.id)) {
             status = 'pending_received';
           }
-          // Note: We don't have access to sent requests in this code.
-          // You'll need another endpoint for that or track them client-side
-          
+
           return {
             ...user,
             friendshipStatus: status,
           };
         });
-        
+
+        console.log('Extended users:', extendedUsers);
+
         setPlayers(extendedUsers);
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -75,11 +86,9 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   }, []);
 
   const handleSendFriendRequest = async (userId: number) => {
-    console.log('userId', userId);
+    console.log('Sending friend request to userId:', userId);
     try {
       await sendFriendRequest(userId);
-      
-      // Update UI
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) =>
           player.id === userId
@@ -94,10 +103,9 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   };
 
   const handleAcceptFriendRequest = async (userId: number) => {
+    console.log('Accepting friend request from userId:', userId);
     try {
       await acceptRequest(userId);
-      
-      // Update UI
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) =>
           player.id === userId
@@ -112,10 +120,9 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   };
 
   const handleRejectFriendRequest = async (userId: number) => {
+    console.log('Rejecting friend request from userId:', userId);
     try {
       await rejectFriendRequest(userId);
-      
-      // Update UI
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) =>
           player.id === userId
@@ -130,10 +137,9 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   };
 
   const handleRemoveFriend = async (userId: number) => {
+    console.log('Removing friend userId:', userId);
     try {
       await removeFriend(userId);
-      
-      // Update UI
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) =>
           player.id === userId
@@ -149,9 +155,9 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
 
   const getFriendActionButton = (player: ExtendedUser) => {
     const isLoggedInUser = player.username === global_curUser;
-    
+
     if (isLoggedInUser) return null;
-    
+
     switch (player.friendshipStatus) {
       case 'friend':
         return (
@@ -200,8 +206,10 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     }
   };
 
-  // Show pending requests at the top
   const pendingRequests = players.filter(player => player.friendshipStatus === 'pending_received');
+  const nonPendingPlayers = players.filter(player => player.friendshipStatus !== 'pending_received');
+
+  console.log('Pending requests filtered for top section:', pendingRequests);
 
   if (isLoading) {
     return <div className="p-6 w-full flex justify-center">Loading players...</div>;
@@ -250,14 +258,14 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
           <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 Hi {global_curUser}! Welcome to the Player Hub!</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {players.map((player) => {
+            {nonPendingPlayers.map((player) => {
               const isLoggedInUser = player.username === global_curUser;
 
               return (
                 <div
                   key={player.id}
                   className={`flex flex-col items-center p-4 rounded-lg shadow-sm hover:scale-[1.02] transition-transform ${
-                    isLoggedInUser 
+                    isLoggedInUser
                       ? 'bg-gradient-to-br from-purple-100 via-white to-purple-50 border-2 border-indigo-500 shadow-lg shadow-indigo-300'
                       : player.friendshipStatus === 'friend'
                       ? 'bg-gradient-to-br from-green-50 via-white to-green-50 border border-green-300'
