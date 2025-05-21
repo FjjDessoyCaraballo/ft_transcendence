@@ -15,7 +15,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   const [players, setPlayers] = useState<ExtendedUser[]>([]);
   const backendBaseUrl = 'https://localhost:3443';
 
-
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
@@ -64,7 +63,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   };
 
   const loggedInUser = typeof window !== 'undefined' ? global_curUser : null;
-  console.log('Logged in user:', loggedInUser);
+  //console.log('Logged in user:', loggedInUser);
   const pendingRequests = players.filter(player => player.friendshipStatus === 'pending');
 
   return (
