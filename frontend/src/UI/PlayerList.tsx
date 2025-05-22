@@ -148,7 +148,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             onClick={() => handleRemoveFriend(player.id)}
             className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white"
           >
-            ✖️ Remove Friend
+            ✖️ Unfriend
           </button>
         );
       case 'pending_received':
@@ -172,7 +172,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         return (
           <button
             disabled
-            className="px-4 py-2 rounded-md bg-yellow-500 text-white cursor-not-allowed"
+            className="px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-yellow-500 text-white cursor-not-allowed"
           >
             ⏳ Request Sent
           </button>
@@ -181,7 +181,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         return (
           <button
             onClick={() => handleSendFriendRequest(player.id)}
-            className="px-4 py-2 rounded-md bg-purple-500 hover:bg-purple-700 text-white"
+            className="px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-purple-500 hover:bg-purple-700 text-white"
           >
             ➕ Add Friend
           </button>
