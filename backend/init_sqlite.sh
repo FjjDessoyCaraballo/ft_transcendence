@@ -60,6 +60,10 @@ sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS matches (
   date DATETIME DEFAULT CURRENT_TIMESTAMP,       -- Date when the match took place
   player1_id INTEGER NOT NULL,                   -- ID of player 1
   player2_id INTEGER NOT NULL,                   -- ID of player 2
+  p1_ranking_points INTEGER,                     -- Ranking points of player 1 before the match
+  p2_ranking_points INTEGER,                     -- Ranking points of player 2 before the match
+  p1_new_ranking_points INTEGER,                 -- New ranking points of player 1 after the match
+  p2_new_ranking_points INTEGER,                 -- New ranking points of player 2 after the match
   winner_id INTEGER,                             -- ID of the winner (NULL if draw)
   game_duration INTEGER,                         -- Duration of the game in seconds
   game_type TEXT NOT NULL,                       -- Type of game (pong, blockbattle)
