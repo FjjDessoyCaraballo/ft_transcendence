@@ -6,6 +6,7 @@ import { updateCurUser } from './GameCanvas';
 
 interface SettingsProps {
 	onClick: () => void;
+	onLogout: () => void;
 }
 
 const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void }> = ({onClose, onConfirm}) => {
@@ -61,7 +62,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 	);
 };
 
-export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
+export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) => {
 	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 	const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -86,18 +87,18 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 
 	const HandleLogout = async () => {
 		try {
-			await clearToken()
-			.then(() => {
-				sessionStorage.setItem('logged-in', 'false');
-				updateCurUser(null);
-				console.log(`Action: user logged off. Status of logged-in: ${sessionStorage.getItem('logged-in')}`);
-				window.dispatchEvent(new Event('loginStatusChanged'));
-				onClick();
-			})
+			await clearToken();
+			sessionStorage.setItem('logged-in', 'false');
+			updateCurUser(null);
+			console.log(`Action: user logged off. Status of logged-in: ${sessionStorage.getItem('logged-in')}`);
+			window.dispatchEvent(new Event('loginStatusChanged'));
+			onLogout(); // Reset Header state
+			onClick(); // Close popup
 		} catch (error) {
 			console.error("Error in logout: ", error);
 		}
-	}
+	};
+	
 
 	const HandleChangePasswordClick = () => {
 		setShowChangePassword(true);
@@ -109,13 +110,18 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick }) => {
 
 	const confirmDeleteAccount = async () => {
 		try {
-			await deleteUserAccount()
-			await HandleLogout();
+			await deleteUserAccount();
+			await clearToken();
+			sessionStorage.setItem('logged-in', 'false');
+			updateCurUser(null);
+			window.dispatchEvent(new Event('loginStatusChanged'));
+			onLogout(); // Reset Header state
 		} catch (error) {
-			throw new Error('Could not delete data. Try again later or contact data protection officer.');
+			console.error('Could not delete data. Try again later.');
 		}
 		setShowDeleteAccount(false);
-	}
+	};
+	
 
 	const HandleAvatarChange = async () => {
 		// under construction

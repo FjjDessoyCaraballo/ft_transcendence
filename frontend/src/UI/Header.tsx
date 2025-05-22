@@ -31,6 +31,14 @@ export const Header: React.FC<HeaderProps> = () => {
   const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
   const [isPlayerListVisible, setIsPlayerListVisible] = useState(false);
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsGameVisible(true);
+    setIsDashboardVisible(false);
+    setIsPlayerListVisible(false);
+    setDashboardUserData(null);
+    setButtonText('Dashboard');
+  };  
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -199,8 +207,10 @@ export const Header: React.FC<HeaderProps> = () => {
             console.log('Settings clicked');
             setShowSettings(false);
           }}
+          onLogout={handleLogout} // ✅ This is the fix
         />
       )}
+
 
 	<main className="pt-32"> {/* or adjust to match header height */}
 	{isGameVisible && <GameCanvas />}
