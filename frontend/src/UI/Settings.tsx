@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getUserDataForDownload, deleteUserAccount } from '../services/userService'; 
 import { PasswordChangePopup } from './PasswordChange'
+import { AvatarChangePopup } from './AvatarChange'
 import { clearToken } from '../services/TokenService'
 import { updateCurUser } from './GameCanvas';
 
@@ -26,7 +27,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 				onConfirm();
 			})
 		} catch (error) {
-			console.error("Error: ", error);
+			console.error(`${error}`);
 		} finally {
 			handleClose();
 		}
@@ -65,6 +66,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) => {
 	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 	const [showChangePassword, setShowChangePassword] = useState(false);
+	const [showAvatarChange, setShowAvatarChange] = useState(false);
 
 	const HandleDownloadData = async () => {
 		try {
@@ -110,12 +112,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 
 	const confirmDeleteAccount = async () => {
 		try {
-			await deleteUserAccount();
-			await clearToken();
-			sessionStorage.setItem('logged-in', 'false');
-			updateCurUser(null);
-			window.dispatchEvent(new Event('loginStatusChanged'));
-			onLogout(); // Reset Header state
+			await HandleLogout();
 		} catch (error) {
 			console.error('Could not delete data. Try again later.');
 		}
@@ -124,12 +121,10 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 	
 
 	const HandleAvatarChange = async () => {
-		// under construction
-		onClick();
+		setShowAvatarChange(true);
 	}
 
 	const HandleClose = () => {
-		// On click is a void function, so it just closes the box/window
 		onClick();
 	}
 
@@ -240,6 +235,13 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
         <DeleteAccountPopup 
           onClose={() => setShowDeleteAccount(false)} 
           onConfirm={confirmDeleteAccount}
+        />
+      )}
+
+      {/* Render the avatar change popup when needed */}
+      {showAvatarChange && (
+        <AvatarChangePopup 
+          onClick={() => setShowAvatarChange(false)}
         />
       )}
     </>
