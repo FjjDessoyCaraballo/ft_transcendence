@@ -17,10 +17,13 @@ RUN apt-get update && \
 RUN npm install
 
 # Install webpack and other dev dependencies
-RUN npm install --save-dev webpack webpack-cli webpack-dev-server html-webpack-plugin ts-loader style-loader css-loader postcss-loader
+RUN npm install i --save-dev @types/node webpack webpack-cli webpack-dev-server html-webpack-plugin ts-loader style-loader css-loader postcss-loader
 
 # Install React and TypeScript definitions
 RUN npm install react react-dom @types/react @types/react-dom --save
+
+# Install Chart.js for Dashboard data graphs
+RUN npm install chart.js react-chartjs-2 
 
 # Create certificates directory
 RUN mkdir -p /app/certs

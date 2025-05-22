@@ -1,7 +1,6 @@
 import { Button } from "../UI/Button";
-import { stateManager, curUser } from "../components/index";
+import { global_stateManager, global_curUser } from "../UI/GameCanvas";
 import { MainMenu } from "../UI/MainMenu";
-import { canvas, ctx } from "../components/Canvas"; // Sort of weird to use this globally here to pass it to BlockBattle...
 import { GameStates, IGameState, } from "./GameStates";
 import { DEEP_PURPLE, PURPLE, TEXT_PADDING } from "./Constants";
 import { UserManager } from "../UI/UserManager";
@@ -9,7 +8,7 @@ import { GameType } from "../UI/Types";
 
 
 // GENERAL HELPER FUNCTIONS
-export function drawCenteredText(text: string, font: string, color: string, y: number)
+export function drawCenteredText(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, text: string, font: string, color: string, y: number)
 {
 	ctx.font = font;
 	ctx.fillStyle = color;
@@ -17,7 +16,7 @@ export function drawCenteredText(text: string, font: string, color: string, y: n
 	ctx.fillText(text, x, y);
 }
 
-export function drawText(text: string, font: string, color: string, x: number, y: number)
+export function drawText(ctx: CanvasRenderingContext2D, text: string, font: string, color: string, x: number, y: number)
 {
 	ctx.font = font;
 	ctx.fillStyle = color;
@@ -28,25 +27,35 @@ export function drawText(text: string, font: string, color: string, x: number, y
 // BUTTONS
 export class PongBtn extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
+
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.canvas = canvas;
+		this.ctx = ctx;
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new MainMenu(canvas, GameType.PONG));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.PONG));
 	}
 }
 
 export class BlockBattleBtn extends Button
 {
-	constructor(x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
+
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
 	{
-		super(x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		this.canvas = canvas;
+		this.ctx = ctx;
 	}
 
 	clickAction(): void {
-		stateManager.changeState(new MainMenu(canvas, GameType.BLOCK_BATTLE));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.BLOCK_BATTLE));
 	}
 }
 
@@ -57,23 +66,27 @@ export class StartScreen implements IGameState
 	name: GameStates;
 	pongBtn: PongBtn;
 	blockBattleBtn: BlockBattleBtn;
+	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
 	{
 		this.name = GameStates.START_SCREEN;
+		this.canvas = canvas;
+		this.ctx = ctx;
 
 		const pongText = 'PONG';
 		ctx.font = '50px arial';
 		const pongX = (canvas.width / 2) - (ctx.measureText(pongText).width / 2) - TEXT_PADDING;
 		const pongY = 470;
-		this.pongBtn = new PongBtn(pongX, pongY, DEEP_PURPLE, PURPLE, pongText, 'white', '50px', 'arial');
+		this.pongBtn = new PongBtn(this.canvas, this.ctx, pongX, pongY, DEEP_PURPLE, PURPLE, pongText, 'white', '50px', 'arial');
 
 		const bbText = 'BLOCK BATTLE';
 		const bbX = (canvas.width / 2) - (ctx.measureText(bbText).width / 2) - TEXT_PADDING;
 		const bbY = 570;
-		this.blockBattleBtn = new BlockBattleBtn(bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial');
+		this.blockBattleBtn = new BlockBattleBtn(this.canvas, this.ctx, bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -81,11 +94,11 @@ export class StartScreen implements IGameState
 
 	mouseMoveCallback(event: MouseEvent)
 	{
-		const rect = canvas.getBoundingClientRect();
+		const rect = this.canvas.getBoundingClientRect();
 		
 		// Calculate the scaling factor based on the CSS size and the canvas resolution
-		const scaleX = canvas.width / rect.width;
-		const scaleY = canvas.height / rect.height;
+		const scaleX = this.canvas.width / rect.width;
+		const scaleY = this.canvas.height / rect.height;
 
 		// Calculate the mouse position relative to the canvas, adjusting for scaling
 		const x = (event.clientX - rect.left) * scaleX;
@@ -103,14 +116,14 @@ export class StartScreen implements IGameState
 
 	enter()
 	{
-		canvas.addEventListener('mousemove', this.mouseMoveBound);
-		canvas.addEventListener('click', this.mouseClickBound);
+		this.canvas.addEventListener('mousemove', this.mouseMoveBound);
+		this.canvas.addEventListener('click', this.mouseClickBound);
 	}
 
 	exit()
 	{
-		canvas.removeEventListener('mousemove', this.mouseMoveBound);
-		canvas.removeEventListener('click', this.mouseClickBound);
+		this.canvas.removeEventListener('mousemove', this.mouseMoveBound);
+		this.canvas.removeEventListener('click', this.mouseClickBound);
 	}
 
 	update(deltaTime: number)
@@ -120,15 +133,15 @@ export class StartScreen implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		UserManager.drawCurUser();
+		UserManager.drawCurUser(this.canvas, ctx);
 		
-		drawCenteredText('Welcome, gamer!', '140px Impact', DEEP_PURPLE, 240);
+		drawCenteredText(this.canvas, this.ctx, 'Welcome, gamer!', '140px Impact', DEEP_PURPLE, 240);
 
-		if (!curUser)
-			drawCenteredText('Please log in to play the game', '50px arial', 'white', canvas.height / 2 + 100);
+		if (!global_curUser)
+			drawCenteredText(this.canvas, this.ctx, 'Please log in to play the game', '50px arial', 'white', this.canvas.height / 2 + 100);
 		else
 		{
-			drawCenteredText('Please choose the game you want to play', '40px arial', 'white', 390);
+			drawCenteredText(this.canvas, this.ctx, 'Please choose the game you want to play', '40px arial', 'white', 390);
 
 			this.pongBtn.draw(ctx);
 			this.blockBattleBtn.draw(ctx);

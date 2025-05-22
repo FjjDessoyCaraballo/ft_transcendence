@@ -57,6 +57,8 @@ export class GameStateManager {
 
 export interface IGameState {
 	name: GameStates;
+	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
     enter(): void;
     exit(): void;
     update(deltaTime: number): void;

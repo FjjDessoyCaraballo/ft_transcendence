@@ -37,10 +37,7 @@ async function userRoutes(fastify, options) {
     return users;
   });
 
-
-
-  
-  // GET user by ID
+// GET user by ID
   fastify.get('/:id', async (request, reply) => {
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
@@ -60,6 +57,27 @@ async function userRoutes(fastify, options) {
     return user;
   });
 
+  // GET user by USERNAME
+  fastify.get('/byusername/:username', async (request, reply) => {
+
+    const user = fastify.db.prepare(`
+      SELECT id, username, avatar_url, ranking_points,
+             games_played_pong, wins_pong, losses_pong,
+             games_played_blockbattle, wins_blockbattle, losses_blockbattle,
+             tournaments_played, tournaments_won, tournament_points,
+             created_at, updated_at
+      FROM users 
+      WHERE username = ? AND deleted_at IS NULL
+    `).get(request.params.username);
+    
+    if (!user) {
+      reply.code(404);
+      return { error: 'User not found' };
+    }
+    
+    return user;
+  });
+
   // Register new user
   fastify.post('/register', async (request, reply) => {
     const { username, password } = request.body;
@@ -68,6 +86,11 @@ async function userRoutes(fastify, options) {
     if (!username || !password) {
       reply.code(400);
       return { error: 'Username and password are required' };
+    }
+
+    if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
+      reply.code(400);
+      return { error: 'password too weak'}
     }
     
     try {
@@ -89,7 +112,7 @@ async function userRoutes(fastify, options) {
         id: result.lastInsertRowid, 
         username, 
         avatar_url: avatarUrl,
-        ranking_points: 0,
+        ranking_points: 1000,
         games_played_pong: 0,
         wins_pong: 0,
         losses_pong: 0,
@@ -223,6 +246,11 @@ async function userRoutes(fastify, options) {
       return { error: 'Current password and new password are required' };
     }
     
+    if (!newPassword.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
+      reply.code(400);
+      return { error: 'password too weak'}
+    }
+
     // Get current user with password
     const user = fastify.db.prepare(`
       SELECT password FROM users WHERE id = ? AND deleted_at IS NULL
@@ -262,6 +290,11 @@ async function userRoutes(fastify, options) {
       return { error: 'Avatar image is required' };
     }
     
+    if (request.body.avatar.size > 2 * 1024 * 1024) {
+      reply.code(400);
+      return { error: 'File size exceeds 2MB' };
+    }
+
     try {
       // Decode base64 image
       const imageData = Buffer.from(request.body.avatar.data, 'base64');
@@ -348,42 +381,71 @@ async function userRoutes(fastify, options) {
 
   // Update rankings after a match (for internal use)
   fastify.post('/update-stats', async (request, reply) => {
-    const { userId, gameType, won, matchDuration } = request.body;
+
+    const { winner, loser, gameTypeString } = request.body;
     
-    if (!userId || !gameType || won === undefined) {
+    if (!winner || !loser || !gameTypeString) {
       reply.code(400);
       return { error: 'Missing required parameters' };
     }
     
     const transaction = fastify.db.transaction(() => {
       // Update game stats
-      if (gameType === 'pong') {
+      if (gameTypeString === 'pong') {
+
         fastify.db.prepare(`
           UPDATE users 
-          SET games_played_pong = games_played_pong + 1,
-              wins_pong = wins_pong + ?,
-              losses_pong = losses_pong + ?,
+          SET games_played_pong = ?,
+              wins_pong = ?,
+              losses_pong = ?,
               updated_at = CURRENT_TIMESTAMP
           WHERE id = ?
-        `).run(won ? 1 : 0, won ? 0 : 1, userId);
-      } else if (gameType === 'blockbattle') {
+        `).run(winner.games_played_pong, winner.wins_pong, winner.losses_pong, winner.id);
+
+		fastify.db.prepare(`
+          UPDATE users 
+          SET games_played_pong = ?,
+              wins_pong = ?,
+              losses_pong = ?,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).run(loser.games_played_pong, loser.wins_pong, loser.losses_pong, loser.id);
+
+      } else if (gameTypeString === 'blockbattle') {
+
         fastify.db.prepare(`
           UPDATE users 
-          SET games_played_blockbattle = games_played_blockbattle + 1,
-              wins_blockbattle = wins_blockbattle + ?,
-              losses_blockbattle = losses_blockbattle + ?,
+          SET games_played_blockbattle = ?,
+              wins_blockbattle = ?,
+              losses_blockbattle = ?,
               updated_at = CURRENT_TIMESTAMP
           WHERE id = ?
-        `).run(won ? 1 : 0, won ? 0 : 1, userId);
+        `).run(winner.games_played_blockbattle, winner.wins_blockbattle, winner.losses_blockbattle, winner.id);
+
+		fastify.db.prepare(`
+          UPDATE users 
+          SET games_played_blockbattle = ?,
+              wins_blockbattle = ?,
+              losses_blockbattle = ?,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).run(loser.games_played_blockbattle, loser.wins_blockbattle, loser.losses_blockbattle, loser.id);
+
       }
       
-      // Update ranking points (example ranking system)
-      const pointsChange = won ? 10 : -5;
+      // Update ranking points
       fastify.db.prepare(`
         UPDATE users 
-        SET ranking_points = MAX(0, ranking_points + ?)
+        SET ranking_points = ?
         WHERE id = ?
-      `).run(pointsChange, userId);
+      `).run(winner.ranking_points, winner.id);
+
+	  fastify.db.prepare(`
+        UPDATE users 
+        SET ranking_points = ?
+        WHERE id = ?
+      `).run(loser.ranking_points, loser.id);
+
     });
     
     transaction();
