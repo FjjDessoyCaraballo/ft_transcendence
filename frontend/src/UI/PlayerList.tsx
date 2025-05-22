@@ -258,7 +258,10 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
           <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 Hi {global_curUser}! Welcome to the Player Hub!</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {nonPendingPlayers.map((player) => {
+            {[...nonPendingPlayers]
+            .sort((a, b) => (a.username === global_curUser ? -1 : b.username === global_curUser ? 1 : 0))
+            .map((player) => {
+
               const isLoggedInUser = player.username === global_curUser;
 
               return (
