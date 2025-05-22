@@ -59,7 +59,8 @@ export const sendFriendRequest = async (friendId: number): Promise<FriendRespons
 export const acceptFriendRequest = async (friendId: number): Promise<FriendResponse> => {
   try {
     return await apiRequest(`/friends/accept/${friendId}`, {
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({ targetUserId: friendId }) // ADDED THIS!!
     });
   } catch (error) {
     throw new Error('Failed to accept friend request.');
