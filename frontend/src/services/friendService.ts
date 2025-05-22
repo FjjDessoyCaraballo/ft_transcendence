@@ -44,7 +44,7 @@ export const sendFriendRequest = async (friendId: number): Promise<FriendRespons
   try {
     return await apiRequest(`/friends/request/${friendId}`, {
       method: 'POST',
-      body: JSON.stringify({ targetUserId: friendId }) // ADDED THIS!!
+      body: JSON.stringify({ targetUserId: friendId })
     });
   } catch (error) {
     throw new Error('Failed to send friend request.');
@@ -60,7 +60,7 @@ export const acceptFriendRequest = async (friendId: number): Promise<FriendRespo
   try {
     return await apiRequest(`/friends/accept/${friendId}`, {
       method: 'PUT',
-      body: JSON.stringify({ targetUserId: friendId }) // ADDED THIS!!
+      body: JSON.stringify({ targetUserId: friendId })
     });
   } catch (error) {
     throw new Error('Failed to accept friend request.');
@@ -75,7 +75,8 @@ export const acceptFriendRequest = async (friendId: number): Promise<FriendRespo
 export const rejectFriendRequest = async (friendId: number): Promise<FriendResponse> => {
   try {
     return await apiRequest(`/friends/reject/${friendId}`, {
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({ targetUserId: friendId })
     });
   } catch (error) {
     throw new Error('Failed to reject friend request.');
