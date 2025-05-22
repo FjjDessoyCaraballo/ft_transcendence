@@ -12,6 +12,7 @@ import {
   removeFriend
 } from '../services/friendService';
 
+// Extend the User interface with friendshipStatus for UI logic
 interface ExtendedUser extends User {
   friendshipStatus: 'none' | 'friend' | 'pending_sent' | 'pending_received';
 }
@@ -21,28 +22,35 @@ interface PlayerListProps {
 }
 
 export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
+  // State to store the list of players, loading state, and error messages
   const [players, setPlayers] = useState<ExtendedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // URL base for fetching user avatars
   const backendBaseUrl = 'https://localhost:3443';
 
+  // Fetch all user data and friendship statuses
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
+        // API requests for users and friendship data
         const [allUsers, friendsList, pendingRequests, sentRequests] = await Promise.all([
           getAllUsers(),
-          getFriends().catch(() => []),
-          getPendingRequests().catch(() => []),
-          getSentRequests().catch(() => [])
+          getFriends().catch(() => []),              // Get accepted friends
+          getPendingRequests().catch(() => []),      // Get friend requests received
+          getSentRequests().catch(() => [])          // Get friend requests sent
         ]);
 
+        // Create sets of user IDs for fast lookup
         const friendIds = new Set(friendsList.map(friend => friend.id));
         const pendingReceivedIds = new Set(pendingRequests.map(request => request.id));
         const pendingSentIds = new Set(sentRequests.map(request => request.id));
 
+        // Add friendship status to users
         const extendedUsers: ExtendedUser[] = allUsers.map((user) => {
           let status: ExtendedUser['friendshipStatus'] = 'none';
 
@@ -60,7 +68,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
           };
         });
 
-        setPlayers(extendedUsers);
+        setPlayers(extendedUsers); // Update state
       } catch (error) {
         console.error('Failed to fetch data:', error);
         setError('Failed to load players. Please try again later.');
@@ -72,6 +80,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     fetchData();
   }, []);
 
+  // Handle sending a friend request
   const handleSendFriendRequest = async (userId: number) => {
     try {
       await sendFriendRequest(userId);
@@ -88,6 +97,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     }
   };
 
+  // Accept an incoming friend request
   const handleAcceptFriendRequest = async (userId: number) => {
     try {
       await acceptRequest(userId);
@@ -104,6 +114,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     }
   };
 
+  // Reject an incoming friend request
   const handleRejectFriendRequest = async (userId: number) => {
     try {
       await rejectFriendRequest(userId);
@@ -120,6 +131,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     }
   };
 
+  // Remove an existing friend
   const handleRemoveFriend = async (userId: number) => {
     try {
       await removeFriend(userId);
@@ -136,6 +148,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     }
   };
 
+  // Renders the appropriate button based on the friendship status
   const getFriendActionButton = (player: ExtendedUser) => {
     const isLoggedInUser = player.username === global_curUser;
 
@@ -189,19 +202,24 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     }
   };
 
+  // Separate friend requests from the rest of the list
   const pendingRequests = players.filter(player => player.friendshipStatus === 'pending_received');
   const nonPendingPlayers = players.filter(player => player.friendshipStatus !== 'pending_received');
 
+  // Show loading state
   if (isLoading) {
     return <div className="p-6 w-full flex justify-center">Loading players...</div>;
   }
 
+  // Show error if any occurred
   if (error) {
     return <div className="p-6 w-full flex justify-center text-red-500">{error}</div>;
   }
 
+  // Main component return
   return (
     <>
+      {/* Display pending friend requests if any */}
       {pendingRequests.length > 0 && (
         <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 p-6 rounded-xl border border-yellow-300 bg-yellow-50 shadow-md">
           <h2 className="titles text-yellow-700 mb-4 text-xl">📬 Friend Requests</h2>
@@ -234,6 +252,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         </div>
       )}
 
+      {/* Display all players (excluding pending requests) */}
       <div className="p-6 w-full flex flex-col items-center">
         <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
           <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 Hi {global_curUser}! Welcome to the Player Hub!</h2>
