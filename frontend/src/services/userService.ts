@@ -1,10 +1,16 @@
 import { apiRequest } from './Api';
 import { User } from '../UI/UserManager'
 import { GameType } from '../UI/Types';
+import { Buffer } from 'node:buffer'
 
 interface RegisterData {
   username: string;
   password: string;
+}
+
+interface AvatarData {
+  data: string;
+  size: number;
 }
 
 interface RegisterResponse {
@@ -31,7 +37,18 @@ export const registerUser = async (registerData: RegisterData): Promise<Register
       body: JSON.stringify(registerData)
     });
   } catch (error) {
-      throw new Error('Registration failed. Please try again later.');
+      throw error;
+  }
+};
+
+export const updateAvatar = async (avatar: AvatarData): Promise<{AvatarUrl: string}> => {
+  try {
+    return await apiRequest('/users/avatar', {
+      method: 'POST',
+      body: JSON.stringify({avatar})
+    });
+  } catch (error) {
+    throw error;
   }
 };
 
@@ -49,7 +66,7 @@ export const loginUser = async (registerData: RegisterData): Promise<{ token: st
     });
     return response;
   } catch (error) {
-      throw new Error('Failed to fetch user data.');
+      throw error;
   }
 };
 
@@ -63,7 +80,7 @@ export const getUserData = async (username: string): Promise<User> => {
   try {
     return await apiRequest(`/users/${username}`);
   } catch (error) {
-      throw new Error('Failed to fetch user data.');
+      throw error;
   }
 };
 
@@ -76,7 +93,7 @@ export const getAllUsers = async (): Promise<User[]> => {
   try {
     return await apiRequest('/users');    
   } catch (error) {
-      throw new Error('Failed to fetch user list.');
+      throw error;
   }
 };
 
@@ -94,7 +111,7 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
       body: JSON.stringify({ winner, loser })
     });    
   } catch (error) {
-      throw new Error('Failed to update user statistics');
+      throw error;
   }
 };
 
@@ -119,9 +136,7 @@ export const updateUserStatsAPI = async (winner: User, loser: User, gameType: Ga
       body: JSON.stringify({ winner, loser, gameTypeString })
     });    
   } catch (error) {
-    if (error instanceof Error)
       throw error;
-    throw new Error('Failed to update user statistics');
   }
 };
 
@@ -136,7 +151,7 @@ export const deleteUserAccount = async (): Promise<{ success: boolean, message: 
       method: 'DELETE'
     });    
   } catch (error) {
-      throw new Error('Failed to delete user account. Contact data protection officer.');
+      throw error;
   }
 };
 
@@ -149,7 +164,7 @@ export const getUserDataForDownload = async (): Promise<any> => {
   try {
     return await apiRequest('/users/export-data');    
   } catch (error) {
-      throw new Error('Failed to retrieve user data for download. Contact data protection officer.');
+      throw error;
   }
 };
 
@@ -171,7 +186,7 @@ export const changePassword = async (passwordChange: PasswordChange): Promise<Pa
       body: JSON.stringify(formattedPayload)
     });
   } catch (error) {
-      throw new Error('Password change failed. Please try again later.');
+      throw error;
   }
 };
  

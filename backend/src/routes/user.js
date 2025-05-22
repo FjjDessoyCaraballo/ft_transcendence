@@ -67,6 +67,11 @@ async function userRoutes(fastify, options) {
       reply.code(400);
       return { error: 'Username and password are required' };
     }
+
+    if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
+      reply.code(400);
+      return { error: 'password too weak'}
+    }
     
     try {
       // Hash the password
@@ -221,6 +226,11 @@ async function userRoutes(fastify, options) {
       return { error: 'Current password and new password are required' };
     }
     
+    if (!newPassword.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
+      reply.code(400);
+      return { error: 'password too weak'}
+    }
+
     // Get current user with password
     const user = fastify.db.prepare(`
       SELECT password FROM users WHERE id = ? AND deleted_at IS NULL
@@ -260,6 +270,11 @@ async function userRoutes(fastify, options) {
       return { error: 'Avatar image is required' };
     }
     
+    if (request.body.avatar.size > 2 * 1024 * 1024) {
+      reply.code(400);
+      return { error: 'File size exceeds 2MB' };
+    }
+
     try {
       // Decode base64 image
       const imageData = Buffer.from(request.body.avatar.data, 'base64');

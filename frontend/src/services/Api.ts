@@ -1,13 +1,6 @@
 const API_URL = 'https://localhost:3443/api';
 import { getToken } from './TokenService'
 
-// not sure if this is needed, but it is here for now
-interface ApiError {
-  error: string;
-  status?: number;
-  details?: any;
-}
-
 /**
  * Helper function for making API requests. Abstraction to help other API calls easier.
  * 
@@ -50,7 +43,6 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
     return data;
   } catch (error) {
     if (error instanceof Error) {
-      console.error('Network error:', error);
       throw error;
     }
     throw new Error('Network error. Please check your connection and try again.');
