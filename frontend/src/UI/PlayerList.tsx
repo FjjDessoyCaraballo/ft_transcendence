@@ -5,6 +5,7 @@ import { global_curUser } from './GameCanvas';
 import {
   getFriends,
   getPendingRequests,
+  getSentRequests,
   sendFriendRequest,
   acceptFriendRequest as acceptRequest,
   rejectFriendRequest,
@@ -31,30 +32,16 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       setError(null);
 
       try {
-        const [allUsers, friendsList, pendingRequests] = await Promise.all([
+        const [allUsers, friendsList, pendingRequests, sentRequests] = await Promise.all([
           getAllUsers(),
           getFriends().catch(() => []),
-          getPendingRequests().catch(() => [])
+          getPendingRequests().catch(() => []),
+          getSentRequests().catch(() => [])
         ]);
 
-        console.log('All users:', allUsers);
-        console.log('Friends list:', friendsList);
-        console.log('Pending requests raw:', pendingRequests);
-
         const friendIds = new Set(friendsList.map(friend => friend.id));
-
-        // Try logging a sample of what pendingRequests look like
-        if (pendingRequests.length > 0) {
-          console.log('Sample pending request:', pendingRequests[0]);
-        }
-
-        // Check if pendingRequests contains users or user objects inside another object
-        let pendingReceivedIds = new Set<number>();
-        try {
-          pendingReceivedIds = new Set(pendingRequests.map(request => request.id));
-        } catch (e) {
-          console.error('Error parsing pending request IDs. Structure may be invalid.', e);
-        }
+        const pendingReceivedIds = new Set(pendingRequests.map(request => request.id));
+        const pendingSentIds = new Set(sentRequests.map(request => request.id));
 
         const extendedUsers: ExtendedUser[] = allUsers.map((user) => {
           let status: ExtendedUser['friendshipStatus'] = 'none';
@@ -63,6 +50,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             status = 'friend';
           } else if (pendingReceivedIds.has(user.id)) {
             status = 'pending_received';
+          } else if (pendingSentIds.has(user.id)) {
+            status = 'pending_sent';
           }
 
           return {
@@ -70,8 +59,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             friendshipStatus: status,
           };
         });
-
-        console.log('Extended users:', extendedUsers);
 
         setPlayers(extendedUsers);
       } catch (error) {
@@ -86,7 +73,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   }, []);
 
   const handleSendFriendRequest = async (userId: number) => {
-    console.log('Sending friend request to userId:', userId);
     try {
       await sendFriendRequest(userId);
       setPlayers((prevPlayers) =>
@@ -103,7 +89,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   };
 
   const handleAcceptFriendRequest = async (userId: number) => {
-    console.log('Accepting friend request from userId:', userId);
     try {
       await acceptRequest(userId);
       setPlayers((prevPlayers) =>
@@ -120,7 +105,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   };
 
   const handleRejectFriendRequest = async (userId: number) => {
-    console.log('Rejecting friend request from userId:', userId);
     try {
       await rejectFriendRequest(userId);
       setPlayers((prevPlayers) =>
@@ -137,7 +121,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   };
 
   const handleRemoveFriend = async (userId: number) => {
-    console.log('Removing friend userId:', userId);
     try {
       await removeFriend(userId);
       setPlayers((prevPlayers) =>
@@ -209,8 +192,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   const pendingRequests = players.filter(player => player.friendshipStatus === 'pending_received');
   const nonPendingPlayers = players.filter(player => player.friendshipStatus !== 'pending_received');
 
-  console.log('Pending requests filtered for top section:', pendingRequests);
-
   if (isLoading) {
     return <div className="p-6 w-full flex justify-center">Loading players...</div>;
   }
@@ -259,49 +240,48 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...nonPendingPlayers]
-            .sort((a, b) => (a.username === global_curUser ? -1 : b.username === global_curUser ? 1 : 0))
-            .map((player) => {
+              .sort((a, b) => (a.username === global_curUser ? -1 : b.username === global_curUser ? 1 : 0))
+              .map((player) => {
+                const isLoggedInUser = player.username === global_curUser;
 
-              const isLoggedInUser = player.username === global_curUser;
+                return (
+                  <div
+                    key={player.id}
+                    className={`flex flex-col items-center p-4 rounded-lg shadow-sm hover:scale-[1.02] transition-transform ${
+                      isLoggedInUser
+                        ? 'bg-gradient-to-br from-purple-100 via-white to-purple-50 border-2 border-indigo-500 shadow-lg shadow-indigo-300'
+                        : player.friendshipStatus === 'friend'
+                        ? 'bg-gradient-to-br from-green-50 via-white to-green-50 border border-green-300'
+                        : 'bg-white border border-[#4B0082]'
+                    }`}
+                  >
+                    <img
+                      src={`${backendBaseUrl}${player.avatar_url}`}
+                      alt={`${player.username}'s avatar`}
+                      className="w-32 object-contain mb-4"
+                    />
 
-              return (
-                <div
-                  key={player.id}
-                  className={`flex flex-col items-center p-4 rounded-lg shadow-sm hover:scale-[1.02] transition-transform ${
-                    isLoggedInUser
-                      ? 'bg-gradient-to-br from-purple-100 via-white to-purple-50 border-2 border-indigo-500 shadow-lg shadow-indigo-300'
-                      : player.friendshipStatus === 'friend'
-                      ? 'bg-gradient-to-br from-green-50 via-white to-green-50 border border-green-300'
-                      : 'bg-white border border-[#4B0082]'
-                  }`}
-                >
-                  <img
-                    src={`${backendBaseUrl}${player.avatar_url}`}
-                    alt={`${player.username}'s avatar`}
-                    className="w-32 object-contain mb-4"
-                  />
+                    <h3 className="font-mono text-xl text-[#4B0082] font-bold">
+                      {isLoggedInUser ? 'You' : player.username}
+                      {player.friendshipStatus === 'friend' && ' 👥'}
+                    </h3>
+                    <p className="texts mb-4 text-sm">🏓 Pong games played: <strong>{player.games_played_pong}</strong></p>
+                    <p className="texts mb-4 text-sm">🟩 Block Battle games played: <strong>{player.games_played_blockbattle}</strong></p>
 
-                  <h3 className="font-mono text-xl text-[#4B0082] font-bold">
-                    {isLoggedInUser ? 'You' : player.username}
-                    {player.friendshipStatus === 'friend' && ' 👥'}
-                  </h3>
-                  <p className="texts mb-4 text-sm">🏓 Pong games played: <strong>{player.games_played_pong}</strong></p>
-                  <p className="texts mb-4 text-sm">🟩 Block Battle games played: <strong>{player.games_played_blockbattle}</strong></p>
-
-                  <div className="flex gap-2 mt-auto">
-                    {getFriendActionButton(player)}
-                    {(isLoggedInUser || player.friendshipStatus === 'friend') && (
-                      <button
-                        onClick={onShowDashboard}
-                        className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
-                      >
-                        More Stats
-                      </button>
-                    )}
+                    <div className="flex gap-2 mt-auto">
+                      {getFriendActionButton(player)}
+                      {(isLoggedInUser || player.friendshipStatus === 'friend') && (
+                        <button
+                          onClick={onShowDashboard}
+                          className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
+                        >
+                          More Stats
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       </div>

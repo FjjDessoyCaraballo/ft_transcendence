@@ -38,6 +38,20 @@ export const getPendingRequests = async (): Promise<User[]> => {
 };
 
 /**
+ * Get friend requests sent by the current user (pending).
+ */
+export const getSentRequests = async (): Promise<User[]> => {
+  try {
+    console.log('GET SENT FRIEND REQUESTS');
+    const response = await apiRequest('/friends/sent-requests');
+    return response.sentRequests;
+  } catch (error) {
+    throw new Error('Failed to fetch sent friend requests.');
+  }
+};
+
+
+/**
  * Send a friend request to another user.
  * 
  * @param friendId The ID of the user to send a request to.
