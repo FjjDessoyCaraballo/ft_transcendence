@@ -287,12 +287,14 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
 
                   <div className="flex gap-2 mt-auto">
                     {getFriendActionButton(player)}
-                    <button
-                      onClick={onShowDashboard}
-                      className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
-                    >
-                      More Stats
-                    </button>
+                    {(isLoggedInUser || player.friendshipStatus === 'friend') && (
+                      <button
+                        onClick={onShowDashboard}
+                        className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
+                      >
+                        More Stats
+                      </button>
+                    )}
                   </div>
                 </div>
               );
