@@ -15,6 +15,9 @@ export const PADDLE_SPEED = 10;
 export const BALL_SIZE = 15;
 export const BUFFER = 15;
 export const MAX_BALL_SPEED = 30;
+export const WINNING_SCORE = 5;
+export const AI_UPDATE_INTERVAL = 1000;
+
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
@@ -124,7 +127,7 @@ export class Pong implements IGameState {
     } 
     else {
       const now = performance.now();
-      if (now - this.aiLastUpdateTime >= 1000) { // Only update AI's target once per second
+      if (now - this.aiLastUpdateTime >= AI_UPDATE_INTERVAL) { // Only update AI's target once per second
         this.aiTargetY = this.predictBallY(this.ball.x, this.ball.y, this.ball.speedX, this.ball.speedY, this.player2.paddle.x);
         this.aiLastUpdateTime = now;
       }
@@ -163,7 +166,7 @@ export class Pong implements IGameState {
     // Reset ball if missed and count score
     if (this.ball.x < 0) {
       this.player2.score++;
-      if (this.player2.score === 5) {
+      if (this.player2.score === WINNING_SCORE) {
         this.gameState = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player2;
@@ -174,7 +177,7 @@ export class Pong implements IGameState {
 
     if (this.ball.x > this.canvasWidth) {
       this.player1.score++;
-      if (this.player1.score === 5) {
+      if (this.player1.score === WINNING_SCORE) {
         this.gameState = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player1;
