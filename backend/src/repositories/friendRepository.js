@@ -73,6 +73,15 @@ class FriendRepository {
 		WHERE f.friend_id = ? AND f.status = 'pending'
 	  `).all(userId);
 	}
+
+	getSentRequests(userId) {
+		return this.db.prepare(`
+		  SELECT u.id, u.username, u.ranking_points
+		  FROM friends f
+		  JOIN users u ON u.id = f.friend_id
+		  WHERE f.user_id = ? AND f.status = 'pending' AND f.deleted_at IS NULL
+		`).all(userId);
+	  }
   
 	// Check if users are friends
 	areFriends(userId, friendId) {

@@ -20,12 +20,20 @@ async function friendRoutes(fastify, options) {
     return { friends };
   });
 
-  // Get pending friend requests
+  // Get pending received friend requests
   fastify.get('/requests', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
     const requests = friendRepo.getPendingRequests(userId);
     return { requests };
   });
+
+  // Get pending sent friend requests
+  fastify.get('/sent-requests', { preHandler: authenticate }, async (request, reply) => {
+    const userId = request.user.id;
+    const sentRequests = friendRepo.getSentRequests(userId);
+    return { sentRequests };
+  });
+
 
   // Send friend request
   fastify.post('/request/:friendId', { preHandler: authenticate }, async (request, reply) => {

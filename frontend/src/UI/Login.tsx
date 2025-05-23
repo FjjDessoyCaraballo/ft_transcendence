@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
-import { setToken } from '../services/TokenService';
+import { setToken, getToken } from '../services/TokenService';
 import { updateAllUserDataArr, updateCurUser } from './GameCanvas';
 import { getAllUsers, loginUser } from '../services/userService'
 
@@ -38,6 +38,9 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
 
       if (response && response.token) {
         await setToken(response.token);
+        const stored = await getToken();
+        console.log('[LoginPopup] Token after setToken:', stored);
+
       } else {
         console.error('No token received from server.')
       }
