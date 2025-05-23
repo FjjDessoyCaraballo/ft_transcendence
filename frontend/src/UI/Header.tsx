@@ -4,7 +4,7 @@ import { GameCanvas, global_curUser } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
-import { getUserData } from '../services/userService';
+import { getUserDataByUsername } from '../services/userService';
 import { User } from './UserManager';
 import { PlayerList } from './PlayerList'
 
@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = () => {
 		return ;
 	
 	try {
-		const userData = await getUserData(global_curUser);
+		const userData = await getUserDataByUsername(global_curUser);
 		setDashboardUserData(userData);
 		setIsGameVisible(false);
 		setIsDashboardVisible(true);

@@ -37,8 +37,28 @@ async function userRoutes(fastify, options) {
     return users;
   });
 
+// GET user by ID
+  fastify.get('/:id', async (request, reply) => {
+    const user = fastify.db.prepare(`
+      SELECT id, username, avatar_url, ranking_points,
+             games_played_pong, wins_pong, losses_pong,
+             games_played_blockbattle, wins_blockbattle, losses_blockbattle,
+             tournaments_played, tournaments_won, tournament_points,
+             created_at, updated_at
+      FROM users 
+      WHERE id = ? AND deleted_at IS NULL
+    `).get(request.params.id);
+    
+    if (!user) {
+      reply.code(404);
+      return { error: 'User not found' };
+    }
+    
+    return user;
+  });
+
   // GET user by USERNAME
-  fastify.get('/:username', async (request, reply) => {
+  fastify.get('/byusername/:username', async (request, reply) => {
 
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,

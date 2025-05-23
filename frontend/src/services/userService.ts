@@ -76,9 +76,9 @@ export const loginUser = async (registerData: RegisterData): Promise<{ token: st
  * @param username Username to fetch
  * @returns Promise with user data
  */
-export const getUserData = async (username: string): Promise<User> => {
+export const getUserDataByUsername = async (username: string): Promise<User> => {
   try {
-    return await apiRequest(`/users/${username}`);
+    return await apiRequest(`/users/byusername/${username}`);
   } catch (error) {
       throw error;
   }
