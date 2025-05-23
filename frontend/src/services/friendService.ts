@@ -119,33 +119,33 @@ export const removeFriend = async (friendId: number): Promise<FriendResponse> =>
 };
 
 
-//DO WE NEED THESE?
-/**
- * Search for users to add as friends.
- * 
- * @param query The username search query.
- */
-export const searchUsers = async (query: string): Promise<User[]> => {
-  if (query.length < 3) {
-    throw new Error('Search query must be at least 3 characters long.');
-  }
+// //DO WE NEED THESE?
+// /**
+//  * Search for users to add as friends.
+//  * 
+//  * @param query The username search query.
+//  */
+// export const searchUsers = async (query: string): Promise<User[]> => {
+//   if (query.length < 3) {
+//     throw new Error('Search query must be at least 3 characters long.');
+//   }
 
-  try {
-    const response = await apiRequest(`/friends/search?q=${encodeURIComponent(query)}`);
-    return response.users;
-  } catch (error) {
-    throw new Error('Failed to search for users.');
-  }
-};
+//   try {
+//     const response = await apiRequest(`/friends/search?q=${encodeURIComponent(query)}`);
+//     return response.users;
+//   } catch (error) {
+//     throw new Error('Failed to search for users.');
+//   }
+// };
 
-/**
- * Get all online friends of the current user.
- */
-export const getOnlineFriends = async (): Promise<User[]> => {
-  try {
-    const response = await apiRequest('/friends/online');
-    return response.onlineFriends;
-  } catch (error) {
-    throw new Error('Failed to fetch online friends.');
-  }
-};
+// /**
+//  * Get all online friends of the current user.
+//  */
+// export const getOnlineFriends = async (): Promise<User[]> => {
+//   try {
+//     const response = await apiRequest('/friends/online');
+//     return response.onlineFriends;
+//   } catch (error) {
+//     throw new Error('Failed to fetch online friends.');
+//   }
+// };
