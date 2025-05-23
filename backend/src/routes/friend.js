@@ -1,4 +1,5 @@
 const FriendRepository = require('../repositories/friendRepository');
+const socketManager = require('../utils/socketManager');
 
 async function friendRoutes(fastify, options) {
   const friendRepo = new FriendRepository(fastify.db);
@@ -54,7 +55,7 @@ async function friendRoutes(fastify, options) {
       friendRepo.sendRequest(userId, friendId);
 
       // Emit notification to the target user
-      const friendSocket = fastify.io.sockets.get(friendId);
+      const friendSocket = socketManager.getSocket(friendId);
       if (friendSocket) {
         friendSocket.emit('friend_request_received', {
           from: userId,
@@ -88,7 +89,7 @@ async function friendRoutes(fastify, options) {
     }
 
     // Emit notification to the requester
-    const requesterSocket = fastify.io.sockets.get(friendId);
+    const requesterSocket = socketManager.getSocket(friendId);
     if (requesterSocket) {
       requesterSocket.emit('friend_request_accepted', {
         from: userId,
@@ -99,7 +100,7 @@ async function friendRoutes(fastify, options) {
     return { success: true, message: 'Friend request accepted' };
   });
 
-  // Reject friend request
+  // Reject friend request (deletes the request)
   fastify.put('/reject/:friendId', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
     const friendId = parseInt(request.params.friendId);
@@ -111,7 +112,7 @@ async function friendRoutes(fastify, options) {
       return { error: 'No pending request from this user' };
     }
     
-    return { success: true, message: 'Friend request rejected' };
+    return { success: true, message: 'Friend request rejected and deleted' };
   });
 
   // Remove friend
@@ -122,7 +123,7 @@ async function friendRoutes(fastify, options) {
     friendRepo.removeFriend(userId, friendId);
 
     // Notify the friend about the removal
-    const friendSocket = fastify.io.sockets.get(friendId);
+    const friendSocket = socketManager.getSocket(friendId);
     if (friendSocket) {
       friendSocket.emit('friend_removed', {
         from: userId,
@@ -141,7 +142,7 @@ async function friendRoutes(fastify, options) {
 	}
 	
 	const users = fastify.db.prepare(`
-	  SELECT id, username, elo_rank 
+	  SELECT id, username, ranking_points 
 	  FROM users 
 	  WHERE username LIKE ? AND id != ? AND deleted_at IS NULL
 	  LIMIT 20
@@ -154,14 +155,13 @@ async function friendRoutes(fastify, options) {
   fastify.get('/online', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
     const friends = friendRepo.getFriends(userId);
-    const socketManager = require('../utils/socketManager');
     
     const onlineFriends = friends
       .filter(friend => socketManager.isUserOnline(friend.id))
       .map(friend => ({
         id: friend.id,
         username: friend.username,
-        elo_rank: friend.elo_rank
+        ranking_points: friend.ranking_points
       }));
     
     return { onlineFriends };

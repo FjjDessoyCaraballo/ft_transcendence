@@ -6,6 +6,7 @@ const FriendRepository = require('./repositories/friendRepository');
 let friendRepo;
 const fastify = require('fastify')({
 	logger: true,
+  bodyLimit: 5 * 1024 * 1024,
 	https: {
 	  key: fs.readFileSync('/app/certs/key.pem'),
 	  cert: fs.readFileSync('/app/certs/cert.pem')
