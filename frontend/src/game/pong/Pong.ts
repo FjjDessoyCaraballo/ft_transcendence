@@ -14,7 +14,7 @@ export const PADDLE_HEIGHT = 100;
 export const PADDLE_SPEED = 10;
 export const BALL_SIZE = 15;
 export const BUFFER = 15;
-export const MAX_BALL_SPEED = 25;
+export const MAX_BALL_SPEED = 30;
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
