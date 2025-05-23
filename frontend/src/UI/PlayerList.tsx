@@ -277,9 +277,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                     <img
                       src={`${backendBaseUrl}${player.avatar_url}`}
                       alt={`${player.username}'s avatar`}
-                      className="w-32 object-contain mb-4"
+                      className="w-24 h-24 object-contain rounded-full bg-white border border-gray-300 p-1"
                     />
-
                     <h3 className="font-mono text-xl text-[#4B0082] font-bold">
                       {isLoggedInUser ? 'You' : player.username}
                       {player.friendshipStatus === 'friend' && ' 👥'}
