@@ -126,18 +126,28 @@ export class Pong implements IGameState {
         this.player2.paddle.moveDown();
     } 
     else {
-      const now = performance.now();
-      if (now - this.aiLastUpdateTime >= AI_UPDATE_INTERVAL) { // Only update AI's target once per second
-        this.aiTargetY = this.predictBallY(this.ball.x, this.ball.y, this.ball.speedX, this.ball.speedY, this.player2.paddle.x);
-        this.aiLastUpdateTime = now;
+      if (this.ball.speedX < 0) {
+        this.player1.paddle.stayInBounds(this.canvasHeight);
+        this.player2.paddle.stayInBounds(this.canvasHeight);
+        return ; //Prevents unnecessary calculations if the ball is moving away from the AI paddle
       }
 
-      // AI movement toward target using same speed as human
+      const now = performance.now();
+
+      if (now - this.aiLastUpdateTime >= 1000) {
+        this.aiTargetY = this.predictBallY(
+          this.ball.x, this.ball.y,
+          this.ball.speedX, this.ball.speedY,
+          this.player2.paddle.x
+        );
+        this.aiLastUpdateTime = now;
+      }
+      // Move paddle smoothly toward predicted Y
       const paddleCenter = this.player2.paddle.y + PADDLE_HEIGHT / 2;
+
       if (paddleCenter < this.aiTargetY - PADDLE_SPEED) {
         this.player2.paddle.moveDown();
-      } 
-      else if (paddleCenter > this.aiTargetY + PADDLE_SPEED) {
+      } else if (paddleCenter > this.aiTargetY + PADDLE_SPEED) {
         this.player2.paddle.moveUp();
       }
     }
