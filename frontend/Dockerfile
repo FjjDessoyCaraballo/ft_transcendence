@@ -25,9 +25,6 @@ RUN npm install react react-dom @types/react @types/react-dom --save
 # Install Chart.js for Dashboard data graphs
 RUN npm install chart.js react-chartjs-2 
 
-# Create certificates directory
-RUN mkdir -p /app/certs
-
 # Copy the rest of the application code
 COPY . .
 
