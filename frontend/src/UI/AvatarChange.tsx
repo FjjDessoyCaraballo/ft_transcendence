@@ -21,14 +21,18 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 				data: base64.split(',')[1],
 				size: fileSize
 			});
+			onClick();
+
 		} catch (error) {
 			console.error(`${error}`);
-			alert("Failed to load image!");
+			if (error instanceof Error) {
+            	setErrorMessage(error.message);
+			} else {
+				setErrorMessage("Failed to load image!");
+			}
 		} finally {
 			setIsLoading(false);
 		}
-
-		onClick();
 	}
 
 	const HandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
