@@ -4,7 +4,7 @@ import { GameCanvas, global_curUser } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
-import { getUserData } from '../services/userService';
+import { getUserDataByUsername } from '../services/userService';
 import { User } from './UserManager';
 
 interface HeaderProps {
@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = () => {
 
   useEffect(() => {
     const checkLoginStatus = () => {
-      const loginStatus = localStorage.getItem('logged-in');
+      const loginStatus = sessionStorage.getItem('logged-in');
       setIsLoggedIn(loginStatus === 'true');
     };
 
@@ -43,11 +43,9 @@ export const Header: React.FC<HeaderProps> = () => {
     };
 
     window.addEventListener('loginStatusChanged', handleLoginChange);
-    window.addEventListener('storage', handleLoginChange);
 
     return () => {
       window.removeEventListener('loginStatusChanged', handleLoginChange);
-      window.removeEventListener('storage', handleLoginChange);
     };
   }, []);
 
@@ -77,7 +75,7 @@ export const Header: React.FC<HeaderProps> = () => {
 		return ;
 	
 	try {
-		const userData = await getUserData(global_curUser);
+		const userData = await getUserDataByUsername(global_curUser);
 		setDashboardUserData(userData);
 		setIsGameVisible(false);
 		setIsDashboardVisible(true);
@@ -97,7 +95,7 @@ export const Header: React.FC<HeaderProps> = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[9999] shadow-md">
+      <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[200] shadow-md">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
             Transcendence
@@ -160,7 +158,7 @@ export const Header: React.FC<HeaderProps> = () => {
             console.log('Login successful');
             setShowLogin(false);
             setIsLoggedIn(true);
-            localStorage.setItem('logged-in', 'true');
+            sessionStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
             setWindowOpen(false);
           }}

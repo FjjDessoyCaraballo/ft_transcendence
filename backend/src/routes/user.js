@@ -37,8 +37,28 @@ async function userRoutes(fastify, options) {
     return users;
   });
 
+// GET user by ID
+  fastify.get('/:id', async (request, reply) => {
+    const user = fastify.db.prepare(`
+      SELECT id, username, avatar_url, ranking_points,
+             games_played_pong, wins_pong, losses_pong,
+             games_played_blockbattle, wins_blockbattle, losses_blockbattle,
+             tournaments_played, tournaments_won, tournament_points,
+             created_at, updated_at
+      FROM users 
+      WHERE id = ? AND deleted_at IS NULL
+    `).get(request.params.id);
+    
+    if (!user) {
+      reply.code(404);
+      return { error: 'User not found' };
+    }
+    
+    return user;
+  });
+
   // GET user by USERNAME
-  fastify.get('/:username', async (request, reply) => {
+  fastify.get('/byusername/:username', async (request, reply) => {
 
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
@@ -66,6 +86,11 @@ async function userRoutes(fastify, options) {
     if (!username || !password) {
       reply.code(400);
       return { error: 'Username and password are required' };
+    }
+
+    if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
+      reply.code(400);
+      return { error: 'password too weak'}
     }
     
     try {
@@ -221,6 +246,11 @@ async function userRoutes(fastify, options) {
       return { error: 'Current password and new password are required' };
     }
     
+    if (!newPassword.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
+      reply.code(400);
+      return { error: 'password too weak'}
+    }
+
     // Get current user with password
     const user = fastify.db.prepare(`
       SELECT password FROM users WHERE id = ? AND deleted_at IS NULL
@@ -260,6 +290,11 @@ async function userRoutes(fastify, options) {
       return { error: 'Avatar image is required' };
     }
     
+    if (request.body.avatar.size > 2 * 1024 * 1024) {
+      reply.code(400);
+      return { error: 'File size exceeds 2MB' };
+    }
+
     try {
       // Decode base64 image
       const imageData = Buffer.from(request.body.avatar.data, 'base64');
