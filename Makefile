@@ -43,8 +43,11 @@ clean:
 	@echo "$(RED)Removing data directory contents...$(RESET)"
 	rm -rf data/*
 	touch data/.gitkeep
-	rm -rf certs/*
-	
+	rm -rf certs/
+	rm -rf backend/certs
+	rm -rf frontend/certs
+
+
 # Full clean: remove everything, including images and unused volumes
 fclean: clean
 	@echo "$(RED)Removing all unused Docker volumes...$(RESET)"
