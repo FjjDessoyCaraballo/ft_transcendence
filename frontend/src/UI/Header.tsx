@@ -6,6 +6,7 @@ import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
 import { getUserDataByUsername } from '../services/userService';
 import { User } from './UserManager';
+import { PlayerList } from './PlayerList'
 
 interface HeaderProps {
   onClick: () => void;
@@ -28,7 +29,16 @@ export const Header: React.FC<HeaderProps> = () => {
   const [buttonText, setButtonText] = useState('Dashboard');
   const [isDashboardVisible, setIsDashboardVisible] = useState(false);
   const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
+  const [isPlayerListVisible, setIsPlayerListVisible] = useState(false);
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsGameVisible(true);
+    setIsDashboardVisible(false);
+    setIsPlayerListVisible(false);
+    setDashboardUserData(null);
+    setButtonText('Dashboard');
+  };  
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -68,6 +78,14 @@ export const Header: React.FC<HeaderProps> = () => {
     setShowSettings(true);
   }
 
+  const handlePlayerListClick = () => {
+    //console.log('Player List clicked');
+    setIsGameVisible(false);
+    setIsPlayerListVisible(true);
+    setIsDashboardVisible(false);
+    setButtonText('To Game');
+  };
+
   // Dashboard state change functions
   const handleDashboardClick = async () => {
 
@@ -79,6 +97,7 @@ export const Header: React.FC<HeaderProps> = () => {
 		setDashboardUserData(userData);
 		setIsGameVisible(false);
 		setIsDashboardVisible(true);
+    setIsPlayerListVisible(false);
 		setButtonText('To Game');
 	} catch {
 		alert("Error while fetching user data for Dashboard");
@@ -90,6 +109,7 @@ export const Header: React.FC<HeaderProps> = () => {
 	setDashboardUserData(null);
     setIsGameVisible(true);
     setIsDashboardVisible(false);
+    setIsPlayerListVisible(false);
     setButtonText('Dashboard');
   };
 
@@ -106,11 +126,23 @@ export const Header: React.FC<HeaderProps> = () => {
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
 			<>
-				<button
-  				className="buttonsStyle"
-  				onClick={isGameVisible ? handleDashboardClick : handleBackToGameClick}>
-  				{buttonText}
-				</button>
+				{(isGameVisible || isDashboardVisible) && (
+          <button
+            className="buttonsStyle"
+            onClick={isDashboardVisible ? handleBackToGameClick : handleDashboardClick}>
+            {isDashboardVisible ? 'To Game' : 'Dashboard'}
+          </button>
+        )}
+
+        {(isGameVisible || isPlayerListVisible) && (
+          <button
+            className="buttonsStyle"
+            onClick={isPlayerListVisible ? handleBackToGameClick : handlePlayerListClick}>
+            {isPlayerListVisible ? 'To Game' : 'Players'}
+          </button>
+        )}
+
+
               
               <button
               className="buttonsStyle"
@@ -175,12 +207,15 @@ export const Header: React.FC<HeaderProps> = () => {
             console.log('Settings clicked');
             setShowSettings(false);
           }}
+          onLogout={handleLogout} // ✅ This is the fix
         />
       )}
+
 
 	<main className="pt-32"> {/* or adjust to match header height */}
 	{isGameVisible && <GameCanvas />}
 	{isDashboardVisible && dashboardUserData && <Dashboard userData={dashboardUserData}/>}
+  {isPlayerListVisible && <PlayerList onShowDashboard={handleDashboardClick} />}
 	</main>
 	
     </>

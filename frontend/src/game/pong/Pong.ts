@@ -42,8 +42,8 @@ export class Pong implements IGameState {
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
 
-	this.canvas = canvas;
-	this.ctx = ctx;
+	  this.canvas = canvas;
+	  this.ctx = ctx;
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
     this.storedOpponentName = user2.username;
@@ -256,7 +256,6 @@ export class Pong implements IGameState {
         global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI));
 	  }
   }
-
   drawGame()
   {
     // Clear canvas
