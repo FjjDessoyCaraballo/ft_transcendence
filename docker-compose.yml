@@ -10,6 +10,7 @@ services:
       - ./backend:/app
       - /app/node_modules
       - ./data:/app/data
+      - ./certs:/app/certs
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - JWT_SECRET=${JWT_SECRET:-dev_jwt_secret}
@@ -29,7 +30,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - ./frontend/certs:/app/certs
+      - ./certs:/app/certs
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - BACKEND_URL=${BACKEND_URL:-https://localhost:3443}
