@@ -1,12 +1,15 @@
 import { GameStates, IGameState } from "../GameStates";
 import { User } from "../../UI/UserManager";
-import { global_allUserDataArr, global_stateManager } from "../../UI/GameCanvas";
+import { global_stateManager } from "../../UI/GameCanvas";
 import { EndScreen } from "../EndScreen";
 import { TournamentPlayer } from "../Tournament";
 import { GameType } from "../../UI/Types";
 import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "../Constants";
 import { Player, Paddle} from "./Paddle";
 import { Ball } from "./Ball";
+import { getLoggedInUserData, getOpponentData } from "../../services/userService";
+import { drawCenteredText } from "../StartScreen";
+import { UserManager } from "../../UI/UserManager";
 
 // Game Constants
 export const PADDLE_WIDTH = 15; 
@@ -26,11 +29,11 @@ export class Pong implements IGameState {
   aiTargetY: number; // AI's current target
 
   twoPlayerMode: boolean = false;
-  player1: Player;
-  player2: Player;
+  player1: Player | null;
+  player2: Player | null;
+  AIData: User | null;
   tournamentData1: TournamentPlayer | null;
   tournamentData2: TournamentPlayer | null;
-  storedOpponentName: string;
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
@@ -39,38 +42,91 @@ export class Pong implements IGameState {
   canvasHeight: number;
   ctx: CanvasRenderingContext2D;
   isStateReady: boolean;
+  isDataReady: boolean;
+  showLoadingText: boolean;
+  savingDataToDB: boolean;
+  saveReady: boolean;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, AIData: User | null, state: 'ai' | 'playing') {
 
 	this.canvas = canvas;
 	this.ctx = ctx;
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
-    this.storedOpponentName = user2.username;
     this.aiTargetY = (this.canvasHeight - PADDLE_HEIGHT) / 2; // AI's current target
-    this.player1 = new Player(user1, new Paddle(BUFFER, this.canvasHeight)); //STAT
-    this.player2 = new Player(user2, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+    this.player1 = null;
+    this.player2 = null;
+	this.AIData = AIData;
     this.ball = new Ball(this.canvasWidth, this.canvasHeight);
     this.isStateReady = false;
+	this.isDataReady = false;
+	this.showLoadingText = false;
+	this.savingDataToDB = false;
+	this.saveReady = false;
     this.gameState = state;
-    this.tournamentData1 = tData1;
-	  this.tournamentData2 = tData2;
+    this.tournamentData1 = null;
+	  this.tournamentData2 = null;
     if (this.gameState === 'playing')
     {
       this.twoPlayerMode = true; // Two-player mode
-      this.player2.user.username = this.storedOpponentName;
     }
     else if (this.gameState === 'ai')
     {
       this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
-      this.player2.user.username = "Computer";
       this.gameState = 'playing';
     }
+
+	setTimeout(() => {
+		this.showLoadingText = true;
+	}, 500); 
+
+	this.fetchUserData();
 
     // Listen for key events
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
     document.addEventListener('keyup', this.handleKeyUp.bind(this));
   }
+
+  async fetchUserData()
+	{
+		try
+		{
+			const player1UserData = await getLoggedInUserData();
+			if (!player1UserData)
+			{
+				console.log("PONG: User data fetch failed.");
+				return ;
+			}
+  
+			let player2UserData;
+			if (this.twoPlayerMode)
+			{
+				player2UserData = await getOpponentData();
+				if (!player2UserData)
+				{
+					console.log("PONG: User data fetch failed.");
+					return ;
+				}
+			}
+			else
+				player2UserData = this.AIData;
+  
+			if (!player2UserData)
+			{
+				console.log("PONG: User data fetch failed.");
+				return ;
+			}
+			
+			this.player1 = new Player(player1UserData, new Paddle(BUFFER, this.canvasHeight)); //STAT
+    		this.player2 = new Player(player2UserData, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+
+			this.isDataReady = true;
+		}
+		catch {
+			console.log("PONG: User data fetch failed.");
+			this.isDataReady = false;
+		}
+	}
 
   handleKeyDown(e: KeyboardEvent) {
       this.keysPressed[e.key] = true;
@@ -109,12 +165,14 @@ export class Pong implements IGameState {
 
   updatePlayerPositions() {
     // Player 1 movement
+	if (!this.player1)
+		return ;
     if (this.keysPressed[PONG_UP_1]) 
       this.player1.paddle.moveUp();
     if (this.keysPressed[PONG_DOWN_1]) 
       this.player1.paddle.moveDown();
 
-    if (this.twoPlayerMode) {
+    if (this.twoPlayerMode && this.player2) {
       // Player 2 movement
       if (this.keysPressed[PONG_UP_2]) 
         this.player2.paddle.moveUp();
@@ -123,12 +181,14 @@ export class Pong implements IGameState {
     } 
     else {
       const now = performance.now();
-      if (now - this.aiLastUpdateTime >= 1000) { // Only update AI's target once per second
+      if (now - this.aiLastUpdateTime >= 1000 && this.player2) { // Only update AI's target once per second
         this.aiTargetY = this.predictBallY(this.ball.x, this.ball.y, this.ball.speedX, this.ball.speedY, this.player2.paddle.x);
         this.aiLastUpdateTime = now;
       }
 
       // AI movement toward target using same speed as human
+	  if (!this.player2)
+		return ;
       const paddleCenter = this.player2.paddle.y + PADDLE_HEIGHT / 2;
       if (paddleCenter < this.aiTargetY - PADDLE_SPEED) {
         this.player2.paddle.moveDown();
@@ -155,6 +215,9 @@ export class Pong implements IGameState {
 	}
 
   updateGame() {
+	if (!this.player1 || !this.player2)
+		return ;
+
     this.updatePlayerPositions();
     this.ball.move();
     this.ball.checkCollisions(this.player1.paddle, this.player2.paddle, this.canvasHeight, this.canvasWidth);
@@ -203,10 +266,46 @@ export class Pong implements IGameState {
 
 // Wins and Losses for each user?
 
+	async saveUserDataToDB(winner: User, loser: User)
+	{
+		this.savingDataToDB = true;
+
+		try {
+			await UserManager.updateUserStats(winner, loser, GameType.PONG);
+		} catch {
+
+			// Is this enough? Or do we need more error handling...?
+			// Should we change state to StartScreen or something?
+			alert('User data saving failed');
+			console.log('User data saving failed');
+			this.savingDataToDB = false;
+			return ;
+		}
+
+		this.saveReady = true;
+	}
+
   drawResult() {
+
+	if (!this.player1 || !this.player2)
+			return ;
+
+	const p1 = this.player1.user;
+	const p2 = this.player2.user;
+
+	// AI ending
+	if (!this.twoPlayerMode)
+	{
+		if (this.winner === this.player1)
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG_AI));
+		else if (this.winner === this.player2)
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI));
+	}
+
     // Tournament ending
     if (this.tournamentData1 && this.tournamentData2)
     {
+
       if (this.winner === this.player1)
       {
         this.tournamentData1.tournamentPoints++;
@@ -238,27 +337,32 @@ export class Pong implements IGameState {
     // const player2Score = this.player2.score;
 
     // Regular ending
-    const p1 = this.player1.user;
-	const p2 = this.player2.user;
+	if (!this.savingDataToDB)
+	{
+		if (this.winner === this.player1)
+			this.saveUserDataToDB(this.player1.user, this.player2.user);
+		else if (this.winner === this.player2)
+			this.saveUserDataToDB(this.player2.user, this.player1.user);
 
-    if (this.twoPlayerMode)
+		return ;
+	}
+
+    if (this.saveReady)
     {
       if (this.winner === this.player1)
         global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG));
       else if (this.winner === this.player2)
         global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG));
     }
-    else
-    {
-      if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG_AI));
-      else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI));
-	  }
+
   }
 
   drawGame()
   {
+
+	if (!this.player1 || !this.player2)
+		return ;
+
     // Clear canvas
     this.ctx.fillStyle = 'black';
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -288,9 +392,18 @@ export class Pong implements IGameState {
 
   render(ctx: CanvasRenderingContext2D) {
 
-	  // if (this.gameState === 'menu') {
-		//   this.drawMenu(ctx);
-	  // } 
+	if (!this.isDataReady)
+	{
+		if (!this.showLoadingText)
+			return ;
+
+		const loadingHeader = 'Fetching user data, please wait.';
+		drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+		const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+		drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+		return ;
+	}	 
+
     if (this.gameState === 'result') {
 		  this.drawResult();
 	  } 
@@ -300,6 +413,10 @@ export class Pong implements IGameState {
   }
 
   resetGame() {
+
+	if (!this.player1 || !this.player2)
+		return ;
+
     this.player1.paddle.y = (this.canvasHeight - PADDLE_HEIGHT) / 2;
     this.player2.paddle.y = (this.canvasHeight - PADDLE_HEIGHT) / 2;
     this.ball.reset(this.twoPlayerMode, this.canvasWidth, this.canvasHeight);

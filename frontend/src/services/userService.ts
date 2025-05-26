@@ -70,6 +70,66 @@ export const loginUser = async (registerData: RegisterData): Promise<{ token: st
   }
 };
 
+
+/**
+ * Verify opponent
+ * 
+ * @param userData User registration data
+ * @returns Promise with user data
+ */
+export const verifyOpponent = async (registerData: RegisterData): Promise<{ status: string }> => {
+  try {
+    const response = await apiRequest('/users/verify-opponent', {
+      method: 'POST',
+      body: JSON.stringify(registerData)
+    });
+    return response;
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Get current opponent's data from backend
+ * 
+ */
+export const getOpponentData = async (): Promise<User> => {
+  try {
+    return await apiRequest(`/users/opponent-data`);
+  } catch (error) {
+      throw error;
+  }
+};
+
+
+
+/**
+ * Check from backend if we have a logged in user or not (based on JWT token)
+ * This makes it safer for us to track the logged in state (rather than using frontend's localStorage)
+ * 
+ */
+export const checkIsLoggedIn = async (): Promise<{status: string}> => {
+  try {
+    return await apiRequest(`/users/is-logged-in`);
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Authenticates current logged in user with JWT and returns the user data for him/her.
+ * 
+ */
+export const getLoggedInUserData = async (): Promise<User> => {
+  try {
+    return await apiRequest(`/users/logged-in-user-data`);
+  } catch (error) {
+      throw error;
+  }
+};
+
+
+
 /**
  * Get user data from the API
  * 
@@ -78,7 +138,7 @@ export const loginUser = async (registerData: RegisterData): Promise<{ token: st
  */
 export const getUserDataByUsername = async (username: string): Promise<User> => {
   try {
-    return await apiRequest(`/users/byusername/${username}`);
+    return await apiRequest(`/users/by-username/${username}`);
   } catch (error) {
       throw error;
   }

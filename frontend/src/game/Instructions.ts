@@ -1,3 +1,5 @@
+/*
+
 import { GameStates, IGameState } from "./GameStates";
 import { ReturnMainMenuButton } from "./EndScreen";
 import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./Constants";
@@ -115,3 +117,5 @@ export class Instructions implements IGameState
 	}
 
 }
+
+*/

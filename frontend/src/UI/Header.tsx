@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Dashboard } from './Dashboard'
-import { GameCanvas, global_curUser } from './GameCanvas';
+import { GameCanvas } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
-import { getUserDataByUsername } from '../services/userService';
+import { getLoggedInUserData, checkIsLoggedIn } from '../services/userService';
 import { User } from './UserManager';
 
 interface HeaderProps {
@@ -30,31 +30,29 @@ export const Header: React.FC<HeaderProps> = () => {
   const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
 
 
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const loginStatus = sessionStorage.getItem('logged-in');
-      setIsLoggedIn(loginStatus === 'true');
-    };
-
-    checkLoginStatus();
-
-    const handleLoginChange = () => {
-      	checkLoginStatus();
-
-		if (!isLoggedIn)
-		{
-			setDashboardUserData(null);
+ useEffect(() => {
+  	const checkLoginStatus = async () => {
+		try {
+			await checkIsLoggedIn();
+			setIsLoggedIn(true);
+		} catch (err) {
+			console.log('HEADER: No one is logged in');
+			setIsLoggedIn(false);
 			setIsGameVisible(true);
 			setIsDashboardVisible(false);
+			setDashboardUserData(null);
 		}
-    };
+  };
 
-    window.addEventListener('loginStatusChanged', handleLoginChange);
+  checkLoginStatus();
 
-    return () => {
-      window.removeEventListener('loginStatusChanged', handleLoginChange);
-    };
-  }, []);
+  window.addEventListener('loginStatusChanged', checkLoginStatus);
+
+  return () => {
+    window.removeEventListener('loginStatusChanged', checkLoginStatus);
+  };
+}, []);
+
 
   const HandleRegistrationClick = () => {
     if (windowOpen === false)
@@ -78,17 +76,14 @@ export const Header: React.FC<HeaderProps> = () => {
   // Dashboard state change functions
   const handleDashboardClick = async () => {
 
-	if (!global_curUser)
-		return ;
-	
 	try {
-		const userData = await getUserDataByUsername(global_curUser);
+		const userData = await getLoggedInUserData();
 		setDashboardUserData(userData);
 		setIsGameVisible(false);
 		setIsDashboardVisible(true);
 		setButtonText('To Game');
 	} catch {
-		alert("Error while fetching user data for Dashboard");
+		alert("Error while fetching user data for Dashboard; are you sure you're logged in...?");
 		console.log("Error while fetching user data for Dashboard");
 	}
   };
@@ -127,6 +122,7 @@ export const Header: React.FC<HeaderProps> = () => {
 			</>
           ) : (
             <>
+
               <button 
                 className="buttonsStyle"
                 onClick={HandleLoginClick}>
@@ -186,7 +182,7 @@ export const Header: React.FC<HeaderProps> = () => {
       )}
 
 	<main className="pt-32"> {/* or adjust to match header height */}
-	{isGameVisible && <GameCanvas />}
+	{isGameVisible && <GameCanvas isLoggedIn={isLoggedIn} />}
 	{isDashboardVisible && dashboardUserData && <Dashboard userData={dashboardUserData}/>}
 	</main>
 	

@@ -137,7 +137,7 @@ export class Tournament implements IGameState
 
 			if (player1 && player2)
 			{
-				this.curMatch = new MatchIntro(this.canvas, this.ctx, player1.user, player2.user, player1, player2, this.gameType);
+				this.curMatch = new MatchIntro(this.canvas, this.ctx, this.gameType, true);
 				this.curMatch.enter();
 			}
 		}
@@ -172,9 +172,9 @@ export class Tournament implements IGameState
 				{	
 
 					if (this.gameType === GameType.BLOCK_BATTLE)
-						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.user, player2.user, player1, player2, player1.bbWeapons, player2.bbWeapons);
+						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.bbWeapons, player2.bbWeapons);
 					else if (this.gameType === GameType.PONG)
-						this.curMatch = new Pong(this.canvas, this.ctx, player1.user, player2.user, player1, player2, 'playing');
+						this.curMatch = new Pong(this.canvas, this.ctx, null, 'playing');
 
 					this.curMatch.enter();
 				}

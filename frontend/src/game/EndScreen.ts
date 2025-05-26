@@ -95,8 +95,8 @@ export class EndScreen implements IGameState
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
 
-		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
-			this.saveUserDataToDB();
+//		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
+//			this.saveUserDataToDB();
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -137,23 +137,6 @@ export class EndScreen implements IGameState
 	{
 		this.canvas.removeEventListener('mousemove', this.mouseMoveBound);
 		this.canvas.removeEventListener('click', this.mouseClickBound);
-	}
-
-	async saveUserDataToDB()
-	{
-		this.savingDataToDB = true;
-
-		try {
-			await UserManager.updateUserStats(this.winner, this.loser, this.gameType);
-		} catch {
-
-			// Is this enough? Or do we need more error handling...?
-			alert('User data saving failed');
-			console.log('User data saving failed');
-		}
-
-		this.savingDataToDB = false;
-
 	}
 
 	update(deltaTime: number)

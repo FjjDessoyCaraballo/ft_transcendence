@@ -8,15 +8,16 @@ import { Pong } from "./pong/Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
 import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE, BB_LEFT_1, BB_RIGHT_1, BB_LEFT_2, BB_RIGHT_2 } from "./Constants";
 import { Bazooka, LandMine, Pistol, Weapon } from "./Weapons";
+import { getLoggedInUserData, getOpponentData } from "../services/userService";
 
 
 export class MatchIntro implements IGameState
 {
 	name: GameStates;
-	player1: User;
-	player2: User;
-	tournamentData1: TournamentPlayer | null;
-	tournamentData2: TournamentPlayer | null;
+	player1Data: User | null = null;
+	player2Data: User | null = null;
+	player1TournamentData: TournamentPlayer | null;
+	player2TournamentData: TournamentPlayer | null;
 	isStateReady: boolean;
 	p1IsReady: boolean;
 	p2IsReady: boolean;
@@ -35,17 +36,23 @@ export class MatchIntro implements IGameState
 	p2SelectDown: boolean = false;
 	p2LeftDown: boolean = false;
 	p2RightDown: boolean = false;
+	isTournament: boolean;
+	isDataReady: boolean;
+	showLoadingText: boolean;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, player1: User, player2: User | null, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, type: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: GameType, isTournament: boolean)
 	{
 		this.name = GameStates.MATCH_INTRO;
+		this.isTournament = isTournament;
+		this.isDataReady = false;
+		this.showLoadingText = false;
 
 		// We should create a user in the DB for AI computer. Then we could track it's win/lose stats etc :D
-		if (!player2)
+		if (type === GameType.PONG_AI)
 		{
-			player2 = {
+			this.player2Data = {
 				id: 9999,
 				username: 'Computer',
 				ranking_points: 9999,
@@ -60,32 +67,73 @@ export class MatchIntro implements IGameState
 				tournaments_won: 9999,
 				tournament_points: 9999,
 				match_history: [],
+				bbWeapons: [],
 				created_at: new Date(),
 				updated_at: new Date(),
 				deleted_at: null
 			};
 		}
 
+		this.player1TournamentData = null;
+		this.player2TournamentData = null;
+
+		/**
+		 * ADD TOURNAMENT DATA CREATION LOGIC HERE
+		 */
+
 		this.canvas = canvas;
 		this.ctx = ctx;
-		this.player1 = player1;
-		this.player2 = player2;
-		this.keys = {}; // Maybe in enter() ?
+		this.keys = {};
 		this.gameType = type;
 		this.p1IsReady = false;
 		if (this.gameType === GameType.PONG_AI)
 			this.p2IsReady = true;
 		else
 			this.p2IsReady = false;
-		this.tournamentData1 = tData1;
-		this.tournamentData2 = tData2;
 		this.isStateReady = false;
 		this.weaponIdx1 = 0;
 		this.weaponIdx2 = 0;
 
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		this.fetchPlayerData();
+
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
 
+	}
+
+	// ADD FETCH TOURNAMENT INFO
+
+	async fetchPlayerData()
+	{
+		try
+		{
+			this.player1Data = await getLoggedInUserData();
+			if (!this.player1Data)
+			{
+				console.log("MATCH INTRO: User data fetch failed.");
+				return ;
+			}
+
+			if (this.gameType !== GameType.PONG_AI)
+			{
+				this.player2Data = await getOpponentData();
+				if (!this.player2Data)
+				{
+					console.log("MATCH INTRO: User data fetch failed.");
+					return ;
+				}
+			}
+
+			this.isDataReady = true;
+		}
+		catch {
+			console.log("MATCH INTRO: User data fetch failed.");
+			this.isDataReady = false;
+		}
 	}
 
 	keyDownCallback(event: KeyboardEvent)
@@ -190,17 +238,21 @@ export class MatchIntro implements IGameState
 		// CHECK GAME START
 		if (this.p1IsReady && this.p2IsReady)
 		{
-			if (!this.tournamentData1)
+			if (!this.isTournament)
 			{
 				if (this.gameType === GameType.BLOCK_BATTLE)
-					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.player1, this.player2, null, null, this.p1Weapons, this.p2Weapons));
-				else if (this.gameType === GameType.PONG)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'playing'));
-				else if (this.gameType === GameType.PONG_AI)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'ai'));
+					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.p1Weapons, this.p2Weapons));
+				else if (this.gameType === GameType.PONG && this.player1Data && this.player2Data)
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, null, 'playing'));
+				else if (this.gameType === GameType.PONG_AI && this.player1Data && this.player2Data)
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player2Data, 'ai'));
 			}
 			else
 			{
+				/*
+
+				ADD TOURNAMENT API LOGIC!!
+
 				this.isStateReady = true;
 				this.tournamentData1.bbWeapons.push(this.p1Weapons[0].clone());
 				this.tournamentData1.bbWeapons.push(this.p1Weapons[1].clone());
@@ -210,6 +262,7 @@ export class MatchIntro implements IGameState
 					this.tournamentData2.bbWeapons.push(this.p2Weapons[0].clone());
 					this.tournamentData2.bbWeapons.push(this.p2Weapons[1].clone());
 				}
+				*/
 			}
 		}
 	}
@@ -351,6 +404,19 @@ export class MatchIntro implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
+
+		if (!this.isDataReady)
+		{
+			if (!this.showLoadingText)
+				return ;
+
+			const loadingHeader = 'Fetching user data, please wait.';
+			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+			return ;
+		}
+
 		const p1FillColor = this.p1IsReady ? 'green' : 'red';
 		const p2FillColor = this.p2IsReady ? 'green' : 'red';
 
@@ -359,9 +425,9 @@ export class MatchIntro implements IGameState
 		drawCenteredText(this.canvas, this.ctx, "GAME IS ABOUT TO START!", '70px Impact', DEEP_PURPLE, 100);
 
 		let infoText = '';
-		if (this.gameType != GameType.BLOCK_BATTLE)
+		if (this.gameType != GameType.BLOCK_BATTLE && this.player1Data && this.player2Data)
 		{
-			infoText = `Press the up key (${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play`;
+			infoText = `Press the up key (${this.player1Data.username}: '${PONG_UP_1}' / ${this.player2Data.username}: '${PONG_UP_2}') when you are ready to play`;
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
 
 		}
@@ -369,24 +435,34 @@ export class MatchIntro implements IGameState
 		{
 			infoText = 'Use LEFT and RIGHT keys to navigate through weapons.';
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
-			infoText = 'Use SHOOT key to equip/unequip them.';
+			infoText = 'Use SHOOT key to equip/unequip weapons.';
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 185);
 		}
 
 		const playerNamesY = 340;
 		const rankingPointsY = 380;
+
 		// PLAYER 1
-		let p1Text = this.player1.username;
+
+		if (!this.player1Data)
+			return ;
+
+		let p1Text = this.player1Data.username;
 		let p1X = this.canvas.width / 4 - this.ctx.measureText(p1Text).width / 2;
 		drawText(this.ctx, p1Text, '55px arial', p1FillColor, p1X, playerNamesY);
 
 		let p1Rank;
-		if (!this.tournamentData1)
-			p1Rank = `Ranking points: ${this.player1.ranking_points.toFixed(2)}`;
+		if (!this.isTournament)
+			p1Rank = `Ranking points: ${this.player1Data.ranking_points.toFixed(2)}`;
 		else
 		{
-			p1Rank = `Place: ${this.tournamentData1.place}
-			Points: ${this.tournamentData1.tournamentPoints}`;
+			if (this.player1TournamentData)
+			{
+				p1Rank = `Place: ${this.player1TournamentData.place}
+				Points: ${this.player1TournamentData.tournamentPoints}`;
+			}
+			else
+				p1Rank = 'Error';
 		}
 		const halfOfP1Text = ctx.measureText(p1Text).width / 2;
 		ctx.font = '30px arial';
@@ -397,17 +473,25 @@ export class MatchIntro implements IGameState
 		drawCenteredText(this.canvas, this.ctx, 'VS', '60px arial', 'white', playerNamesY);
 
 		// PLAYER 2
-		const p2Text = this.player2.username;
+		if (!this.player2Data)
+				return ;
+
+		const p2Text = this.player2Data.username;
 		const p2X = this.canvas.width * 0.75 - ctx.measureText(p2Text).width / 2;
 		drawText(this.ctx, p2Text, '55px arial', p2FillColor, p2X, playerNamesY);
 
 		let p2Rank;
-		if (!this.tournamentData2)
-			p2Rank = `Ranking points: ${this.player2.ranking_points.toFixed(2)}`;
+		if (!this.isTournament)
+			p2Rank = `Ranking points: ${this.player2Data.ranking_points.toFixed(2)}`;
 		else
 		{
-			p2Rank = `Place: ${this.tournamentData2.place}
-			Points: ${this.tournamentData2.tournamentPoints}`;
+			if (this.player2TournamentData)
+			{
+				p2Rank = `Place: ${this.player2TournamentData.place}
+				Points: ${this.player2TournamentData.tournamentPoints}`;
+			}
+			else
+				p2Rank = 'Error';
 		}
 		const halfOfP2Text = ctx.measureText(p2Text).width / 2;
 		ctx.font = '30px arial';

@@ -3,15 +3,17 @@ import { Player2 } from './Player2';
 import { Platform, PlatformDir } from './Platform';
 import { collType } from './CollisionShape';
 import { drawGround, drawWalls} from './Environment';
-import { global_stateManager, global_allUserDataArr } from '../UI/GameCanvas';
+import { global_stateManager } from '../UI/GameCanvas';
 import { GameStates, IGameState } from './GameStates';
 import { EndScreen } from './EndScreen';
-import { User } from '../UI/UserManager';
+import { UserManager, User } from '../UI/UserManager';
 import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
 import { Weapon } from './Weapons';
+import { getLoggedInUserData, getOpponentData } from '../services/userService';
+import { drawCenteredText } from './StartScreen';
 
 export interface bbMatchData {
 	date: Date;
@@ -40,8 +42,10 @@ export interface bbMatchData {
 export class BlockBattle implements IGameState
 {
 	name: GameStates
-	player1: Player;
-	player2: Player2;
+	player1: Player | null;
+	player2: Player2 | null;
+	p1Weapons: Weapon [] = [];
+	p2Weapons: Weapon [] = [];
 	tournamentData1: TournamentPlayer | null;
 	tournamentData2: TournamentPlayer | null;
 	isStateReady: boolean;
@@ -50,20 +54,30 @@ export class BlockBattle implements IGameState
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	coinHandler: CoinHandler;
-	gameStats: bbMatchData;
+	gameStats: bbMatchData | null;
+	isDataReady: boolean;
+	showLoadingText: boolean;
+	savingDataToDB: boolean;
+	saveReady: boolean;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, 
-		tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, p1Weapons: Weapon[], p2Weapons: Weapon[])
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, p1Weapons: Weapon[], p2Weapons: Weapon[])
 	{
 		this.name = GameStates.BLOCK_BATTLE;
 		this.isStateReady = false;
-		this.tournamentData1 = tData1;
-		this.tournamentData2 = tData2;
-		
-		this.player1 = new Player(100, 745, 'green', user1, p1Weapons[0], p1Weapons[1]);
-		this.player2 = new Player2(1100, 745, 'red', user2, p2Weapons[0], p2Weapons[1]);
+		this.tournamentData1 = null;
+		this.tournamentData2 = null;
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		this.savingDataToDB = false;
+		this.saveReady = false;
+		this.p1Weapons = p1Weapons;
+		this.p2Weapons = p2Weapons;
+
+		this.player1 = null;
+		this.player2 = null;
+		this.gameStats = null;
 
 		this.keys = {}; // Maybe in enter() ?
 
@@ -85,40 +99,74 @@ export class BlockBattle implements IGameState
 
 		]
 		
-
-		this.gameStats = {
-			date: new Date(),
-			startTime: Date.now(),
-			player1_id: user1.id,
-			player1_rank: user1.ranking_points,
-			player2_id: user2.id,
-			player2_rank: user2.ranking_points,
-			game_duration: -1,
-			win_method: '', // KO or Coins
-			player1_weapon1: p1Weapons[0].name,
-			player1_weapon2: p1Weapons[1].name,
-			player1_damage_taken: 0,
-			player1_damage_done: 0,
-			player1_coins_collected: 0,
-			player1_shots_fired: 0,
-			player2_weapon1: p2Weapons[0].name,
-			player2_weapon2: p2Weapons[1].name,
-			player2_damage_taken: 0,
-			player2_damage_done: 0,
-			player2_coins_collected: 0,
-			player2_shots_fired: 0
-		}
-
-
 		this.coinHandler = new CoinHandler(COIN_SPAWN_TIME, this.platforms);
 		this.coinHandler.start();
 
 		this.canvas = canvas;
 		this.ctx = ctx;
 
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		this.fetchUserData();
+
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
 	}
+
+	async fetchUserData()
+	{
+		try
+		{
+			const player1UserData = await getLoggedInUserData();
+			if (!player1UserData)
+			{
+				console.log("BLOCK BATTLE: User data fetch failed.");
+				return ;
+			}
+
+			const player2UserData = await getOpponentData();
+			if (!player2UserData)
+			{
+				console.log("BLOCK BATTLE: User data fetch failed.");
+				return ;
+			}
+
+			this.player1 = new Player(100, 745, 'green', player1UserData, this.p1Weapons[0], this.p1Weapons[1]);
+			this.player2 = new Player2(1100, 745, 'red', player2UserData, this.p2Weapons[0], this.p2Weapons[1]);
+
+			this.gameStats = {
+				date: new Date(),
+				startTime: Date.now(),
+				player1_id: player1UserData.id,
+				player1_rank: player1UserData.ranking_points,
+				player2_id: player2UserData.id,
+				player2_rank: player2UserData.ranking_points,
+				game_duration: -1,
+				win_method: '', // KO or Coins
+				player1_weapon1: this.p1Weapons[0].name,
+				player1_weapon2: this.p1Weapons[1].name,
+				player1_damage_taken: 0,
+				player1_damage_done: 0,
+				player1_coins_collected: 0,
+				player1_shots_fired: 0,
+				player2_weapon1: this.p2Weapons[0].name,
+				player2_weapon2: this.p2Weapons[1].name,
+				player2_damage_taken: 0,
+				player2_damage_done: 0,
+				player2_coins_collected: 0,
+				player2_shots_fired: 0
+			}
+
+			this.isDataReady = true;
+		}
+		catch {
+			console.log("BLOCK BATTLE: User data fetch failed.");
+			this.isDataReady = false;
+		}
+	}
+
 
 	keyDownCallback(event: KeyboardEvent)
 	{
@@ -149,6 +197,8 @@ export class BlockBattle implements IGameState
 		const screenH = 100;
 
 		// PLAYER 1
+		if (!this.player1)
+			return ;
 
 		// Draw background
 		this.ctx.fillStyle = 'rgba(140, 185, 87, 0.75)';
@@ -193,7 +243,9 @@ export class BlockBattle implements IGameState
 
 
 		// PLAYER 2
-		
+		if (!this.player2)
+			return ;
+
 		// Draw background
 		this.ctx.fillStyle = 'rgba(211, 94, 91, 0.75)';
 		const screenX = this.canvas.width - screenW;
@@ -238,14 +290,39 @@ export class BlockBattle implements IGameState
 
 	}
 
+	async saveUserDataToDB(winner: User, loser: User)
+	{
+		this.savingDataToDB = true;
+
+		try {
+			await UserManager.updateUserStats(winner, loser, GameType.BLOCK_BATTLE);
+		} catch {
+
+			// Is this enough? Or do we need more error handling...?
+			// Should we change state to StartScreen or something?
+			alert('User data saving failed');
+			console.log('User data saving failed');
+			this.savingDataToDB = false;
+			return ;
+		}
+
+		this.saveReady = true;
+	}
+
 	update(deltaTime: number)
 	{
+
+		if (!this.isDataReady || this.savingDataToDB)
+			return ;
 
 		for (const platform of this.platforms) {
 				platform.move(deltaTime);
 			}
 
 		// PLAYER 1
+		if (!this.player1 || !this.gameStats)
+			return ;
+
 		this.player1.checkKeyEvents(this.keys, this.gameStats);
 		let player1PrevPos: { x: number, y: number } = { x: this.player1.x, y: this.player1.y};
 		this.player1.move(this.keys, deltaTime);
@@ -261,6 +338,9 @@ export class BlockBattle implements IGameState
 		}
 
 		// PLAYER 2
+		if (!this.player2 || !this.gameStats)
+			return ;
+
 		this.player2.checkKeyEvents(this.keys, this.gameStats);
 		let player2PrevPos: { x: number, y: number } = { x: this.player2.x, y: this.player2.y};
 		this.player2.move(this.keys, deltaTime);
@@ -334,8 +414,8 @@ export class BlockBattle implements IGameState
 			else
 				this.gameStats.win_method = 'Coins';
 
-			console.log("GAME STATS:")
-			console.log(this.gameStats);
+			//console.log("GAME STATS:")
+			//console.log(this.gameStats);
 
 			// Tournament ending
 			if (this.tournamentData1 && this.tournamentData2)
@@ -358,16 +438,27 @@ export class BlockBattle implements IGameState
 				return ;
 			}
 
+			// Regular ending
 			if (this.player1.userData && this.player2.userData)
 			{
-				// Regular ending
-				const p1 = global_allUserDataArr.find(user => user.username === this.player1.userData?.username);
-				const p2 = global_allUserDataArr.find(user => user.username === this.player2.userData?.username);
-	
-				if (p1 && p2 && (this.player1.health.amount === 0 || this.player2.hasWon))
-					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.BLOCK_BATTLE));
-				else if (p1 && p2 && (this.player2.health.amount === 0 || this.player1.hasWon))
-					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.BLOCK_BATTLE));
+				if (!this.savingDataToDB)
+				{
+					if (this.player1.health.amount === 0 || this.player2.hasWon)
+						this.saveUserDataToDB(this.player2.userData, this.player1.userData);
+					else if (this.player2.health.amount === 0 || this.player1.hasWon)
+						this.saveUserDataToDB(this.player1.userData, this.player2.userData);
+
+					return ;
+				}
+
+				if (this.saveReady)
+				{
+					if (this.player1.health.amount === 0 || this.player2.hasWon)
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player2.userData, this.player1.userData, null, null, GameType.BLOCK_BATTLE));
+					else if (this.player2.health.amount === 0 || this.player1.hasWon)
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player1.userData, this.player2.userData, null, null, GameType.BLOCK_BATTLE));
+				}
+
 			}
 		}
 
@@ -375,6 +466,18 @@ export class BlockBattle implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
+		if (!this.isDataReady)
+		{
+			if (!this.showLoadingText)
+				return ;
+
+			const loadingHeader = 'Fetching user data, please wait.';
+			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+			return ;
+		}
+
 		drawGround(this.canvas, ctx);
 		drawWalls(this.canvas, ctx);
 
@@ -382,8 +485,11 @@ export class BlockBattle implements IGameState
 			platform.draw(ctx);
 		}
 		
-		this.player1.draw(ctx);
-		this.player2.draw(ctx);
+		if (this.player1 && this.player2)
+		{
+			this.player1.draw(ctx);
+			this.player2.draw(ctx);
+		}
 		
 		this.coinHandler.renderCoins(ctx);
 		

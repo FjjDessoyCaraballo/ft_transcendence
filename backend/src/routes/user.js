@@ -6,6 +6,11 @@ const { promisify } = require('util');
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
+// A helper variable that stores opponent information. 
+// The frontend then uses this variable to verify that the opponent data is not changed mid game in frontend.
+let globalOpponentData = null;
+
+
 async function userRoutes(fastify, options) {
   // Middleware to check authentication
   const authenticate = async (request, reply) => {
@@ -24,6 +29,13 @@ async function userRoutes(fastify, options) {
     fastify.log.error(`Error creating avatar directory: ${err.message}`);
   }
 
+
+  // CHECK if we have logged in user (based on JWT token)
+  fastify.get('/is-logged-in', { preHandler: authenticate }, async (request, reply) => {
+	return {status: 'OK'};
+  });
+
+
   // GET all users with statistics
   fastify.get('/', async (request, reply) => {
     const users = fastify.db.prepare(`
@@ -36,6 +48,39 @@ async function userRoutes(fastify, options) {
     `).all();
     return users;
   });
+
+
+// GET logged in user info
+fastify.get('/logged-in-user-data', { preHandler: authenticate }, async (request, reply) => {
+
+	const user = fastify.db.prepare(`
+      SELECT id, username, avatar_url, ranking_points,
+             games_played_pong, wins_pong, losses_pong,
+             games_played_blockbattle, wins_blockbattle, losses_blockbattle,
+             tournaments_played, tournaments_won, tournament_points,
+             created_at, updated_at
+      FROM users 
+      WHERE id = ? AND deleted_at IS NULL
+    `).get(request.user.id);
+    
+    if (!user) {
+      reply.code(404);
+      return { error: 'User not found' };
+    }
+    
+    return user;
+});
+
+// GET current opponent's user info
+fastify.get('/opponent-data', { preHandler: authenticate }, async (request, reply) => {
+
+	if (!globalOpponentData) {
+      reply.code(404);
+      return { error: 'Opponent data not found' };
+    }
+
+    return globalOpponentData;
+});
 
 // GET user by ID
   fastify.get('/:id', async (request, reply) => {
@@ -58,7 +103,7 @@ async function userRoutes(fastify, options) {
   });
 
   // GET user by USERNAME
-  fastify.get('/byusername/:username', async (request, reply) => {
+  fastify.get('/by-username/:username', async (request, reply) => {
 
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
@@ -134,6 +179,52 @@ async function userRoutes(fastify, options) {
       reply.code(500);
       return { error: 'Internal server error' };
     }
+  });
+
+  // Verify opponent
+  fastify.post('/verify-opponent', { preHandler: authenticate }, async (request, reply) => {
+    const { username, password } = request.body;
+    
+    // Validate input
+    if (!username || !password) {
+      reply.code(400);
+      return { error: 'Username and password are required' };
+    }
+    
+    // Find user by username
+    const user = fastify.db.prepare(`
+      SELECT * FROM users WHERE username = ? AND deleted_at IS NULL
+    `).get(username);
+    
+    if (!user) {
+      reply.code(401);
+      return { error: 'Invalid username or password' };
+    }
+    
+    // Verify password
+    const passwordMatch = await comparePassword(password, user.password);
+    if (!passwordMatch) {
+      reply.code(401);
+      return { error: 'Invalid username or password' };
+    }
+    
+	globalOpponentData = {
+        id: user.id,
+        username: user.username,
+        avatar_url: user.avatar_url,
+        ranking_points: user.ranking_points,
+        games_played_pong: user.games_played_pong,
+        wins_pong: user.wins_pong,
+        losses_pong: user.losses_pong,
+        games_played_blockbattle: user.games_played_blockbattle,
+        wins_blockbattle: user.wins_blockbattle,
+        losses_blockbattle: user.losses_blockbattle,
+        tournaments_played: user.tournaments_played,
+        tournaments_won: user.tournaments_won,
+        tournament_points: user.tournament_points
+      }
+    
+    return {status: 'OK'};
   });
 
   // Login

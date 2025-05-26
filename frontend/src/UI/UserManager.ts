@@ -1,10 +1,10 @@
-import { global_curUser } from "./GameCanvas"
 import { DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
 import { drawCenteredText } from "../game/StartScreen";
 import { Button } from "./Button";
 import { UserHubState, GameType } from "./Types";
 import { RankingHandler } from "../game/RankingPoints";
 import { updateUserStatsAPI } from "../services/userService";
+import { Weapon } from "../game/Weapons";
 
 /*
 OLD VERSION
@@ -63,7 +63,6 @@ export interface MatchData {
 export interface User {
 	id: number;
 	username: string;
-//	password: string; --> Not needed in the frontend, right?
 	ranking_points: number;
 	avatar_url: string;
 	games_played_pong: number;
@@ -78,6 +77,7 @@ export interface User {
 	created_at: Date;
 	updated_at: Date;
 	deleted_at: Date | null;
+	bbWeapons: Weapon [];
 	match_history: MatchData[];
 }
 
@@ -340,12 +340,12 @@ export class UserManager {
 	}
 
 
-	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
+	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, curUser: User | null)
 	{
-		if (global_curUser)
+		if (curUser)
 		{
 			drawCenteredText(canvas, ctx, 'Currently logged in user: ', '22px arial', 'white', 30);
-			drawCenteredText(canvas, ctx, global_curUser, '28px arial', 'red', 60);
+			drawCenteredText(canvas, ctx, curUser.username, '28px arial', 'red', 60);
 		}
 	}
 }
