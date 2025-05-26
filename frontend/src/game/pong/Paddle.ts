@@ -8,12 +8,12 @@ export class Paddle {
       this.y = (canvasHeight - PADDLE_HEIGHT) / 2;
     }
   
-    moveUp() {
-      this.y -= PADDLE_SPEED;
+    moveUp(deltaTime: number) {
+      this.y -= PADDLE_SPEED * deltaTime;
     }
   
-    moveDown() {
-      this.y += PADDLE_SPEED;
+    moveDown(deltaTime: number) {
+      this.y += PADDLE_SPEED * deltaTime;
     }    
   
     stayInBounds(canvasHeight: number) {
