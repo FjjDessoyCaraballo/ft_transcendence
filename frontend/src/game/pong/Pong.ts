@@ -10,7 +10,7 @@ import { Ball } from "./Ball";
 
 // Game Constants
 export const PADDLE_WIDTH = 15; 
-export const PADDLE_HEIGHT = 120;
+export const PADDLE_HEIGHT = 110;
 export const PADDLE_SPEED = 10;
 export const BALL_SIZE = 15;
 export const BUFFER = 15;
