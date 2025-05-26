@@ -14,7 +14,7 @@ export class Paddle {
   
     moveDown() {
       this.y += PADDLE_SPEED;
-    }    
+    }
   
     stayInBounds(canvasHeight: number) {
       this.y = Math.max(0, Math.min(canvasHeight - PADDLE_HEIGHT, this.y));

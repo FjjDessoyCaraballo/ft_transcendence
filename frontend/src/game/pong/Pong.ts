@@ -10,14 +10,10 @@ import { Ball } from "./Ball";
 
 // Game Constants
 export const PADDLE_WIDTH = 15; 
-export const PADDLE_HEIGHT = 110;
+export const PADDLE_HEIGHT = 100;
 export const PADDLE_SPEED = 10;
 export const BALL_SIZE = 15;
 export const BUFFER = 15;
-export const MAX_BALL_SPEED = 30;
-export const WINNING_SCORE = 5;
-export const AI_UPDATE_INTERVAL = 1000;
-
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
@@ -126,28 +122,18 @@ export class Pong implements IGameState {
         this.player2.paddle.moveDown();
     } 
     else {
-      if (this.ball.speedX < 0) {
-        this.player1.paddle.stayInBounds(this.canvasHeight);
-        this.player2.paddle.stayInBounds(this.canvasHeight);
-        return ; //Prevents unnecessary calculations if the ball is moving away from the AI paddle
-      }
-
       const now = performance.now();
-
-      if (now - this.aiLastUpdateTime >= 1000) {
-        this.aiTargetY = this.predictBallY(
-          this.ball.x, this.ball.y,
-          this.ball.speedX, this.ball.speedY,
-          this.player2.paddle.x
-        );
+      if (now - this.aiLastUpdateTime >= 1000) { // Only update AI's target once per second
+        this.aiTargetY = this.predictBallY(this.ball.x, this.ball.y, this.ball.speedX, this.ball.speedY, this.player2.paddle.x);
         this.aiLastUpdateTime = now;
       }
-      // Move paddle smoothly toward predicted Y
-      const paddleCenter = this.player2.paddle.y + PADDLE_HEIGHT / 2;
 
+      // AI movement toward target using same speed as human
+      const paddleCenter = this.player2.paddle.y + PADDLE_HEIGHT / 2;
       if (paddleCenter < this.aiTargetY - PADDLE_SPEED) {
         this.player2.paddle.moveDown();
-      } else if (paddleCenter > this.aiTargetY + PADDLE_SPEED) {
+      } 
+      else if (paddleCenter > this.aiTargetY + PADDLE_SPEED) {
         this.player2.paddle.moveUp();
       }
     }
@@ -176,7 +162,7 @@ export class Pong implements IGameState {
     // Reset ball if missed and count score
     if (this.ball.x < 0) {
       this.player2.score++;
-      if (this.player2.score === WINNING_SCORE) {
+      if (this.player2.score === 5) {
         this.gameState = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player2;
@@ -187,7 +173,7 @@ export class Pong implements IGameState {
 
     if (this.ball.x > this.canvasWidth) {
       this.player1.score++;
-      if (this.player1.score === WINNING_SCORE) {
+      if (this.player1.score === 5) {
         this.gameState = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player1;
