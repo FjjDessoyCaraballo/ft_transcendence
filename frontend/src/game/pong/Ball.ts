@@ -1,4 +1,4 @@
-import { PADDLE_HEIGHT, PADDLE_WIDTH, BALL_SIZE, BUFFER } from "./Pong";
+import { PADDLE_HEIGHT, PADDLE_WIDTH, BALL_SIZE, BUFFER, MAX_BALL_SPEED } from "./Pong";
 import { Paddle } from "./Paddle";
 
 export class Ball {
@@ -43,7 +43,8 @@ export class Ball {
         const bounceAngle = normalized * Math.PI / 4; // -1 (-45 degrees) to 1 (+45 degrees)
         const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2); // keep same speed after bounce (pythagoras)
       
-        this.speedX = Math.cos(bounceAngle) * speed; // reflected to right
+        const newSpeed = Math.min(speed * 1.025, MAX_BALL_SPEED);
+        this.speedX = Math.cos(bounceAngle) * newSpeed; // reflected to right
         this.speedY = Math.sin(bounceAngle) * speed;
       
         // Make sure ball is moving right
@@ -61,7 +62,8 @@ export class Ball {
         const bounceAngle = normalized * Math.PI / 4;
         const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2);
       
-        this.speedX = -Math.cos(bounceAngle) * speed; // reflected to left
+        const newSpeed = Math.min(speed * 1.025, MAX_BALL_SPEED);
+        this.speedX = -Math.cos(bounceAngle) * newSpeed; // reflected to left
         this.speedY = Math.sin(bounceAngle) * speed;
       
         if (this.speedX > 0) 

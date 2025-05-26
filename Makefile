@@ -11,24 +11,24 @@ BLUE = \033[34m
 
 build:
 	@echo "$(BLUE)Building Docker images...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) build
+	docker compose -f $(COMPOSE_FILE) build
 
 start:
 	@echo "$(GREEN)Starting containers...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) up -d
+	docker compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)Services are running:$(RESET)"
 	@echo "$(GREEN)- Frontend: https://localhost:$$(grep FRONTEND_PORT $(ENV_FILE) | cut -d '=' -f2 || echo 8080)$(RESET)"
 	@echo "$(GREEN)- Backend API: https://localhost:$$(grep BACKEND_PORT $(ENV_FILE) | cut -d '=' -f2 || echo 3443)$(RESET)"
 
 stop:
 	@echo "$(YELLOW)Stopping containers...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) down
+	docker compose -f $(COMPOSE_FILE) down
 
 restart: stop start
 
 clean:
 	@echo "$(RED)Cleaning up Docker resources...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) down -v
+	docker compose -f $(COMPOSE_FILE) down -v
 	@echo "$(RED)Removing data directory contents...$(RESET)"
 	rm -rf data/*
 	touch data/.gitkeep
@@ -44,23 +44,23 @@ fclean: clean
 
 logs:
 	@echo "$(BLUE)Showing logs...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) logs -f
+	docker compose -f $(COMPOSE_FILE) logs -f
 
 logs-backend:
 	@echo "$(BLUE)Showing backend logs...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) logs -f backend
+	docker compose -f $(COMPOSE_FILE) logs -f backend
 
 logs-frontend:
 	@echo "$(BLUE)Showing frontend logs...$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) logs -f frontend
+	docker compose -f $(COMPOSE_FILE) logs -f frontend
 
 backend:
-	docker-compose -f $(COMPOSE_FILE) up backend
+	docker compose -f $(COMPOSE_FILE) up backend
 
 # Show database contents (for SQLite)
 db:
 	@echo "$(BLUE)SQLite database contents:$(RESET)"
-	docker-compose -f $(COMPOSE_FILE) exec backend sqlite3 /app/data/database.sqlite
+	docker compose -f $(COMPOSE_FILE) exec backend sqlite3 /app/data/database.sqlite
 
 # Full stop and cleaning for restart
 nuke: stop fclean build start
