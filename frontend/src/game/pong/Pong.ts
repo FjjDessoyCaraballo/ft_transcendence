@@ -11,12 +11,14 @@ import { Ball } from "./Ball";
 // Game Constants
 export const PADDLE_WIDTH = 15; 
 export const PADDLE_HEIGHT = 110;
-export const PADDLE_SPEED = 10;
+export const PADDLE_SPEED = 500;
 export const BALL_SIZE = 15;
 export const BUFFER = 15;
-export const MAX_BALL_SPEED = 30;
+export const MAX_BALL_SPEED = 1500;
 export const WINNING_SCORE = 5;
 export const AI_UPDATE_INTERVAL = 1000;
+export const INITIAL_BALLSPEED_X = 800;
+export const INITIAL_BALLSPEED_Y = 25;
 
 
 export class Pong implements IGameState {
@@ -111,19 +113,19 @@ export class Pong implements IGameState {
     return ballY; // Return the predicted Y position of the ball
   }
 
-  updatePlayerPositions() {
+  updatePlayerPositions(deltaTime: number) {
     // Player 1 movement
     if (this.keysPressed[PONG_UP_1]) 
-      this.player1.paddle.moveUp();
+      this.player1.paddle.moveUp(deltaTime);
     if (this.keysPressed[PONG_DOWN_1]) 
-      this.player1.paddle.moveDown();
+      this.player1.paddle.moveDown(deltaTime);
 
     if (this.twoPlayerMode) {
       // Player 2 movement
       if (this.keysPressed[PONG_UP_2]) 
-        this.player2.paddle.moveUp();
+        this.player2.paddle.moveUp(deltaTime);
       if (this.keysPressed[PONG_DOWN_2]) 
-        this.player2.paddle.moveDown();
+        this.player2.paddle.moveDown(deltaTime);
     } 
     else {
       if (this.ball.speedX < 0) {
@@ -145,10 +147,10 @@ export class Pong implements IGameState {
       // Move paddle smoothly toward predicted Y
       const paddleCenter = this.player2.paddle.y + PADDLE_HEIGHT / 2;
 
-      if (paddleCenter < this.aiTargetY - PADDLE_SPEED) {
-        this.player2.paddle.moveDown();
-      } else if (paddleCenter > this.aiTargetY + PADDLE_SPEED) {
-        this.player2.paddle.moveUp();
+      if (paddleCenter < this.aiTargetY - PADDLE_SPEED * deltaTime) {
+        this.player2.paddle.moveDown(deltaTime);
+      } else if (paddleCenter > this.aiTargetY + PADDLE_SPEED * deltaTime) {
+        this.player2.paddle.moveUp(deltaTime);
       }
     }
     this.player1.paddle.stayInBounds(this.canvasHeight);
@@ -168,9 +170,9 @@ export class Pong implements IGameState {
     document.removeEventListener('keyup', this.handleKeyUp.bind(this));
 	}
 
-  updateGame() {
-    this.updatePlayerPositions();
-    this.ball.move();
+  updateGame(deltaTime: number) {
+    this.updatePlayerPositions(deltaTime);
+    this.ball.move(deltaTime);
     this.ball.checkCollisions(this.player1.paddle, this.player2.paddle, this.canvasHeight, this.canvasWidth);
 
     // Reset ball if missed and count score
@@ -197,9 +199,9 @@ export class Pong implements IGameState {
     }
   }
 
-  update() {
+  update(deltaTime: number) {
 		if (this.gameState === 'playing')
-			this.updateGame();
+			this.updateGame(deltaTime);
   }
 
 // STATS
