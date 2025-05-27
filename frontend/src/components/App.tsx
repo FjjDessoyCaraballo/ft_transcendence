@@ -4,6 +4,7 @@ import { Header } from '../UI/Header';
 import { GameCanvas, global_curUser } from '../UI/GameCanvas';
 import { Dashboard } from '../UI/Dashboard';
 import { PlayerList } from '../UI/PlayerList';
+import { Instructions } from '../UI/Instructions';
 import { User } from '../UI/UserManager';
 import { getUserDataByUsername } from '../services/userService';
 
