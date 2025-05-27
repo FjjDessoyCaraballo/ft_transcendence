@@ -1,3 +1,5 @@
+/*
+
 import { User } from "../UI/UserManager";
 
 
@@ -34,3 +36,5 @@ export class RankingHandler {
 
     }
 }
+
+*/

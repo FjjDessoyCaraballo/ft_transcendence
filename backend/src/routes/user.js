@@ -5,10 +5,8 @@ const path = require('path');
 const { promisify } = require('util');
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
+const { globalObj } = require('./sharedObjects');
 
-// A helper variable that stores opponent information. 
-// The frontend then uses this variable to verify that the opponent data is not changed mid game in frontend.
-let globalOpponentData = null;
 
 
 async function userRoutes(fastify, options) {
@@ -74,12 +72,12 @@ fastify.get('/logged-in-user-data', { preHandler: authenticate }, async (request
 // GET current opponent's user info
 fastify.get('/opponent-data', { preHandler: authenticate }, async (request, reply) => {
 
-	if (!globalOpponentData) {
+	if (!globalObj.opponentData) {
       reply.code(404);
       return { error: 'Opponent data not found' };
     }
 
-    return globalOpponentData;
+    return globalObj.opponentData;
 });
 
 // GET user by ID
@@ -90,6 +88,22 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
              games_played_blockbattle, wins_blockbattle, losses_blockbattle,
              tournaments_played, tournaments_won, tournament_points,
              created_at, updated_at
+      FROM users 
+      WHERE id = ? AND deleted_at IS NULL
+    `).get(request.params.id);
+    
+    if (!user) {
+      reply.code(404);
+      return { error: 'User not found' };
+    }
+    
+    return user;
+  });
+
+  // GET user name & rank by ID
+  fastify.get('/name-and-rank/:id', { preHandler: authenticate }, async (request, reply) => {
+    const user = fastify.db.prepare(`
+      SELECT username, avatar_url, ranking_points
       FROM users 
       WHERE id = ? AND deleted_at IS NULL
     `).get(request.params.id);
@@ -208,7 +222,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       return { error: 'Invalid username or password' };
     }
     
-	globalOpponentData = {
+	globalObj.opponentData = {
         id: user.id,
         username: user.username,
         avatar_url: user.avatar_url,
@@ -470,6 +484,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     return { friends };
   });
 
+  /*
   // Update rankings after a match (for internal use)
   fastify.post('/update-stats', async (request, reply) => {
 
@@ -542,7 +557,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     transaction();
     
     return { success: true };
-  });
+  }); */
 
   // GDPR - Export user data
   fastify.get('/export-data', { preHandler: authenticate }, async (request, reply) => {

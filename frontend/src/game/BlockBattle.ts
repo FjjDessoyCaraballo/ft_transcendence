@@ -13,16 +13,18 @@ import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
 import { Weapon } from './Weapons';
 import { getLoggedInUserData, getOpponentData } from '../services/userService';
-import { drawCenteredText } from './StartScreen';
+import { drawCenteredText, StartScreen } from './StartScreen';
 
 export interface bbMatchData {
 	date: Date;
+	game_type: string;
 	startTime: number;
 	player1_id: number;
 	player1_rank: number;
 	player2_id: number;
 	player2_rank: number;
 	game_duration: number; // in seconds
+	winner_id: number;
 	win_method: string; // KO or Coins
 	player1_weapon1: string;
 	player1_weapon2: string;
@@ -138,6 +140,7 @@ export class BlockBattle implements IGameState
 
 			this.gameStats = {
 				date: new Date(),
+				game_type: 'blockbattle',
 				startTime: Date.now(),
 				player1_id: player1UserData.id,
 				player1_rank: player1UserData.ranking_points,
@@ -145,6 +148,7 @@ export class BlockBattle implements IGameState
 				player2_rank: player2UserData.ranking_points,
 				game_duration: -1,
 				win_method: '', // KO or Coins
+				winner_id: -1,
 				player1_weapon1: this.p1Weapons[0].name,
 				player1_weapon2: this.p1Weapons[1].name,
 				player1_damage_taken: 0,
@@ -290,18 +294,21 @@ export class BlockBattle implements IGameState
 
 	}
 
-	async saveUserDataToDB(winner: User, loser: User)
+	async saveUserDataToDB(winner: User)
 	{
+		if (!this.gameStats || !this.player1 || !this.player2 || !this.player1.userData || !this.player2.userData)
+			return ;
+
+		this.gameStats.winner_id = winner.id;
+
 		this.savingDataToDB = true;
 
 		try {
-			await UserManager.updateUserStats(winner, loser, GameType.BLOCK_BATTLE);
-		} catch {
+			await UserManager.updateUserStats(this.player1.userData, this.player2.userData, this.gameStats);
+		} catch (error) {
 
-			// Is this enough? Or do we need more error handling...?
-			// Should we change state to StartScreen or something?
-			alert('User data saving failed');
-			console.log('User data saving failed');
+			alert(`User data saving failed! ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 			this.savingDataToDB = false;
 			return ;
 		}
@@ -312,7 +319,7 @@ export class BlockBattle implements IGameState
 	update(deltaTime: number)
 	{
 
-		if (!this.isDataReady || this.savingDataToDB)
+		if (!this.isDataReady)
 			return ;
 
 		for (const platform of this.platforms) {
@@ -444,9 +451,9 @@ export class BlockBattle implements IGameState
 				if (!this.savingDataToDB)
 				{
 					if (this.player1.health.amount === 0 || this.player2.hasWon)
-						this.saveUserDataToDB(this.player2.userData, this.player1.userData);
+						this.saveUserDataToDB(this.player2.userData);
 					else if (this.player2.health.amount === 0 || this.player1.hasWon)
-						this.saveUserDataToDB(this.player1.userData, this.player2.userData);
+						this.saveUserDataToDB(this.player1.userData);
 
 					return ;
 				}
@@ -454,9 +461,9 @@ export class BlockBattle implements IGameState
 				if (this.saveReady)
 				{
 					if (this.player1.health.amount === 0 || this.player2.hasWon)
-						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player2.userData, this.player1.userData, null, null, GameType.BLOCK_BATTLE));
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player2.userData.id, this.player1.userData.id, null, null, GameType.BLOCK_BATTLE));
 					else if (this.player2.health.amount === 0 || this.player1.hasWon)
-						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player1.userData, this.player2.userData, null, null, GameType.BLOCK_BATTLE));
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player1.userData.id, this.player2.userData.id, null, null, GameType.BLOCK_BATTLE));
 				}
 
 			}

@@ -4,7 +4,7 @@ import { GameCanvas } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
-import { getLoggedInUserData, checkIsLoggedIn } from '../services/userService';
+import { getLoggedInUserData, checkIsLoggedIn, getMatchHistoryByID } from '../services/userService';
 import { User } from './UserManager';
 
 interface HeaderProps {
@@ -41,6 +41,7 @@ export const Header: React.FC<HeaderProps> = () => {
 			setIsGameVisible(true);
 			setIsDashboardVisible(false);
 			setDashboardUserData(null);
+			setButtonText('Dashboard');
 		}
   };
 
@@ -78,6 +79,12 @@ export const Header: React.FC<HeaderProps> = () => {
 
 	try {
 		const userData = await getLoggedInUserData();
+
+		if (userData)
+		{
+			userData.match_history = await getMatchHistoryByID(userData.id);
+		}
+
 		setDashboardUserData(userData);
 		setIsGameVisible(false);
 		setIsDashboardVisible(true);

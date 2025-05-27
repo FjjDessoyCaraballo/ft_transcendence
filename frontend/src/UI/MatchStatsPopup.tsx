@@ -2,19 +2,30 @@
 import React from 'react';
 import { MatchData } from './UserManager';
 
+// Dynamic emoji assignment
+const weaponEmojiMap: Record<string, string> = {
+  Pistol: '🔫',
+  Bazooka: '🚀',
+  'Land Mine': '💣'
+};
+
+function getWeaponEmoji(weapon: string): string {
+  return weaponEmojiMap[weapon] || '❓';
+}
+
+// React prop info
 interface MatchStatsPopupProps {
   match: MatchData;
   onClose: () => void;
 }
 
 const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => {
-  const isWinner = match.winner_id === 0;  // Assuming user ID is 0 for the test user
 
   // For Pong match
   const pongStats = match.game_data && 'longest_rally' in match.game_data ? (
 	<div className="bg-purple-100 p-4 rounded-lg shadow-sm">      
 		<p><strong>Longest Rally:</strong> {match.game_data.longest_rally}s 🏓</p>
-		<p><strong>Average Rally:</strong>  {match.game_data.avg_rally}s 🏓</p>
+		<p><strong>Average Rally:</strong>  {match.game_data.avg_rally.toFixed(2)}s 🏓</p>
 		<p><strong>Player 1 Points:</strong>  {match.game_data.player1_points} 🏓</p>
 		<p><strong>Player 2 Points:</strong>  {match.game_data.player2_points} 🏓</p>
     </div>
@@ -26,9 +37,9 @@ const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => 
       {/* Player 1 Column */}
       <div className="flex flex-col w-1/2 space-y-4">
         <div className="bg-purple-100 p-4 rounded-lg shadow-sm">
-          <h4 className="font-bold text-lg text-purple-700">Player 1 Info</h4>
-          <p><strong>Weapon 1:</strong> {match.game_data.player1_weapon1} ⚔️</p>
-          <p><strong>Weapon 2:</strong> {match.game_data.player1_weapon2} 🛡️</p>
+          <h4 className="font-bold text-lg text-purple-700">{match.player1_name}</h4>
+          <p><strong>Weapon 1:</strong> {match.game_data.player1_weapon1} {getWeaponEmoji(match.game_data.player1_weapon1)}</p>
+          <p><strong>Weapon 2:</strong> {match.game_data.player1_weapon2} {getWeaponEmoji(match.game_data.player1_weapon2)}</p>
           <p><strong>Damage Done:</strong> {match.game_data.player1_damage_done} 💥</p>
           <p><strong>Damage Taken:</strong> {match.game_data.player1_damage_taken} ⚡</p>
           <p><strong>Coins Collected:</strong> {match.game_data.player1_coins_collected} 🪙</p>
@@ -38,9 +49,9 @@ const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => 
       {/* Player 2 Column */}
       <div className="flex flex-col w-1/2 space-y-4">
         <div className="bg-purple-100 p-4 rounded-lg shadow-sm">
-          <h4 className="font-bold text-lg text-purple-700">Player 2 Info</h4>
-          <p><strong>Weapon 1:</strong> {match.game_data.player2_weapon1} ⚔️</p>
-          <p><strong>Weapon 2:</strong> {match.game_data.player2_weapon2} 🛡️</p>
+          <h4 className="font-bold text-lg text-purple-700">{match.player2_name}</h4>
+          <p><strong>Weapon 1:</strong> {match.game_data.player2_weapon1} {getWeaponEmoji(match.game_data.player2_weapon1)}</p>
+          <p><strong>Weapon 2:</strong> {match.game_data.player2_weapon2} {getWeaponEmoji(match.game_data.player2_weapon2)}</p>
           <p><strong>Damage Done:</strong> {match.game_data.player2_damage_done} 💥</p>
           <p><strong>Damage Taken:</strong> {match.game_data.player2_damage_taken} ⚡</p>
           <p><strong>Coins Collected:</strong> {match.game_data.player2_coins_collected} 🪙</p>
@@ -59,7 +70,7 @@ const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => 
 				<div className="flex justify-center space-x-6 text-black">
 				<p><strong>Game Type:</strong><br/> {match.game_type.toUpperCase()} 🎮</p>
 				<p><strong>Match Date:</strong><br/> {new Date(match.date).toLocaleDateString()} 📅</p>
-				<p><strong>Duration:</strong><br/> {match.game_duration}s ⏱</p>
+				<p><strong>Duration:</strong><br/> {match.game_duration.toFixed(2)}s ⏱</p>
 				{'win_method' in match.game_data && (
 					<p><strong>Win Method:</strong><br/> {match.game_data.win_method} 🏆</p>
 				)}           

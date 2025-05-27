@@ -7,6 +7,7 @@ import { User, UserManager } from "../UI/UserManager";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { drawCenteredText } from "./StartScreen";
+import { getEndScreenData } from "../services/userService";
 
 export class ReturnMainMenuButton extends Button
 {
@@ -47,8 +48,8 @@ class ReturnToTournamentBtn extends Button
 export class EndScreen implements IGameState
 {
 	name: GameStates;
-	winner: User;
-	loser: User;
+	winner: User | null;
+	loser: User | null;
 	tournamentData1: TournamentPlayer | null;
 	tournamentData2: TournamentPlayer | null;
 	canvas: HTMLCanvasElement;
@@ -56,24 +57,26 @@ export class EndScreen implements IGameState
 	returnMenuButton: ReturnMainMenuButton;
 	returnToTournamentBtn: ReturnToTournamentBtn;
 	isStateReady: boolean;
-	savingDataToDB: boolean;
 	gameType: GameType;
+	isDataReady: boolean;
+	showLoadingText: boolean;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winnerId: number, loserId: number, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
 	{
 		this.name = GameStates.END_SCREEN;
 
 		this.canvas = canvas;
 		this.ctx = ctx;
-		this.winner = winner;
-		this.loser = loser;
+		this.winner = null;
+		this.loser = null;
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
 		this.isStateReady = false;
 		this.gameType = gameType;
-		this.savingDataToDB = false;
+		this.isDataReady = false;
+		this.showLoadingText = false;
 
 		if (this.tournamentData1)
 			this.tournamentData1.bbWeapons.length = 0;
@@ -92,11 +95,46 @@ export class EndScreen implements IGameState
 		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
 		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
 
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		this.fetchPlayerData(winnerId, loserId);
+
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
 
-//		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
-//			this.saveUserDataToDB();
+	}
+
+	async fetchPlayerData(winnerId: number, loserId: number)
+	{
+		try
+		{
+			this.winner = await getEndScreenData(winnerId);
+			if (!this.winner)
+			{
+				console.log("END SCREEN: User data fetch failed.");
+				// Should we return to StartScreen if this happens...?
+				return ;
+			}
+
+			if (this.gameType !== GameType.PONG_AI)
+			{
+				this.loser = await getEndScreenData(loserId);
+				if (!this.loser)
+				{
+					console.log("END SCREEN: User data fetch failed.");
+					// Should we return to StartScreen if this happens...?
+					return ;
+				}
+			}
+
+			this.isDataReady = true;
+		}
+		catch {
+			console.log("END SCREEN: User data fetch failed.");
+			this.isDataReady = false;
+		}
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -145,6 +183,21 @@ export class EndScreen implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
+		if (!this.isDataReady)
+		{
+			if (!this.showLoadingText)
+				return ;
+
+			const loadingHeader = 'Fetching user data, please wait.';
+			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+			return ;
+		}
+
+		if (!this.winner || !this.loser)
+			return ;
+
 		const text = this.winner.username + ' wins the game!';
 		drawCenteredText(this.canvas, this.ctx, text, '40px arial', '#1cc706', 200);
 
@@ -165,12 +218,10 @@ export class EndScreen implements IGameState
 			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 
-		if (!this.tournamentData1 && !this.savingDataToDB)
+		if (!this.tournamentData1)
 			this.returnMenuButton.draw(ctx);
-		else if (!this.savingDataToDB)
-			this.returnToTournamentBtn.draw(ctx);
 		else
-			drawCenteredText(this.canvas, this.ctx, 'Sending data to backend, please wait', '30px arial', 'white', this.canvas.height - 100);
+			this.returnToTournamentBtn.draw(ctx);
 
 
 	}

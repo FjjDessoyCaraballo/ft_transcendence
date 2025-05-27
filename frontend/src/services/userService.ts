@@ -1,7 +1,9 @@
 import { apiRequest } from './Api';
-import { User } from '../UI/UserManager'
+import { MatchData, User } from '../UI/UserManager'
 import { GameType } from '../UI/Types';
 import { Buffer } from 'node:buffer'
+import { bbMatchData } from '../game/BlockBattle';
+import { pongMatchData } from '../game/pong/Pong';
 
 interface RegisterData {
   username: string;
@@ -128,6 +130,20 @@ export const getLoggedInUserData = async (): Promise<User> => {
   }
 };
 
+/**
+ * Get user data for EndScreen by ID
+ * 
+ * @param id Username to fetch
+ * @returns Promise with user data
+ */
+export const getEndScreenData = async (id: number): Promise<User> => {
+  try {
+    return await apiRequest(`/users/name-and-rank/${id}`);
+  } catch (error) {
+      throw error;
+  }
+};
+
 
 
 /**
@@ -136,6 +152,7 @@ export const getLoggedInUserData = async (): Promise<User> => {
  * @param username Username to fetch
  * @returns Promise with user data
  */
+/*
 export const getUserDataByUsername = async (username: string): Promise<User> => {
   try {
     return await apiRequest(`/users/by-username/${username}`);
@@ -143,6 +160,7 @@ export const getUserDataByUsername = async (username: string): Promise<User> => 
       throw error;
   }
 };
+*/
 
 /**
  * Get all registered users in an array.
@@ -164,6 +182,55 @@ export const getAllUsers = async (): Promise<User[]> => {
  * @param loser Loser user data
  * @returns Promise with the updated user data
  */
+export const recordMatchResult = async (player1: User, player2: User, matchData: bbMatchData | pongMatchData): Promise<{ status: string }> => {
+  try {
+    return await apiRequest('/games/record-match', {
+      method: 'POST',
+      body: JSON.stringify({ player1, player2, matchData })
+    });    
+  } catch (error) {
+      throw error;
+  }
+}; 
+
+/**
+ * Get the whole match history of a user based on user ID
+ * 
+ */
+export const getMatchHistoryByID = async (id: number): Promise<MatchData[]> => {
+  try {
+    const matchData = await apiRequest(`/games/matches/player/${id}`);
+	return matchData.matches;
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Get single match data by match ID
+ * 
+ */
+export const getMatchByID = async (id: number): Promise<MatchData> => {
+  try {
+    const { match, gameStats } = await apiRequest(`/games/match/${id}`);
+
+	const finalData: MatchData = match;
+	finalData.game_data = gameStats;
+	return finalData;
+  } catch (error) {
+      throw error;
+  }
+};
+
+
+/**
+ * Update user statistics after a game
+ * 
+ * @param winner Winner user data
+ * @param loser Loser user data
+ * @returns Promise with the updated user data
+ */
+/*
 export const updateUserStats = async (winner: User, loser: User): Promise<{ winner: User, loser: User }> => {
   try {
     return await apiRequest('/users/update-stats', {
@@ -173,7 +240,8 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
   } catch (error) {
       throw error;
   }
-};
+}; */
+
 
 /**
  * Update user statistics after a game
@@ -182,6 +250,7 @@ export const updateUserStats = async (winner: User, loser: User): Promise<{ winn
  * @param loser Loser user data
  * @returns Promise with the updated user data
  */
+/*
 export const updateUserStatsAPI = async (winner: User, loser: User, gameType: GameType): Promise<{ winner: User, loser: User }> => {
   try {
 
@@ -198,7 +267,7 @@ export const updateUserStatsAPI = async (winner: User, loser: User, gameType: Ga
   } catch (error) {
       throw error;
   }
-};
+}; */
 
 /**
  * Delete a user account

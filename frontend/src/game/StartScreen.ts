@@ -71,6 +71,7 @@ export class StartScreen implements IGameState
 	ctx: CanvasRenderingContext2D;
 	loggedInUserData: User | null;
 	isDataReady: boolean;
+	showLoggedOutText: boolean;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
@@ -81,6 +82,7 @@ export class StartScreen implements IGameState
 		this.ctx = ctx;
 		this.isDataReady = false;
 		this.loggedInUserData = null;
+		this.showLoggedOutText = false;
 
 		const pongText = 'PONG';
 		ctx.font = '50px arial';
@@ -93,6 +95,9 @@ export class StartScreen implements IGameState
 		const bbY = 570;
 		this.blockBattleBtn = new BlockBattleBtn(this.canvas, this.ctx, bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial');
 
+		setTimeout(() => {
+			this.showLoggedOutText = true;
+		}, 50); 
 		this.fetchLoggedInUserData();
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
@@ -161,9 +166,9 @@ export class StartScreen implements IGameState
 		
 		drawCenteredText(this.canvas, this.ctx, 'Welcome, gamer!', '140px Impact', DEEP_PURPLE, 240);
 
-		if (!this.isDataReady)
+		if (!this.isDataReady && this.showLoggedOutText)
 			drawCenteredText(this.canvas, this.ctx, 'Please log in to play the game', '50px arial', 'white', this.canvas.height / 2 + 100);
-		else
+		else if (this.isDataReady)
 		{
 			drawCenteredText(this.canvas, this.ctx, 'Please choose the game you want to play', '40px arial', 'white', 390);
 

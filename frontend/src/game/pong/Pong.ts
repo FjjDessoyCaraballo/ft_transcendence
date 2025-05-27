@@ -10,6 +10,24 @@ import { Ball } from "./Ball";
 import { getLoggedInUserData, getOpponentData } from "../../services/userService";
 import { drawCenteredText } from "../StartScreen";
 import { UserManager } from "../../UI/UserManager";
+import { StartScreen } from "../StartScreen";
+
+export interface pongMatchData {
+	date: Date;
+	game_type: string;
+	startTime: number;
+	player1_id: number;
+	player1_rank: number;
+	player2_id: number;
+	player2_rank: number;
+	game_duration: number; // in seconds
+	winner_id: number;
+	longest_rally: number;
+	avg_rally: number;
+	player1_points: number;
+	player2_points: number;
+}
+
 
 // Game Constants
 export const PADDLE_WIDTH = 15; 
@@ -20,7 +38,8 @@ export const BUFFER = 15;
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
-  gameState: 'playing' | 'result' | 'ai';
+  state: 'playing' | 'result' | 'ai';
+  gameStats: pongMatchData | null;
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
   averageRally: number = 0;
@@ -63,17 +82,18 @@ export class Pong implements IGameState {
 	this.showLoadingText = false;
 	this.savingDataToDB = false;
 	this.saveReady = false;
-    this.gameState = state;
+    this.state = state;
+	this.gameStats = null;
     this.tournamentData1 = null;
 	  this.tournamentData2 = null;
-    if (this.gameState === 'playing')
+    if (this.state === 'playing')
     {
       this.twoPlayerMode = true; // Two-player mode
     }
-    else if (this.gameState === 'ai')
+    else if (this.state === 'ai')
     {
       this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
-      this.gameState = 'playing';
+      this.state = 'playing';
     }
 
 	setTimeout(() => {
@@ -119,6 +139,22 @@ export class Pong implements IGameState {
 			
 			this.player1 = new Player(player1UserData, new Paddle(BUFFER, this.canvasHeight)); //STAT
     		this.player2 = new Player(player2UserData, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+
+			this.gameStats = {
+				date: new Date(),
+				game_type: 'pong',
+				startTime: Date.now(),
+				player1_id: player1UserData.id,
+				player1_rank: player1UserData.ranking_points,
+				player2_id: player2UserData.id,
+				player2_rank: player2UserData.ranking_points,
+				game_duration: -1,
+				winner_id: -1,
+				longest_rally: 0,
+				avg_rally: 0,
+				player1_points: 0,
+				player2_points: 0
+			}
 
 			this.isDataReady = true;
 		}
@@ -226,7 +262,7 @@ export class Pong implements IGameState {
     if (this.ball.x < 0) {
       this.player2.score++;
       if (this.player2.score === 5) {
-        this.gameState = 'result';
+        this.state = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player2;
         this.duration = performance.now() - this.startTime;
@@ -237,7 +273,7 @@ export class Pong implements IGameState {
     if (this.ball.x > this.canvasWidth) {
       this.player1.score++;
       if (this.player1.score === 5) {
-        this.gameState = 'result';
+        this.state = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player1;
         this.duration = performance.now() - this.startTime;
@@ -247,37 +283,26 @@ export class Pong implements IGameState {
   }
 
   update() {
-		if (this.gameState === 'playing')
+		if (this.state === 'playing')
 			this.updateGame();
   }
 
-// STATS
-// BOTH GAMES
-// - Player1 (in TP)
-// - Player2 (in TP)
-// - Winner (in TP)
-// - Game duration 
-// - Game type
-// PONG
-// - Longest ball rally
-// - Avg ball rally
-// - Points scored by Player1 (in TP)
-// - Points scored by Player2 (in TP)
 
-// Wins and Losses for each user?
-
-	async saveUserDataToDB(winner: User, loser: User)
+	async saveUserDataToDB(winner: User)
 	{
+		if (!this.gameStats || !this.player1 || !this.player2 || !this.player1.user || !this.player2.user)
+			return ;
+
+		this.gameStats.winner_id = winner.id;
+
 		this.savingDataToDB = true;
 
 		try {
-			await UserManager.updateUserStats(winner, loser, GameType.PONG);
-		} catch {
+			await UserManager.updateUserStats(this.player1.user, this.player2.user, this.gameStats);
+		} catch (error){
 
-			// Is this enough? Or do we need more error handling...?
-			// Should we change state to StartScreen or something?
-			alert('User data saving failed');
-			console.log('User data saving failed');
+			alert(`User data saving failed! ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 			this.savingDataToDB = false;
 			return ;
 		}
@@ -287,7 +312,7 @@ export class Pong implements IGameState {
 
   drawResult() {
 
-	if (!this.player1 || !this.player2)
+	if (!this.player1 || !this.player2 || !this.gameStats)
 			return ;
 
 	const p1 = this.player1.user;
@@ -297,9 +322,9 @@ export class Pong implements IGameState {
 	if (!this.twoPlayerMode)
 	{
 		if (this.winner === this.player1)
-			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG_AI));
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, null, null, GameType.PONG_AI));
 		else if (this.winner === this.player2)
-			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI));
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, null, null, GameType.PONG_AI));
 	}
 
     // Tournament ending
@@ -336,23 +361,25 @@ export class Pong implements IGameState {
     // const player1Score = this.player1.score;
     // const player2Score = this.player2.score;
 
-    // Regular ending
-	if (!this.savingDataToDB)
-	{
-		if (this.winner === this.player1)
-			this.saveUserDataToDB(this.player1.user, this.player2.user);
-		else if (this.winner === this.player2)
-			this.saveUserDataToDB(this.player2.user, this.player1.user);
+	this.gameStats.game_duration = (Date.now() - this.gameStats.startTime) / 1000; // in seconds
+	this.gameStats.avg_rally = this.averageRally;
+	this.gameStats.longest_rally = this.ball.longestRally;
+	this.gameStats.player1_points = this.player1.score;
+	this.gameStats.player2_points = this.player2.score;
 
+    // Regular ending
+	if (!this.savingDataToDB && this.winner)
+	{
+		this.saveUserDataToDB(this.winner.user);
 		return ;
 	}
 
     if (this.saveReady)
     {
       if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, null, null, GameType.PONG));
       else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, null, null, GameType.PONG));
     }
 
   }
@@ -404,7 +431,7 @@ export class Pong implements IGameState {
 		return ;
 	}	 
 
-    if (this.gameState === 'result') {
+    if (this.state === 'result') {
 		  this.drawResult();
 	  } 
     else {

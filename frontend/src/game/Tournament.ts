@@ -185,7 +185,7 @@ export class Tournament implements IGameState
 					const winner = player1.isWinner ? player1 : player2;
 					const loser = player1.isWinner ? player2 : player1;
 
-					this.curMatch = new EndScreen(this.canvas, this.ctx, winner.user, loser.user, winner, loser, this.gameType);
+					this.curMatch = new EndScreen(this.canvas, this.ctx, winner.user.id, loser.user.id, winner, loser, this.gameType);
 					
 					this.curMatch.enter();
 					player1.isWinner = false;
