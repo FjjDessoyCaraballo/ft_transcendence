@@ -59,6 +59,7 @@ export default function App() {
             path="/playerlist"
             element={<PlayerList onShowDashboard={handleShowDashboard} />}
           />
+          <Route path="/instructions" element={<Instructions />}/>
         </Routes>
       </main>
     </>
