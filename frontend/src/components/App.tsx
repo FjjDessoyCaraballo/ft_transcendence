@@ -39,6 +39,7 @@ export default function App() {
   return (
     <>
       <Header />
+      <main className="pt-32"></main>
       <Routes>
         <Route path="/" element={<GameCanvas />} />
         <Route
