@@ -25,6 +25,9 @@ RUN npm install react react-dom @types/react @types/react-dom --save
 # Install Chart.js for Dashboard data graphs
 RUN npm install chart.js react-chartjs-2 
 
+# Install React Router DOM for back and forward functionality
+npm install react-router-dom
+
 # Copy the rest of the application code
 COPY . .
 
