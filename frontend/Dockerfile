@@ -28,6 +28,9 @@ RUN npm install chart.js react-chartjs-2
 # Install React Router DOM for back and forward functionality
 RUN npm install react-router-dom
 
+# Install i18next and react-i18nect for multi-language support
+RUN npm install i18next react-i18next i18next-browser-languagedetector
+
 # Copy the rest of the application code
 COPY . .
 

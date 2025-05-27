@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login';
 import { SettingsPopup } from './Settings';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+
 
 interface HeaderProps {
   onClick?: () => void;
@@ -20,6 +23,7 @@ export const Header: React.FC<HeaderProps> = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -73,22 +77,39 @@ export const Header: React.FC<HeaderProps> = () => {
           <h4 className="p-5 pb-2 m-0 text-1xl font-mono font-bold text-[#4B0082]">
             A Dads and Coders Inc. product
           </h4>
-          <div className="buttonsDiv place-items-right">
+            <div className="buttonsDiv place-items-right flex items-center gap-4">
+            {/* Language switcher */}
+            <div className="flex gap-2 items-center text-sm">
+              <label htmlFor="language" className="text-[#4B0082] font-bold">🌐</label>
+              <select
+                id="language"
+                onChange={(e) => {
+                  i18n.changeLanguage(e.target.value);
+                  localStorage.setItem('preferredLanguage', e.target.value);
+                }}
+                className="border border-gray-300 rounded px-2 py-1"
+                value={i18n.language}
+              >
+                <option value="en">EN</option>
+                <option value="fi">FI</option>
+                <option value="pt">PT</option>
+              </select>
+            </div>
             {isLoggedIn ? (
               <>
-                <button className="buttonsStyle" onClick={() => navigate('/')}>Game</button>
-                <button className="buttonsStyle" onClick={() => navigate('/instructions')}>Instructions</button>
-                <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>Dashboard</button>
-                <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
-                <button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
+                <button className="buttonsStyle" onClick={() => navigate('/')}>{t('game')}</button>
+                <button className="buttonsStyle" onClick={() => navigate('/instructions')}>{t('instructions')}</button>
+                <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>{t('dashboard')}</button>
+                <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>{t('players')}</button>
+                <button className="buttonsStyle" onClick={HandleSettingsClick}>{t('settings')}</button>
               </>
             ) : (
               <>
                 <button className="buttonsStyle" onClick={HandleLoginClick}>
-                  Login
+                  {t('login')}
                 </button>
                 <button className="buttonsStyle px-1" onClick={HandleRegistrationClick}>
-                  Registration
+                  {t('registration')}
                 </button>
               </>
             )}

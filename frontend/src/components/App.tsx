@@ -7,6 +7,7 @@ import { PlayerList } from '../UI/PlayerList';
 import { Instructions } from '../UI/Instructions';
 import { User } from '../UI/UserManager';
 import { getUserDataByUsername } from '../services/userService';
+import '../i18n';
 
 export default function App() {
   const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);

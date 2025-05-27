@@ -1,0 +1,10 @@
+{
+  "settings": "Asetukset",
+  "dashboard": "Hallintapaneeli",
+  "players": "Pelaajat",
+  "game": "Peli",
+  "logout": "Kirjaudu ulos",
+  "login": "Kirjaudu sisään",
+  "registration": "Rekisteröityminen",
+  "instructions": "Ohjeet"
+}

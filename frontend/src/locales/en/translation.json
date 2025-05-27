@@ -1,0 +1,10 @@
+{
+  "settings": "Settings",
+  "dashboard": "Dashboard",
+  "players": "Players",
+  "game": "Game",
+  "logout": "Logout",
+  "login": "Login",
+  "registration": "Registration",
+  "instructions": "Instructions"
+}
