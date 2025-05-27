@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User } from "./UserManager";
 import { getAllUsers } from '../services/userService';
 import { global_curUser } from './GameCanvas';
@@ -26,6 +27,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   const [players, setPlayers] = useState<ExtendedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // URL base for fetching user avatars
   const backendBaseUrl = 'https://localhost:3443';
@@ -290,7 +292,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                       {getFriendActionButton(player)}
                       {(isLoggedInUser || player.friendshipStatus === 'friend') && (
                         <button
-                          onClick={onShowDashboard}
+                          onClick={() => navigate('/dashboard')}
                           className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
                         >
                           More Stats
