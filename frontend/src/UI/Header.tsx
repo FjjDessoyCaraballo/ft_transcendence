@@ -76,12 +76,10 @@ export const Header: React.FC<HeaderProps> = () => {
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
               <>
-                <Link to="/" className="buttonsStyle">To Game</Link>
-                <Link to="/dashboard" className="buttonsStyle">Dashboard</Link>
-                <Link to="/playerlist" className="buttonsStyle">Players</Link>
-                <button className="buttonsStyle" onClick={HandleSettingsClick}>
-                  Settings
-                </button>
+                <button className="buttonsStyle" onClick={() => navigate('/')}>To Game</button>
+                <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>Dashboard</button>
+                <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
+                <button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
               </>
             ) : (
               <>
