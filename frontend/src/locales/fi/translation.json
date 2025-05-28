@@ -1,10 +1,16 @@
 {
   "settings": "Asetukset",
-  "dashboard": "Hallintapaneeli",
+  "dashboard": "Kojelauta",
   "players": "Pelaajat",
   "game": "Peli",
   "logout": "Kirjaudu ulos",
   "login": "Kirjaudu sisään",
   "registration": "Rekisteröityminen",
-  "instructions": "Ohjeet"
+  "instructions": "Ohjeet",
+  "download_data": "Lataa tiedot",
+  "change_password": "Vaihda salasana",
+  "change_avatar": "Vaihda avatar",
+  "delete_account": "Poista tili",
+  "contribute": "Osallistu",
+  "close": "Sulje"
 }

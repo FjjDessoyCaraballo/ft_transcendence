@@ -4,6 +4,8 @@ import { PasswordChangePopup } from './PasswordChange'
 import { AvatarChangePopup } from './AvatarChange'
 import { clearToken } from '../services/TokenService'
 import { updateCurUser } from './GameCanvas';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 interface SettingsProps {
 	onClick: () => void;
@@ -67,6 +69,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 	const [showChangePassword, setShowChangePassword] = useState(false);
 	const [showAvatarChange, setShowAvatarChange] = useState(false);
+	const { t } = useTranslation();
 
 	const HandleDownloadData = async () => {
 		try {
@@ -142,7 +145,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 		  <div className="bg-white rounded-lg shadow-lg w-[400px] max-w-[90%] overflow-hidden mx-auto">
 			<div className="p-6 bg-[#4B0082] text-white">
-			  <h2 className="text-2xl font-bold font-mono">Settings</h2>
+			  <h2 className="text-2xl font-bold font-mono">{t('settings')}</h2>
 			</div>
 
 			{/* DOWNLOAD DATA BUTTON */}
@@ -152,7 +155,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleDownloadData}
 			>
-      		Download Data
+      		{t('download_data')}
           	</button>
 		  	</div>
 
@@ -163,7 +166,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleChangePasswordClick}
 			>
-      		Change Password
+      		{t('change_password')}
           	</button>
 		  	</div>
 
@@ -174,7 +177,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleAvatarChange}
 			>
-      		Change Avatar
+      		{t('change_avatar')}
           	</button>
 		  	</div>
 
@@ -185,7 +188,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle text-red-600 hover:bg-red-50"
 			  onClick={DeleteAccountClick}
 			>
-      		Delete Account
+      		{t('delete_account')}
           	</button>
 		  	</div>
 
@@ -196,7 +199,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleContribute}
 			>
-      		Contribute
+      		{t('contribute')}
           	</button>
 		  	</div>
 
@@ -207,7 +210,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleLogout}
 			>
-      		Logout
+      		{t('logout')}
           	</button>
 		  	</div>
 
@@ -218,7 +221,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle" 
               onClick={HandleClose}
             >
-              Close
+              {t('close')}
 			</button>
 			</div>
 		  </div>

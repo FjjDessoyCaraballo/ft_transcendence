@@ -6,5 +6,11 @@
   "logout": "Logout",
   "login": "Login",
   "registration": "Registration",
-  "instructions": "Instructions"
+  "instructions": "Instructions",
+  "download_data": "Download Data",
+  "change_password": "Change Password",
+  "change_avatar": "Change Avatar",
+  "delete_account": "Delete Account",
+  "contribute": "Contribute",
+  "close": "Close"
 }
