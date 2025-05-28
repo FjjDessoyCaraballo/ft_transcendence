@@ -12,5 +12,14 @@
   "change_avatar": "Vaihda avatar",
   "delete_account": "Poista tili",
   "contribute": "Osallistu",
-  "close": "Sulje"
+  "close": "Sulje",
+  "password_change": "Salasanan vaihto",
+  "current_password": "Nykyinen salasana",
+  "new_password": "Uusi salasana",
+  "confirm_new": "Vahvista uusi salasana",
+  "cancel": "Peruuta",
+  "enter_your_current": "Syötä nykyinen salasana",
+  "create_new": "Luo uusi salasana",
+  "confirm_your_new": "Vahvista uusi salasana",
+  "processing": "Käsitellään..."
 }
