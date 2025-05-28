@@ -76,7 +76,8 @@ export const Header: React.FC<HeaderProps> = () => {
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
               <>
-                <button className="buttonsStyle" onClick={() => navigate('/')}>To Game</button>
+                <button className="buttonsStyle" onClick={() => navigate('/')}>Game</button>
+                <button className="buttonsStyle" onClick={() => navigate('/instructions')}>Instructions</button>
                 <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>Dashboard</button>
                 <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
                 <button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
