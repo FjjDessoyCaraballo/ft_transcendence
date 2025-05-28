@@ -11,9 +11,19 @@ import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
-import { Weapon } from './Weapons';
-import { getLoggedInUserData, getOpponentData } from '../services/userService';
+import { Bazooka, LandMine, Pistol, Weapon } from './Weapons';
+import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, recordTournamentMatchResult } from '../services/userService';
 import { drawCenteredText, StartScreen } from './StartScreen';
+
+function createWeapon(name: string) : Weapon{
+
+	if (name === 'Pistol')
+		return new Pistol();
+	else if (name === 'Bazooka')
+		return new Bazooka();
+	else
+		return new LandMine();
+}
 
 export interface bbMatchData {
 	date: Date;
@@ -64,7 +74,7 @@ export class BlockBattle implements IGameState
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, p1Weapons: Weapon[], p2Weapons: Weapon[])
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, p1Weapons: Weapon[], p2Weapons: Weapon[], isTournament: boolean)
 	{
 		this.name = GameStates.BLOCK_BATTLE;
 		this.isStateReady = false;
@@ -111,11 +121,65 @@ export class BlockBattle implements IGameState
 			this.showLoadingText = true;
 		}, 500); 
 
-		this.fetchUserData();
+		if (!isTournament)
+			this.fetchUserData();
+		else
+			this.fetchNextTournamentData();
 
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
 	}
+
+	async fetchNextTournamentData()
+		{
+			try {
+			const response = await getNextTournamentGameData();
+
+			this.tournamentData1 = response[0];
+			this.tournamentData2 = response[1];
+
+			const p1w1 = createWeapon(this.tournamentData1.bbWeapons[0].name);
+			const p1w2 = createWeapon(this.tournamentData1.bbWeapons[1].name);
+			const p2w1 = createWeapon(this.tournamentData2.bbWeapons[0].name);
+			const p2w2 = createWeapon(this.tournamentData2.bbWeapons[1].name);
+
+			this.player1 = new Player(100, 745, 'green', this.tournamentData1.user, p1w1, p1w2);
+			this.player2 = new Player2(1100, 745, 'red', this.tournamentData2.user, p2w1, p2w2);
+
+			this.gameStats = {
+				date: new Date(),
+				game_type: 'blockbattle',
+				startTime: Date.now(),
+				player1_id: this.tournamentData1.user.id,
+				player1_rank: this.tournamentData1.user.ranking_points,
+				player2_id: this.tournamentData2.user.id,
+				player2_rank: this.tournamentData2.user.ranking_points,
+				game_duration: -1,
+				win_method: '', // KO or Coins
+				winner_id: -1,
+				player1_weapon1: this.player1.weapons[0].name,
+				player1_weapon2: this.player1.weapons[1].name,
+				player1_damage_taken: 0,
+				player1_damage_done: 0,
+				player1_coins_collected: 0,
+				player1_shots_fired: 0,
+				player2_weapon1: this.player2.weapons[0].name,
+				player2_weapon2: this.player2.weapons[1].name,
+				player2_damage_taken: 0,
+				player2_damage_done: 0,
+				player2_coins_collected: 0,
+				player2_shots_fired: 0
+			}
+
+			this.isDataReady = true;
+			}
+			catch (error) {
+				alert(`User data fetch failed, returning to main menu! ${error}`)
+				console.log("BLOCK BATTLE: User data fetch failed.");
+				global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+				this.isDataReady = false;
+			}
+		}
 
 	async fetchUserData()
 	{
@@ -165,8 +229,10 @@ export class BlockBattle implements IGameState
 
 			this.isDataReady = true;
 		}
-		catch {
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
 			console.log("BLOCK BATTLE: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 			this.isDataReady = false;
 		}
 	}
@@ -316,6 +382,33 @@ export class BlockBattle implements IGameState
 		this.saveReady = true;
 	}
 
+	async saveTournamentGameDataToDB(winner: User)
+	{
+		if (!this.gameStats || !this.player1 || !this.player2 || !this.player1.userData || !this.player2.userData)
+			return ;
+
+		console.log('Inside saveTournamentData in BB');
+		console.log('Winner is: ', winner);
+
+		this.gameStats.winner_id = winner.id;
+		this.savingDataToDB = true;
+
+		try {
+
+			await recordTournamentMatchResult(this.player1.userData, this.player2.userData, this.gameStats);
+			this.isStateReady = true;
+
+		} catch (error) {
+
+			alert(`User data saving failed, returning to Start Screen! ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.savingDataToDB = false;
+			return ;
+		}
+
+		this.saveReady = true;
+	}
+
 	update(deltaTime: number)
 	{
 
@@ -421,31 +514,31 @@ export class BlockBattle implements IGameState
 			else
 				this.gameStats.win_method = 'Coins';
 
-			//console.log("GAME STATS:")
-			//console.log(this.gameStats);
-
 			// Tournament ending
 			if (this.tournamentData1 && this.tournamentData2)
 			{
-				if (this.player1.health.amount === 0 || this.player2.hasWon)
+				console.log('BB Tournament ending');
+				if (!this.savingDataToDB)
 				{
-					this.tournamentData2.tournamentPoints++;
-					this.tournamentData2.coinsCollected += this.player2.coinCount;
-					this.tournamentData1.coinsCollected += this.player1.coinCount;
-					this.tournamentData2.isWinner = true;
+					if (this.player1.health.amount === 0 || this.player2.hasWon)
+					{
+						console.log('Player 2 wins');
+
+						this.saveTournamentGameDataToDB(this.tournamentData2.user);
+					}
+					else if (this.player2.health.amount === 0 || this.player1.hasWon)
+					{
+						console.log('Player 1 wins');
+
+						this.saveTournamentGameDataToDB(this.tournamentData1.user);
+					}
+
 				}
-				else if (this.player2.health.amount === 0 || this.player1.hasWon)
-				{
-					this.tournamentData1.tournamentPoints++;
-					this.tournamentData1.coinsCollected += this.player1.coinCount;
-					this.tournamentData2.coinsCollected += this.player2.coinCount;
-					this.tournamentData1.isWinner = true;
-				}				
-				this.isStateReady = true;
+
 				return ;
 			}
 
-			// Regular ending
+			// Single game ending
 			if (this.player1.userData && this.player2.userData)
 			{
 				if (!this.savingDataToDB)
@@ -461,9 +554,9 @@ export class BlockBattle implements IGameState
 				if (this.saveReady)
 				{
 					if (this.player1.health.amount === 0 || this.player2.hasWon)
-						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player2.userData.id, this.player1.userData.id, null, null, GameType.BLOCK_BATTLE));
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player2.userData.id, this.player1.userData.id, GameType.BLOCK_BATTLE, false, null));
 					else if (this.player2.health.amount === 0 || this.player1.hasWon)
-						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player1.userData.id, this.player2.userData.id, null, null, GameType.BLOCK_BATTLE));
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player1.userData.id, this.player2.userData.id, GameType.BLOCK_BATTLE, false, null));
 				}
 
 			}

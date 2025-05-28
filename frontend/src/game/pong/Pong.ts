@@ -118,16 +118,9 @@ export class Pong implements IGameState {
 				return ;
 			}
   
-			let player2UserData;
+			let player2UserData = null;
 			if (this.twoPlayerMode)
-			{
 				player2UserData = await getOpponentData();
-				if (!player2UserData)
-				{
-					console.log("PONG: User data fetch failed.");
-					return ;
-				}
-			}
 			else
 				player2UserData = this.AIData;
   
@@ -158,8 +151,10 @@ export class Pong implements IGameState {
 
 			this.isDataReady = true;
 		}
-		catch {
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
 			console.log("PONG: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 			this.isDataReady = false;
 		}
 	}
@@ -322,9 +317,11 @@ export class Pong implements IGameState {
 	if (!this.twoPlayerMode)
 	{
 		if (this.winner === this.player1)
-			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, null, null, GameType.PONG_AI));
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG_AI, false, this.AIData));
 		else if (this.winner === this.player2)
-			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, null, null, GameType.PONG_AI));
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG_AI, false, this.AIData));
+
+		return ;
 	}
 
     // Tournament ending
@@ -377,9 +374,9 @@ export class Pong implements IGameState {
     if (this.saveReady)
     {
       if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG, false, null));
       else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG, false, null));
     }
 
   }

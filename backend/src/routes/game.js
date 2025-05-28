@@ -1,4 +1,4 @@
-const { globalObj } = require('./sharedObjects');
+const { globalObj, globalTournamentObj } = require('./sharedObjects');
 const { authenticate } = require('../middleware/auth');
 const { validateFriendship } = require('../middleware/friendValidation');
 const socketManager = require('../utils/socketManager');
@@ -144,32 +144,6 @@ async function gameRoutes(fastify, options) {
     return { matches };
   });
 
-  /*
-  	interface bbMatchData {
-	date: Date;
-	game_type: string;
-	startTime: number;
-	player1_id: number;
-	player1_rank: number;
-	player2_id: number;
-	player2_rank: number;
-	game_duration: number; // in seconds
-	winner_id: number;
-	win_method: string; // KO or Coins
-	player1_weapon1: string;
-	player1_weapon2: string;
-	player1_damage_taken: number;
-	player1_damage_done: number;
-	player1_coins_collected: number;
-	player1_shots_fired: number;
-	player2_weapon1: string;
-	player2_weapon2: string;
-	player2_damage_taken: number;
-	player2_damage_done: number;
-	player2_coins_collected: number;
-	player2_shots_fired: number;	
-}
-  */
 
   	// Helper function for /record-match
 	function validateMatchData(matchData)
@@ -235,18 +209,19 @@ async function gameRoutes(fastify, options) {
 	|| (player1.id !== globalObj.opponentData.id && player2.id !== globalObj.opponentData.id)
 	|| player1.id === player2.id
 	|| (matchData.winner_id !== player1.id && matchData.winner_id !== player2.id)) {
-      reply.code(400);
-      return { error: 'Bad user data; are you cheating...?' };
-    }
 
-	// Validate match data
-	if (!validateMatchData(matchData)) {
-      reply.code(400);
-      return { error: 'Bad match data; are you cheating...?' };
+		globalObj.opponentData = null; // Reset opponent from backend
+		reply.code(400);
+		return { error: 'Bad user data; are you cheating...?' };
     }
 
 	globalObj.opponentData = null; // Reset opponent from backend
 
+	// Validate match data
+	if (!validateMatchData(matchData)) {
+		reply.code(400);
+		return { error: 'Bad match data; are you cheating...?' };
+    }
 
     try {
       // Start a transaction
@@ -417,6 +392,96 @@ async function gameRoutes(fastify, options) {
       return { error: 'Failed to record match', message: err.message };
     }
   });
+
+  // Record a new match result
+  fastify.post('/record-tournament-match', { preHandler: authenticate }, async (request, reply) => {
+    const { 
+      player1,
+	  player2,
+	  matchData
+    } = request.body;
+
+	const player1TournamentObj = globalTournamentObj.tournamentArr.find(p => p.user.id === player1.id);
+	const player2TournamentObj = globalTournamentObj.tournamentArr.find(p => p.user.id === player2.id);
+
+    // Validate users
+    if (!player1TournamentObj || !player2TournamentObj || player1.id === player2.id
+	|| (matchData.winner_id !== player1.id && matchData.winner_id !== player2.id)) {
+
+		globalTournamentObj.tournamentArr.length = 0; // Reset tournament arr from backend
+		reply.code(400);
+		return { error: 'Bad user data; are you cheating...?' };
+    }
+
+	// Validate match data
+	if (!validateMatchData(matchData)) {
+		globalTournamentObj.tournamentArr.length = 0; // Reset tournament arr from backend
+		reply.code(400);
+		return { error: 'Bad match data; are you cheating...?' };
+    }
+
+	if (matchData.game_type === 'blockbattle')
+	{
+		if (matchData.winner_id === player2.id)
+		{
+			player2TournamentObj.tournamentPoints++;
+			player2TournamentObj.coinsCollected += matchData.player2_coins_collected;
+			player1TournamentObj.coinsCollected += matchData.player1_coins_collected;
+			player2TournamentObj.isWinner = true;
+		}
+		else
+		{
+			player1TournamentObj.tournamentPoints++;
+			player2TournamentObj.coinsCollected += matchData.player2_coins_collected;
+			player1TournamentObj.coinsCollected += matchData.player1_coins_collected;
+			player1TournamentObj.isWinner = true;
+		}
+
+		const sortedPlayerArr = [...globalTournamentObj.tournamentArr].sort((a, b) => {
+			if (b.tournamentPoints !== a.tournamentPoints)
+				return b.tournamentPoints - a.tournamentPoints;
+			return b.coinsCollected - a.coinsCollected;
+		});
+
+		for (let i = 0; i < sortedPlayerArr.length; i++)
+			sortedPlayerArr[i].place = i + 1;
+	}
+	// add Pong here
+    	
+
+
+      
+    return {status: 'OK'};
+  });
+
+
+  // Get tournament end screen data
+fastify.get('/get-tournament-end-screen-data', { preHandler: authenticate }, async (request, reply) => {
+
+	const player1Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][0];
+	const player2Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][1];
+
+	const player1Obj = globalTournamentObj.tournamentArr[player1Idx];
+	const player2Obj = globalTournamentObj.tournamentArr[player2Idx];
+
+	if (!player1Obj.isWinner && !player2Obj.isWinner) {
+		globalTournamentObj.tournamentArr.length = 0; // Reset tournament arr from backend
+		reply.code(400);
+		return { error: 'Tournament data error; no winner found!' };
+    }
+
+	const winner = player1Obj.isWinner ? player1Obj : player2Obj;
+	const loser = player1Obj.isWinner ? player2Obj : player1Obj;
+
+	player1Obj.isWinner = false;
+	player2Obj.isWinner = false;
+	player1Obj.bbWeapons.length = 0;
+	player2Obj.bbWeapons.length = 0;
+	globalTournamentObj.matchCounter++;
+
+	return ({winner: winner, loser: loser, playerArr: globalTournamentObj.tournamentArr, matchCount: globalTournamentObj.matchCounter});
+
+})
 
   // Game invitation endpoint
   fastify.post('/invite/:friendId', { preHandler: [authenticate, validateFriendship] }, async (request, reply) => {

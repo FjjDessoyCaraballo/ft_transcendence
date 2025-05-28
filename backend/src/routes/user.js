@@ -5,7 +5,7 @@ const path = require('path');
 const { promisify } = require('util');
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
-const { globalObj } = require('./sharedObjects');
+const { globalObj, globalTournamentObj } = require('./sharedObjects');
 
 
 
@@ -240,6 +240,197 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     
     return {status: 'OK'};
   });
+
+  // Start new tournament (this should probably be post...?)
+	fastify.get('/start-new-tournament', { preHandler: authenticate }, async (request, reply) => {
+
+	globalTournamentObj.tournamentArr.length = 0;
+	globalTournamentObj.matchCounter = 0;
+
+	const user = fastify.db.prepare(`
+      SELECT id, username, avatar_url, ranking_points,
+             games_played_pong, wins_pong, losses_pong,
+             games_played_blockbattle, wins_blockbattle, losses_blockbattle,
+             tournaments_played, tournaments_won, tournament_points,
+             created_at, updated_at
+      FROM users 
+      WHERE id = ? AND deleted_at IS NULL
+    `).get(request.user.id);
+    
+    if (!user) {
+      reply.code(404);
+      return { error: 'User not found' };
+    }
+
+	const tournamentPlayer = {
+		id: 0,
+		user: user,
+		place: 1,
+		tournamentPoints: 0,
+		coinsCollected: 0,
+		pongPointsScored: 0,
+		isWinner: false,
+		bbWeapons: []
+	};
+
+	globalTournamentObj.tournamentArr.push(tournamentPlayer);
+
+    return {status: 'OK'};
+});
+
+  // Verify tournament player
+  fastify.post('/verify-tournament-player', { preHandler: authenticate }, async (request, reply) => {
+    const { username, password } = request.body;
+
+	if (globalTournamentObj.tournamentArr.length === 4) {
+      reply.code(400);
+      return { error: 'Tournament already full' };
+    }
+    
+    // Validate input
+    if (!username || !password) {
+      reply.code(400);
+      return { error: 'Username and password are required' };
+    }
+    
+    // Find user by username
+    const user = fastify.db.prepare(`
+      SELECT * FROM users WHERE username = ? AND deleted_at IS NULL
+    `).get(username);
+    
+    if (!user) {
+      reply.code(401);
+      return { error: 'Invalid username or password' };
+    }
+    
+    // Verify password
+    const passwordMatch = await comparePassword(password, user.password);
+    if (!passwordMatch) {
+      reply.code(401);
+      return { error: 'Invalid username or password' };
+    }
+    
+	const opponentData = {
+        id: user.id,
+        username: user.username,
+        avatar_url: user.avatar_url,
+        ranking_points: user.ranking_points,
+        games_played_pong: user.games_played_pong,
+        wins_pong: user.wins_pong,
+        losses_pong: user.losses_pong,
+        games_played_blockbattle: user.games_played_blockbattle,
+        wins_blockbattle: user.wins_blockbattle,
+        losses_blockbattle: user.losses_blockbattle,
+        tournaments_played: user.tournaments_played,
+        tournaments_won: user.tournaments_won,
+        tournament_points: user.tournament_points
+      }
+
+	const tournamentPlayer = {
+		id: globalTournamentObj.tournamentArr.length,
+		user: opponentData,
+		place: globalTournamentObj.tournamentArr.length + 1,
+		tournamentPoints: 0,
+		coinsCollected: 0,
+		pongPointsScored: 0,
+		isWinner: false,
+		bbWeapons: []
+	};
+
+	globalTournamentObj.tournamentArr.push(tournamentPlayer);
+    
+	return globalTournamentObj.tournamentArr;
+	
+  });
+
+  	// Remove tournament player
+  fastify.post('/remove-tournament-player', { preHandler: authenticate }, async (request, reply) => {
+    const playerId = request.body;
+
+	if (globalTournamentObj.tournamentArr.length === 0) {
+      reply.code(400);
+      return { error: 'Tournament already empty' };
+    }
+    
+   const idx = globalTournamentObj.tournamentArr.findIndex(p => p.user.id === playerId);
+
+   if (idx === -1) {
+      reply.code(400);
+      return { error: 'User not found in tournament' };
+    }
+
+	globalTournamentObj.tournamentArr.splice(idx, 1);
+    
+	return globalTournamentObj.tournamentArr;
+	
+  });
+
+  // Save weapon data
+  fastify.post('/save-weapon-data', { preHandler: authenticate }, async (request, reply) => {
+
+	const { p1Weapons, p2Weapons} = request.body;
+
+	if (globalTournamentObj.tournamentArr.length === 0) {
+      reply.code(400);
+      return { error: 'Tournament array empty' };
+    }
+
+	// Verify that weapons are valid...?
+    
+	const p1Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][0];
+	const p2Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][1];
+
+	globalTournamentObj.tournamentArr[p1Idx].bbWeapons = p1Weapons;
+	globalTournamentObj.tournamentArr[p2Idx].bbWeapons = p2Weapons;
+    
+	return { status: 'OK' };
+	
+  });
+
+  	// GET tournament players
+	fastify.get('/tournament-players', { preHandler: authenticate }, async (request, reply) => {
+
+	if (globalTournamentObj.tournamentArr.length != 4) {
+      reply.code(400);
+      return { error: 'Tournament data error; wrong amount of participants' };
+    }
+
+    return globalTournamentObj.tournamentArr;
+	});
+
+	// GET next tournament game data
+	fastify.get('/next-tournament-game-data', { preHandler: authenticate }, async (request, reply) => {
+
+	if (globalTournamentObj.tournamentArr.length != 4) {
+      reply.code(400);
+      return { error: 'Tournament data error; wrong amount of participants' };
+    }
+
+	const responseArr = [];
+	const player1Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][0];
+	const player2Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][1];
+
+	responseArr.push(globalTournamentObj.tournamentArr[player1Idx]);
+	responseArr.push(globalTournamentObj.tournamentArr[player2Idx]);
+
+    return responseArr;
+	});
+
+  	// Check tournament status
+	fastify.get('/check-tournament-status', { preHandler: authenticate }, async (request, reply) => {
+
+	if (globalTournamentObj.tournamentArr.length < 4) {
+      reply.code(400);
+      return { error: 'Tournament players still missing' };
+    }
+	
+	if (globalTournamentObj.tournamentArr.length > 4) {
+      reply.code(400);
+      return { error: 'Tournament data error; too many players!' };
+    }
+
+    return {status: 'OK'};
+});
 
   // Login
   fastify.post('/login', async (request, reply) => {

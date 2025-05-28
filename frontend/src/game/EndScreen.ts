@@ -6,7 +6,7 @@ import { TEXT_PADDING } from "./Constants";
 import { User, UserManager } from "../UI/UserManager";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
-import { drawCenteredText } from "./StartScreen";
+import { drawCenteredText, StartScreen } from "./StartScreen";
 import { getEndScreenData } from "../services/userService";
 
 export class ReturnMainMenuButton extends Button
@@ -50,8 +50,7 @@ export class EndScreen implements IGameState
 	name: GameStates;
 	winner: User | null;
 	loser: User | null;
-	tournamentData1: TournamentPlayer | null;
-	tournamentData2: TournamentPlayer | null;
+	AIData: User | null;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	returnMenuButton: ReturnMainMenuButton;
@@ -59,11 +58,12 @@ export class EndScreen implements IGameState
 	isStateReady: boolean;
 	gameType: GameType;
 	isDataReady: boolean;
+	isTournament: boolean;
 	showLoadingText: boolean;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winnerId: number, loserId: number, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winnerId: number, loserId: number, gameType: GameType, isTournament: boolean, AIData: User | null)
 	{
 		this.name = GameStates.END_SCREEN;
 
@@ -71,17 +71,12 @@ export class EndScreen implements IGameState
 		this.ctx = ctx;
 		this.winner = null;
 		this.loser = null;
-		this.tournamentData1 = tData1;
-		this.tournamentData2 = tData2;
 		this.isStateReady = false;
 		this.gameType = gameType;
 		this.isDataReady = false;
 		this.showLoadingText = false;
-
-		if (this.tournamentData1)
-			this.tournamentData1.bbWeapons.length = 0;
-		if (this.tournamentData2)
-			this.tournamentData2.bbWeapons.length = 0;
+		this.isTournament = isTournament;
+		this.AIData = AIData;
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
@@ -110,29 +105,22 @@ export class EndScreen implements IGameState
 	{
 		try
 		{
-			this.winner = await getEndScreenData(winnerId);
-			if (!this.winner)
-			{
-				console.log("END SCREEN: User data fetch failed.");
-				// Should we return to StartScreen if this happens...?
-				return ;
-			}
+			if (winnerId != -1)
+				this.winner = await getEndScreenData(winnerId);
+			else
+				this.winner = this.AIData;
 
-			if (this.gameType !== GameType.PONG_AI)
-			{
+			if (loserId != -1)
 				this.loser = await getEndScreenData(loserId);
-				if (!this.loser)
-				{
-					console.log("END SCREEN: User data fetch failed.");
-					// Should we return to StartScreen if this happens...?
-					return ;
-				}
-			}
+			else
+				this.loser = this.AIData;
 
 			this.isDataReady = true;
 		}
-		catch {
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
 			console.log("END SCREEN: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 			this.isDataReady = false;
 		}
 	}
@@ -147,7 +135,7 @@ export class EndScreen implements IGameState
 		const x = (event.clientX - rect.left) * scaleX;
 		const y = (event.clientY - rect.top) * scaleY;
 
-		if (!this.tournamentData1)
+		if (!this.isTournament)
 			this.returnMenuButton.checkMouse(x, y);
 		else
 			this.returnToTournamentBtn.checkMouse(x, y);
@@ -156,7 +144,7 @@ export class EndScreen implements IGameState
 
 	mouseClickCallback()
 	{
-		if (!this.tournamentData1)
+		if (!this.isTournament)
 			this.returnMenuButton.checkClick();
 		else
 		{
@@ -209,7 +197,7 @@ export class EndScreen implements IGameState
 				drawCenteredText(this.canvas, this.ctx, 'Great job, humans ROCK!!', '30px arial', 'white', 300);
 
 		}
-		else if (!this.tournamentData1)
+		else if (!this.isTournament)
 		{
 			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, winnerRankText, '30px arial', 'white', 300);
@@ -218,7 +206,7 @@ export class EndScreen implements IGameState
 			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 
-		if (!this.tournamentData1)
+		if (!this.isTournament)
 			this.returnMenuButton.draw(ctx);
 		else
 			this.returnToTournamentBtn.draw(ctx);

@@ -4,6 +4,9 @@ import { GameType } from '../UI/Types';
 import { Buffer } from 'node:buffer'
 import { bbMatchData } from '../game/BlockBattle';
 import { pongMatchData } from '../game/pong/Pong';
+import { TournamentPlayer } from '../game/Tournament';
+import { Weapon } from '../game/Weapons';
+import { match } from 'node:assert';
 
 interface RegisterData {
   username: string;
@@ -86,6 +89,105 @@ export const verifyOpponent = async (registerData: RegisterData): Promise<{ stat
       body: JSON.stringify(registerData)
     });
     return response;
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Verify tournament player
+ * 
+ * @param registerData User registration data
+ * @returns Promise with already registered tournament player array
+ */
+export const verifyTournamentPlayer = async (registerData: RegisterData): Promise<TournamentPlayer[]> => {
+  try {
+    return await apiRequest('/users/verify-tournament-player', {
+      method: 'POST',
+      body: JSON.stringify(registerData)
+    });
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Remove tournament player
+ * 
+ * @param playerId Id of the player that should be removed from the tournament
+ * @returns Promise with already registered tournament player array
+ */
+export const removeTournamentPlayer = async (playerId: number): Promise<TournamentPlayer[]> => {
+  try {
+    return await apiRequest('/users/remove-tournament-player', {
+      method: 'POST',
+      body: JSON.stringify(playerId)
+    });
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Post weapon data (related to Block Battle tournament mode) to backend
+ * 
+ * @returns 
+ */
+export const saveWeaponDataToDB = async (p1Weapons: Weapon[], p2Weapons: Weapon[]): Promise< {status: string} > => {
+  try {
+    return await apiRequest('/users/save-weapon-data', {
+      method: 'POST',
+      body: JSON.stringify({p1Weapons: p1Weapons, p2Weapons: p2Weapons})
+    });
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Start a tournament by clearing old tournament data from DB and adding loggedIn user to it
+ * 
+ * @returns Promise with user data
+ */
+export const startNewTournament = async (): Promise< {status: string} > => {
+  try {
+    	return await apiRequest(`/users/start-new-tournament`);
+  } catch (error) {
+    	throw error;
+  }
+};
+
+/**
+ * Check from backend if Tournament is ready to be played (meaning, if it already has have 4 validated players)
+ * 
+ */
+export const checkTournamentStatus = async (): Promise<{status: string}> => {
+  try {
+    return await apiRequest(`/users/check-tournament-status`);
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Get tournament player data from backend
+ * 
+ */
+export const getTournamentPlayers = async (): Promise<TournamentPlayer[]> => {
+  try {
+    return await apiRequest(`/users/tournament-players`);
+  } catch (error) {
+      throw error;
+  }
+};
+
+/**
+ * Get user data of the next Tournament game participants
+ * 
+ */
+export const getNextTournamentGameData = async (): Promise<TournamentPlayer[]> => {
+  try {
+    return await apiRequest(`/users/next-tournament-game-data`);
   } catch (error) {
       throw error;
   }
@@ -188,6 +290,44 @@ export const recordMatchResult = async (player1: User, player2: User, matchData:
       method: 'POST',
       body: JSON.stringify({ player1, player2, matchData })
     });    
+  } catch (error) {
+      throw error;
+  }
+}; 
+
+/**
+ * Update user statistics after a tournament game
+ * 
+ * @param winner Winner user data
+ * @param loser Loser user data
+ * @returns Promise with status string
+ */
+export const recordTournamentMatchResult = async (player1: User, player2: User, matchData: bbMatchData | pongMatchData): Promise<{ status: string }> => {
+  try {
+
+	console.log('Record Tournament match');
+	console.log('Winner ID:', matchData.winner_id);
+
+
+
+    return await apiRequest('/games/record-tournament-match', {
+      method: 'POST',
+      body: JSON.stringify({ player1, player2, matchData })
+    });    
+  } catch (error) {
+      throw error;
+  }
+}; 
+
+
+/**
+ * Get player data for Tournament mode EndScreen
+ * 
+ * @returns Promise with the updated Tournament game user data
+ */
+export const getTournamentEndScreenData = async (): Promise<{winner: TournamentPlayer, loser: TournamentPlayer, playerArr: TournamentPlayer[], matchCount: number}> => {
+  try {
+    return await apiRequest('/games/get-tournament-end-screen-data');    
   } catch (error) {
       throw error;
   }

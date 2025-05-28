@@ -5,10 +5,10 @@ import { BlockBattle } from "./BlockBattle";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
-import { drawCenteredText, drawText } from "./StartScreen";
+import { drawCenteredText, drawText, StartScreen } from "./StartScreen";
 import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE, BB_LEFT_1, BB_RIGHT_1, BB_LEFT_2, BB_RIGHT_2 } from "./Constants";
 import { Bazooka, LandMine, Pistol, Weapon } from "./Weapons";
-import { getLoggedInUserData, getOpponentData } from "../services/userService";
+import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, saveWeaponDataToDB } from "../services/userService";
 
 
 export class MatchIntro implements IGameState
@@ -39,6 +39,7 @@ export class MatchIntro implements IGameState
 	isTournament: boolean;
 	isDataReady: boolean;
 	showLoadingText: boolean;
+	isSavingData: boolean = false;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
 
@@ -53,7 +54,7 @@ export class MatchIntro implements IGameState
 		if (type === GameType.PONG_AI)
 		{
 			this.player2Data = {
-				id: 9999,
+				id: -1,
 				username: 'Computer',
 				ranking_points: 9999,
 				avatar_url: 'Something funny here',
@@ -98,14 +99,15 @@ export class MatchIntro implements IGameState
 			this.showLoadingText = true;
 		}, 500); 
 
-		this.fetchPlayerData();
+		if (!isTournament)
+			this.fetchPlayerData();
+		else
+			this.fetchNextTournamentData();
 
 		this.KeyDownBound = (event: KeyboardEvent) => this.keyDownCallback(event);
 		this.KeyUpBound = (event: KeyboardEvent) => this.keyUpCallback(event);
 
 	}
-
-	// ADD FETCH TOURNAMENT INFO
 
 	async fetchPlayerData()
 	{
@@ -130,8 +132,32 @@ export class MatchIntro implements IGameState
 
 			this.isDataReady = true;
 		}
-		catch {
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
 			console.log("MATCH INTRO: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.isDataReady = false;
+		}
+	}
+
+	async fetchNextTournamentData()
+	{
+		try
+		{
+			const response = await getNextTournamentGameData();
+
+			this.player1TournamentData = response[0];
+			this.player2TournamentData = response[1];
+
+			this.player1Data = this.player1TournamentData.user;
+			this.player2Data = this.player2TournamentData.user;
+
+			this.isDataReady = true;
+		}
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
+			console.log("MATCH INTRO: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 			this.isDataReady = false;
 		}
 	}
@@ -174,6 +200,9 @@ export class MatchIntro implements IGameState
 
 	update(deltaTime: number)
 	{
+		if (this.isSavingData)
+			return ;
+
 		// PONG
 		if (this.keys[PONG_UP_1] && (this.gameType === GameType.PONG || this.gameType === GameType.PONG_AI))
 			this.p1IsReady = true;
@@ -241,7 +270,7 @@ export class MatchIntro implements IGameState
 			if (!this.isTournament)
 			{
 				if (this.gameType === GameType.BLOCK_BATTLE)
-					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.p1Weapons, this.p2Weapons));
+					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.p1Weapons, this.p2Weapons, false));
 				else if (this.gameType === GameType.PONG && this.player1Data && this.player2Data)
 					global_stateManager.changeState(new Pong(this.canvas, this.ctx, null, 'playing'));
 				else if (this.gameType === GameType.PONG_AI && this.player1Data && this.player2Data)
@@ -249,21 +278,27 @@ export class MatchIntro implements IGameState
 			}
 			else
 			{
-				/*
-
-				ADD TOURNAMENT API LOGIC!!
-
-				this.isStateReady = true;
-				this.tournamentData1.bbWeapons.push(this.p1Weapons[0].clone());
-				this.tournamentData1.bbWeapons.push(this.p1Weapons[1].clone());
-
-				if (this.tournamentData2)
-				{
-					this.tournamentData2.bbWeapons.push(this.p2Weapons[0].clone());
-					this.tournamentData2.bbWeapons.push(this.p2Weapons[1].clone());
-				}
-				*/
+				this.isSavingData = true;
+				this.saveWeaponData();
 			}
+		}
+	}
+
+	async saveWeaponData()
+	{
+		try {
+
+			await saveWeaponDataToDB(this.p1Weapons, this.p2Weapons);
+
+			this.isStateReady = true;
+
+		} catch (error) {
+
+			alert(`Weapon data save failed, returning to main menu! ${error}`)
+			console.log("MATCH INTRO: Weapon data saving failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			// Is it a bad idea to exit to StartScreen mid tournament...?
+
 		}
 	}
 

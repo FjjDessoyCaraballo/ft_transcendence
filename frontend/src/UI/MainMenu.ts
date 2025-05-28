@@ -175,8 +175,10 @@ export class MainMenu implements IGameState
 				this.pongAiBtn.addUserData(this.loggedInUserData);
 			}
 		}
-		catch {
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
 			console.log("MAIN MENU: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 			this.loggedInUserData = null;
 			this.isDataReady = false;
 		}
