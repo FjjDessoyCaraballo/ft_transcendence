@@ -23,7 +23,7 @@ export const Header: React.FC<HeaderProps> = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation('header');
 
   useEffect(() => {
     const checkLoginStatus = () => {

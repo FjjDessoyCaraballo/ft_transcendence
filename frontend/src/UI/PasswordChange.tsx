@@ -8,7 +8,7 @@ export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const { t } = useTranslation();
+	const { t } = useTranslation('password');
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();

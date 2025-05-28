@@ -29,7 +29,7 @@ RUN npm install chart.js react-chartjs-2
 RUN npm install react-router-dom
 
 # Install i18next and react-i18nect for multi-language support
-RUN npm install i18next react-i18next i18next-browser-languagedetector
+RUN npm install i18next react-i18next i18next-browser-languagedetector i18next-http-backend
 
 # Copy the rest of the application code
 COPY . .

@@ -68,7 +68,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 	const [showChangePassword, setShowChangePassword] = useState(false);
 	const [showAvatarChange, setShowAvatarChange] = useState(false);
-	const { t } = useTranslation();
+	const { t } = useTranslation('settings');
 
 	const HandleDownloadData = async () => {
 		try {

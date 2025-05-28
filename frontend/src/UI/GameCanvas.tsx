@@ -33,7 +33,7 @@ export const global_gameArea = {
 export const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevTimestampRef = useRef<number>(0);
-  const { t } = useTranslation();
+  const { t } = useTranslation('game');
 
 
   useEffect(() => {
