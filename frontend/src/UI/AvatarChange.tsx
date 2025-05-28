@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { updateAvatar } from '../services/userService' // under work
+import { useTranslation } from 'react-i18next';
 
 export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) => {
 	const [errorMessage, setErrorMessage] = useState('');
@@ -8,8 +9,9 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 	const [base64, setBase64] = useState<string>('');
 	const [fileSize, setFileSize] = useState<number>(0);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const { t } = useTranslation('avatar');
 
-	const showMeasures = 'Files must be in jpg or png format no bigger than 2MB';
+	const showMeasures = t('file_limit');
 	
 	const HandleNewAvatar = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -28,7 +30,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 			if (error instanceof Error) {
             	setErrorMessage(error.message);
 			} else {
-				setErrorMessage("Failed to load image!");
+				setErrorMessage(t('load_fail'))
 			}
 		} finally {
 			setIsLoading(false);
@@ -44,7 +46,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		const file = files[0];
 
 		if (!file.type.startsWith('image/')) {
-			setErrorMessage('Please select an image file');
+			setErrorMessage(t('select_file'));
 			return ;
 		}
 
@@ -69,7 +71,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 	<div className="fixed inset-0 w-full h-full bg-black bg-opacity-70 flex justify-center items-center z-[9999]">
 		<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
 		  <div className="p-6 bg-[#4B0082] text-white">
-			<h2 className="text-2xl font-bold font-mono">Avatar Change</h2>
+			<h2 className="text-2xl font-bold font-mono">{t('avatar_change')}</h2>
 		  </div>
 		{showMeasures && 
 				<div className="mx-6 mt-4 p-3 font-mono rounded-md">
@@ -83,7 +85,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 		<div className="buttonsDiv">
 			<form onSubmit={HandleNewAvatar}
 			className="p-6">
-				<label htmlFor="avatar" className="buttons">Avatar</label>
+				<label htmlFor="avatar" className="buttons">{t('avatar')}</label>
 				<input
 				className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
 				type="file"
@@ -112,7 +114,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 			  disabled={isLoading}
               onClick={HandleClose}
             >
-              Cancel
+              {t('cancel')}
 			</button>
             <button 
               type="submit"
@@ -120,7 +122,7 @@ export const AvatarChangePopup: React.FC<{onClick: () => void}> = ({ onClick }) 
 			  disabled={isLoading}
 			  onClick={HandleNewAvatar}
             >
-              Update
+              {t('update')}
             </button>
 		</div>
 		</div>

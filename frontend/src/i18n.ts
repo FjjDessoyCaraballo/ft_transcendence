@@ -13,7 +13,7 @@ i18n
     lng: savedLanguage,
     fallbackLng: 'en',
     debug: false,
-    ns: ['game', 'header', 'password', 'settings'],
+    ns: ['game', 'header', 'password', 'settings', 'avatar'],
     defaultNS: 'game',
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
