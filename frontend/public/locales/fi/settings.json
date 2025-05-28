@@ -4,5 +4,7 @@
     "change_avatar": "Vaihda avatar",
     "delete_account": "Poista tili",
     "contribute": "Osallistu",
-    "close": "Sulje"
+    "close": "Sulje",
+    "settings": "Asetukset",
+    "logout": "Kirjaudu ulos"
 }

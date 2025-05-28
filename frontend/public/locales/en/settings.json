@@ -4,5 +4,7 @@
     "change_avatar": "Change Avatar",
     "delete_account": "Delete Account",
     "contribute": "Contribute",
-    "close": "Close"
+    "close": "Close",
+    "settings": "Settings",
+    "logout": "Logout"
 }

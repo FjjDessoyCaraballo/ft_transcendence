@@ -4,5 +4,7 @@
     "change_avatar": "Alterar avatar",
     "delete_account": "Excluir conta",
     "contribute": "Contribuir",
-    "close": "Fechar"
+    "close": "Fechar",
+    "settings": "Configurações",
+    "logout": "Sair"
 }
