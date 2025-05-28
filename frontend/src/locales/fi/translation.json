@@ -21,5 +21,8 @@
   "enter_your_current": "Syötä nykyinen salasana",
   "create_new": "Luo uusi salasana",
   "confirm_your_new": "Vahvista uusi salasana",
-  "processing": "Käsitellään..."
+  "processing": "Käsitellään...",
+
+  "welcome_gamer": "Tervetuloa, pelaaja!",
+   "please_login": "Kirjaudu sisään pelataksesi peliä"
 }

@@ -21,5 +21,8 @@
   "enter_your_current": "Digite sua senha atual",
   "create_new": "Crie uma nova senha",
   "confirm_your_new": "Confirme sua nova senha",
-  "processing": "Processando..."
+  "processing": "Processando...",
+
+  "welcome_gamer": "Bem-vindo, jogador!",
+  "please_login": "Faça login para jogar"
 }

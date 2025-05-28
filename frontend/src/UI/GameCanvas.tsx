@@ -3,6 +3,7 @@ import { GameStateManager, GameStates } from '../game/GameStates';
 import { StartScreen } from '../game/StartScreen';
 import { WALL_THICKNESS, FLOOR_THICKNESS } from '../game/Constants';
 import { User } from './UserManager';
+import { useTranslation } from 'react-i18next';
 
 // GLOBAL GAME VARIABLES
 export let global_curUser: string | null = null;
@@ -32,6 +33,8 @@ export const global_gameArea = {
 export const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevTimestampRef = useRef<number>(0);
+  const { t } = useTranslation();
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -40,14 +43,14 @@ export const GameCanvas: React.FC = () => {
     if (!ctx) return;
 
     // Start screen
-    global_stateManager.changeState(new StartScreen(canvas, ctx));
+    global_stateManager.changeState(new StartScreen(canvas, ctx, t));
 
     const gameLoop = (timestamp: number) => {
       const deltaTime = (timestamp - prevTimestampRef.current) / 1000;
       prevTimestampRef.current = timestamp;
 
       if (!global_curUser && global_stateManager.getStateName() !== GameStates.START_SCREEN) {
-        global_stateManager.changeState(new StartScreen(canvas, ctx));
+        global_stateManager.changeState(new StartScreen(canvas, ctx, t));
       }
 
       global_stateManager.update(deltaTime);

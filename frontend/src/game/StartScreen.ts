@@ -5,6 +5,7 @@ import { GameStates, IGameState, } from "./GameStates";
 import { DEEP_PURPLE, PURPLE, TEXT_PADDING } from "./Constants";
 import { UserManager } from "../UI/UserManager";
 import { GameType } from "../UI/Types";
+import { TFunction } from 'i18next';
 
 
 // GENERAL HELPER FUNCTIONS
@@ -68,14 +69,16 @@ export class StartScreen implements IGameState
 	blockBattleBtn: BlockBattleBtn;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, t: TFunction)
 	{
 		this.name = GameStates.START_SCREEN;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 
 		const pongText = 'PONG';
 		ctx.font = '50px arial';
@@ -135,10 +138,10 @@ export class StartScreen implements IGameState
 	{
 		UserManager.drawCurUser(this.canvas, ctx);
 		
-		drawCenteredText(this.canvas, this.ctx, 'Welcome, gamer!', '140px Impact', DEEP_PURPLE, 240);
+		drawCenteredText(this.canvas, this.ctx, this.t('welcome_gamer'), '140px Impact', DEEP_PURPLE, 240);
 
 		if (!global_curUser)
-			drawCenteredText(this.canvas, this.ctx, 'Please log in to play the game', '50px arial', 'white', this.canvas.height / 2 + 100);
+			drawCenteredText(this.canvas, this.ctx, this.t('please_login'), '50px arial', 'white', this.canvas.height / 2 + 100);
 		else
 		{
 			drawCenteredText(this.canvas, this.ctx, 'Please choose the game you want to play', '40px arial', 'white', 390);

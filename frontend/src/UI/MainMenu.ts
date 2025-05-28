@@ -62,7 +62,7 @@ export class ChangeGameBtn extends Button
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+		//global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
 	}
 }
 
