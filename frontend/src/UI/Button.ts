@@ -1,4 +1,5 @@
 import { TEXT_PADDING } from "../game/Constants";
+import { TFunction } from 'i18next';
 
 export abstract class Button
 {
@@ -8,26 +9,28 @@ export abstract class Button
 	height: number;
 	boxColor: string;
 	hoverColor: string;
-	text: string;
+	textKey: string;
 	textColor: string;
 	textSize: string;
 	font: string;
 	isHover: boolean;
+	t: TFunction;
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, textKey: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
 		this.x = x;
 		this.y = y;
 		this.boxColor = boxColor;
 		this.hoverColor = hoverColor;
-		this.text = text;
+		this.textKey = textKey;
 		this.textColor = textColor;
 		this.textSize = textSize;
 		this.font = font;
 		this.isHover = false;
+		this.t = t;
 
 		ctx.font = textSize + ' ' + font;
-		const textMetrics = ctx.measureText(this.text);
+		const textMetrics = ctx.measureText(this.t(this.textKey));
 		this.width = textMetrics.width + 2 * TEXT_PADDING;
 		this.height = parseInt(textSize) + 2 * TEXT_PADDING;
 	}
@@ -60,8 +63,9 @@ export abstract class Button
 	}
 
 
-	draw(ctx: CanvasRenderingContext2D)
+	draw(ctx: CanvasRenderingContext2D, t: TFunction)
 	{
+		const translatedText = t(this.textKey);
 		let color;
 
 		if (this.isHover)
@@ -75,12 +79,10 @@ export abstract class Button
 		ctx.font = this.textSize + ' ' + this.font;
 
 		let fontSize: number = parseInt(this.textSize);
-		const textX = (this.x + this.width / 2) - (ctx.measureText(this.text).width / 2)
+		const textX = (this.x + this.width / 2) - (ctx.measureText(translatedText).width / 2)
 		const textY = (this.y + this.height / 2) + (fontSize / 2) - TEXT_PADDING;
 
-		ctx.fillText(this.text, textX, textY);
+		ctx.fillText(translatedText, textX, textY);
 
 	}
-
-
 }

@@ -18,7 +18,7 @@ export class ReturnMainMenuButton extends Button
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
@@ -36,9 +36,9 @@ export class ReturnMainMenuButton extends Button
 
 class ReturnToTournamentBtn extends Button
 {
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void {
@@ -90,7 +90,7 @@ export class EndScreen implements IGameState
 		const buttonY2 = (canvas.height / 2) - TEXT_PADDING;
 
 		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType, this.t);
-		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
+		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial', t);
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -183,9 +183,9 @@ export class EndScreen implements IGameState
 		}
 
 		if (!this.tournamentData1 && !this.savingDataToDB)
-			this.returnMenuButton.draw(ctx);
+			this.returnMenuButton.draw(ctx, this.t);
 		else if (!this.savingDataToDB)
-			this.returnToTournamentBtn.draw(ctx);
+			this.returnToTournamentBtn.draw(ctx, this.t);
 		else
 			drawCenteredText(this.canvas, this.ctx, 'Sending data to backend, please wait', '30px arial', 'white', this.canvas.height - 100);
 

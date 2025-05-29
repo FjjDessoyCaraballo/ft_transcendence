@@ -34,9 +34,9 @@ const GameOrder: [number, number][] = [
 
 export class NextGameBtn extends Button
 {
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void 
@@ -100,7 +100,7 @@ export class Tournament implements IGameState
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
 		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
 		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 240;
-		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial');
+		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial', t);
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -348,7 +348,7 @@ export class Tournament implements IGameState
 			this.drawScoreBoard(ctx);
 	
 			// Draw Return button
-			this.returnMenuButton.draw(ctx);
+			this.returnMenuButton.draw(ctx, this.t);
 			let exitWarning;
 			if (!this.isFinished)
 				exitWarning = this.t('lose_progress');
@@ -363,7 +363,7 @@ export class Tournament implements IGameState
 			// Draw Next game button || Winner announcement
 			if (!this.isFinished)
 			{
-				this.nextGameBtn.draw(ctx);
+				this.nextGameBtn.draw(ctx, this.t);
 
 				const nextGameNum = `${this.t('game_no')}${(this.matchCounter + 1).toString()}/6`;
 				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 50;

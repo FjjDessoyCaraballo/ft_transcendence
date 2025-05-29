@@ -21,7 +21,7 @@ export class SingleGameButton extends Button
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
@@ -42,7 +42,7 @@ export class StartTournamentButton extends Button
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
@@ -62,7 +62,7 @@ export class ChangeGameBtn extends Button
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.t = t;
@@ -81,7 +81,7 @@ export class PongAiBtn extends Button
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.t = t;
@@ -215,12 +215,12 @@ export class MainMenu implements IGameState
 			drawCenteredText(this.canvas, this.ctx, 'Pong', '40px impact', LIGHT_PURPLE, 250);
 
 
-		this.singleGameButton.draw(ctx);
-		this.startTournamentButton.draw(ctx);
-		this.changeGameBtn.draw(ctx);
+		this.singleGameButton.draw(ctx, this.t);
+		this.startTournamentButton.draw(ctx, this.t);
+		this.changeGameBtn.draw(ctx, this.t);
 
 		if (this.gameType === GameType.PONG)
-			this.pongAiBtn.draw(ctx);
+			this.pongAiBtn.draw(ctx, this.t);
 	}
 	
 }

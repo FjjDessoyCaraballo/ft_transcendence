@@ -14,9 +14,9 @@ import { TFunction } from 'i18next';
 export class NextPageButton extends Button
 {
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void {
@@ -25,9 +25,9 @@ export class NextPageButton extends Button
 
 export class PrevPageButton extends Button
 {
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void {
@@ -108,8 +108,8 @@ export class UserHUB implements IGameState
 		const button3Y = 80 + TEXT_PADDING;
 
 		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType, this.t);
-		this.nextPageButton = new NextPageButton(ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial');
-		this.prevPageButton = new PrevPageButton(ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial');
+		this.nextPageButton = new NextPageButton(ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial', t);
+		this.prevPageButton = new PrevPageButton(ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial', t);
 		this.challengeBtnArr = [];
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
@@ -154,7 +154,7 @@ export class UserHUB implements IGameState
 				// Logic for "Remove from tournament" -button
 				const tournamentPlayer = this.tournamentArr.find(player => player.username === btn.user.username);
 
-				if (tournamentPlayer && btn.text === this.t('remove'))
+				if (tournamentPlayer && btn.textKey === this.t('remove'))
 				{
 					const idx = this.tournamentArr.indexOf(tournamentPlayer);
 					this.tournamentArr.splice(idx, 1);
@@ -322,8 +322,8 @@ export class UserHUB implements IGameState
 			// Check if we need to update the tournament button
 			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === global_allUserDataArr[i].username);
 
-			if ((isInTournament && tournamentBtn && tournamentBtn.text === this.t('add_to_tournament'))
-				|| (!isInTournament && tournamentBtn && tournamentBtn.text === this.t('remove'))
+			if ((isInTournament && tournamentBtn && tournamentBtn.textKey === this.t('add_to_tournament'))
+				|| (!isInTournament && tournamentBtn && tournamentBtn.textKey === this.t('remove'))
 			)
 			{
 				const idx = this.challengeBtnArr.indexOf(tournamentBtn);
@@ -337,11 +337,11 @@ export class UserHUB implements IGameState
 		if (this.needNewChallengeButtons)
 			this.needNewChallengeButtons = false;
 
-		this.returnMenuButton.draw(ctx);
+		this.returnMenuButton.draw(ctx, this.t);
 
 		if (this.userStartIdx < global_allUserDataArr.length - 3)
 		{
-			this.nextPageButton.draw(ctx);
+			this.nextPageButton.draw(ctx, this.t);
 			this.isNextActive = true;
 		}
 		else
@@ -349,14 +349,14 @@ export class UserHUB implements IGameState
 
 		if (this.userStartIdx != 0)
 		{
-			this.prevPageButton.draw(ctx);
+			this.prevPageButton.draw(ctx, this.t);
 			this.isPrevActive = true;
 		}
 		else
 			this.isPrevActive = false;
 
 		for (const btn of this.challengeBtnArr)
-			btn.draw(ctx);
+			btn.draw(ctx, this.t);
 		
 	}
 }

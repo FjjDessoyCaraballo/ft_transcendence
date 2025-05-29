@@ -104,7 +104,7 @@ export class Instructions implements IGameState
 			lineCount++;
 		}*/
 
-		this.returnMenuButton.draw(ctx);
+		this.returnMenuButton.draw(ctx, this.t);
 	}
 
 	getInstructionText(): string []

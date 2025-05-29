@@ -34,7 +34,7 @@ export class PongBtn extends Button
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.t = t;
@@ -53,7 +53,7 @@ export class BlockBattleBtn extends Button
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.t = t;
@@ -150,8 +150,8 @@ export class StartScreen implements IGameState
 		{
 			drawCenteredText(this.canvas, this.ctx, this.t('please_choose'), '40px arial', 'white', 390);
 
-			this.pongBtn.draw(ctx);
-			this.blockBattleBtn.draw(ctx);
+			this.pongBtn.draw(ctx, this.t);
+			this.blockBattleBtn.draw(ctx, this.t);
 		}
 	}
 

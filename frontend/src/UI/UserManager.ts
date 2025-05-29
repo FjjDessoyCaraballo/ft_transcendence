@@ -88,9 +88,9 @@ export class ChallengeButton extends Button
 {
 	user: User;
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.user = user;
 	}
 
@@ -102,9 +102,9 @@ export class PongButton extends Button
 {
 	user: User;
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.user = user;
 	}
 
@@ -116,9 +116,9 @@ export class TournamentButton extends Button
 {
 	user: User;
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.user = user;
 	}
 
@@ -311,7 +311,7 @@ export class UserManager {
 			let text = t('challenge');
 			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
 			const buttonY = infoHeight - buttonOffset;
-			const challengeButton = new ChallengeButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
+			const challengeButton = new ChallengeButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user, t);
 			return challengeButton;
 		}
 		else
@@ -323,14 +323,14 @@ export class UserManager {
 				let text = t('add_to_tournament');
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 - 20;
 				const buttonY = infoHeight - buttonOffset;
-				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user);
+				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user, t);
 			}
 			else
 			{
 				let text = t('remove');
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 + 40;
 				const buttonY = infoHeight - buttonOffset;
-				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user);
+				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user, t);
 			}
 
 			return tournamentBtn;
