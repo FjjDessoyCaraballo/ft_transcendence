@@ -24,9 +24,9 @@ export class Instructions implements IGameState
 		this.ctx = ctx;
 		this.t = t;
 		
-		let text = t('return_to_menu');
+		let text = 'return_to_menu';
 		this.ctx.font = '25px arial';
-		const buttonX = (canvas.width / 2) - (this.ctx.measureText(text).width / 2) - TEXT_PADDING;
+		const buttonX = (canvas.width / 2) - (this.ctx.measureText(t('return_to_menu')).width / 2) - TEXT_PADDING;
 		const buttonY = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
 
 		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', this.gameType, this.t);

@@ -80,13 +80,13 @@ export class EndScreen implements IGameState
 		this.savingDataToDB = false;
 		this.t = t;
 
-		let text1 = t('return_to_menu');
+		let text1 = 'return_to_menu';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
-		const buttonX1 = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
+		const buttonX1 = (canvas.width / 2) - (ctx.measureText(t('return_to_menu')).width / 2) - TEXT_PADDING;
 		const buttonY1 = (canvas.height / 2) + 200 - TEXT_PADDING;
 
-		let text2 = t('return_to_tournament');
-		const buttonX2 = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
+		let text2 = 'return_to_tournament';
+		const buttonX2 = (canvas.width / 2) - (ctx.measureText(t('return_to_tournament')).width / 2) - TEXT_PADDING;
 		const buttonY2 = (canvas.height / 2) - TEXT_PADDING;
 
 		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType, this.t);

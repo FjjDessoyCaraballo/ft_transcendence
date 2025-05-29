@@ -90,15 +90,15 @@ export class Tournament implements IGameState
 			this.playerArr.push(tournamentObj);
 		}
 
-		let text1 = t('exit_tournament'); // Add a warning here that all tournament data will be lost
+		let text1 = 'exit_tournament'; // Add a warning here that all tournament data will be lost
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = 20;
 		const button1Y = 20;
 		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType, this.t);
 
-		let text2 = t('next_game');
+		let text2 = 'next_game';
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
-		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
+		const button2X = (canvas.width / 2) - (ctx.measureText(t('next_game')).width / 2) - TEXT_PADDING;
 		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 240;
 		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial', t);
 
