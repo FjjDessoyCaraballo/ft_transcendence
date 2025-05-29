@@ -7,5 +7,7 @@
     "play_single_game": "PELAA YKSI PELI",
     "start_tournament": "ALOITA TURNAUS",
     "play_ai": "PELAA PONGIA TEKOÄLYÄ VASTAAN",
-    "change_game": "VAIHDA PELIÄ"
+    "change_game": "VAIHDA PELIÄ",
+    "return_to_menu": "PALA VALIKKOON",
+    "return_to_tournament": "PALA TURNAAUKSEEN"
 }

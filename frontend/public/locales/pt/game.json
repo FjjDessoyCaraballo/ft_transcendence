@@ -7,6 +7,8 @@
     "play_single_game": "JOGAR PARTIDA ÚNICA",
     "start_tournament": "INICIAR TORNEIO",
     "play_ai": "JOGAR PONG COM IA",
-    "change_game": "MUDAR JOGO"
+    "change_game": "MUDAR JOGO",
+    "return_to_menu": "VOLTAR AO MENU",
+    "return_to_tournament": "VOLTAR AO TORNEIO"
 }
   
