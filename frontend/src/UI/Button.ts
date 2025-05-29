@@ -66,6 +66,12 @@ export abstract class Button
 	draw(ctx: CanvasRenderingContext2D, t: TFunction)
 	{
 		const translatedText = t(this.textKey);
+		console.log('1');
+		console.log(t('start_tournament'));
+		console.log('2');
+		console.log(this.textKey);
+		console.log('3');
+		console.log(t(this.textKey));
 		let color;
 
 		if (this.isHover)

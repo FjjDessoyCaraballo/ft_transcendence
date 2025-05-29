@@ -129,12 +129,12 @@ export class MainMenu implements IGameState
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
 
 		// Define buttons
-		let text1 = this.t('play_single_game');
-		const button1X = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
-		let text2 = this.t('start_tournament');
-		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
-		let text3 = this.t('play_ai');
-		const button3X = (canvas.width / 2) - (ctx.measureText(text3).width / 2) - TEXT_PADDING;
+		let text1 = 'play_single_game';
+		const button1X = (canvas.width / 2) - (ctx.measureText(t('play_single_game')).width / 2) - TEXT_PADDING;
+		let text2 = 'start_tournament';
+		const button2X = (canvas.width / 2) - (ctx.measureText(t('start_tournament')).width / 2) - TEXT_PADDING;
+		let text3 = 'play_ai';
+		const button3X = (canvas.width / 2) - (ctx.measureText(t('play_ai')).width / 2) - TEXT_PADDING;
 
 		const buttonYCenter = (canvas.height / 2) - 20 - TEXT_PADDING; // 20 == 40px / 2
 		const button1Y = buttonYCenter - 60;
@@ -143,8 +143,8 @@ export class MainMenu implements IGameState
 
 		// Define instruction button
 		ctx.font = '30px arial' // GLOBAL USE OF CTX!!
-		let instructText = this.t('change_game');
-		const instructX = (canvas.width / 2) - (ctx.measureText(instructText).width / 2) - TEXT_PADDING;
+		let instructText = 'change_game';
+		const instructX = (canvas.width / 2) - (ctx.measureText(t('change_game')).width / 2) - TEXT_PADDING;
 		const instructY = canvas.height - 100;
 
 		this.singleGameButton = new SingleGameButton(this.canvas, this.ctx, button1X, button1Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text1, 'white', '40px', 'arial', this.gameType, this.t);
