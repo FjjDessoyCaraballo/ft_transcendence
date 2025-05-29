@@ -139,10 +139,10 @@ export class MatchIntro implements IGameState
 		let infoText = '';
 		if (this.gameType != GameType.BLOCK_BATTLE)
 		{
-			infoText = `${this.t('press_up')}(${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play`;
+			infoText = `${this.t('press_up')}(${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}')${this.t('when_ready')}`;
 		}
 		else
-			infoText = `${this.t('press_shoot')}(${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
+			infoText = `${this.t('press_shoot')}(${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}')${this.t('when_ready')}`;
 		drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
 
 		let p1Text = this.player1.username;
