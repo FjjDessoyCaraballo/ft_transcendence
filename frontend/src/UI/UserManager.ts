@@ -6,6 +6,7 @@ import { UserHubState, GameType } from "./Types";
 import { RankingHandler } from "../game/RankingPoints";
 import { updateUserStatsAPI } from "../services/userService";
 import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 /*
 OLD VERSION
@@ -127,7 +128,6 @@ export class TournamentButton extends Button
 }
 
 export class UserManager {
-
    /* static saveUserData(user: User): void 
 	{
         try 
@@ -262,7 +262,7 @@ export class UserManager {
     } */
 
 
-	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
+	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean, t: TFunction): ChallengeButton | TournamentButton
 	{
 		// Draw avatar box & text (JUST A TEST)
 		const avatarW = 200;
@@ -297,19 +297,19 @@ export class UserManager {
 
 		ctx.font = '20px arial';
 		ctx.fillStyle = '#1111d6';
-		ctx.fillText('WINS / LOSSES:  ', boxX + boxPadding, infoHeight);
+		ctx.fillText(t('wins_losses'), boxX + boxPadding, infoHeight);
 		const winLoseData = `${user.wins_blockbattle + user.wins_pong} / ${user.losses_blockbattle + user.losses_pong}`; // CHECK THIS: Should we separate these?
 		ctx.fillStyle = 'black';
 		ctx.fillText(winLoseData, boxX + boxPadding, infoHeight + lineHeight);
 		ctx.fillStyle = '#1111d6';
-		ctx.fillText('RANKING POINTS:  ', boxX + boxPadding + infoWidth, infoHeight);
+		ctx.fillText(t('ranking_points_caps'), boxX + boxPadding + infoWidth, infoHeight);
 		ctx.fillStyle = 'black';
 		ctx.fillText(user.ranking_points.toFixed(2), boxX + boxPadding + infoWidth, infoHeight + lineHeight);
 
 		// Create challenge button
 		if (state === UserHubState.SINGLE_GAME)
 		{
-			let text = 'CHALLENGE';
+			let text = t('challenge');
 			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
 			const buttonY = infoHeight - buttonOffset;
 			const challengeButton = new ChallengeButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
@@ -321,14 +321,14 @@ export class UserManager {
 
 			if (!isInTournament)
 			{
-				let text = 'ADD TO TOURNAMENT';
+				let text = t('add_to_tournament');
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 - 20;
 				const buttonY = infoHeight - buttonOffset;
 				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user);
 			}
 			else
 			{
-				let text = 'REMOVE';
+				let text = t('remove');
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 + 40;
 				const buttonY = infoHeight - buttonOffset;
 				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user);

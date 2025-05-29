@@ -26,6 +26,11 @@
     "lose_progress": "(e perderá todo o progresso do torneio)",
     "safe_exit": "(Agora você pode sair do torneio com segurança)",
     "game_no": "Jogo nº ",
-    "tournament winner": "VENCEDOR(ES) DO TORNEIO"
+    "tournament winner": "VENCEDOR(ES) DO TORNEIO",
+    "wins_losses": "VITÓRIAS / DERROTAS: ",
+    "ranking_points_caps": "PONTOS DE RANKING: ",
+    "challenge": "DESAFIAR",
+    "add_to_tournament": "ADICIONAR AO TORNEIO",
+    "remove": "REMOVER"
 }
   

@@ -311,7 +311,7 @@ export class UserHUB implements IGameState
 
 			const isInTournament = this.tournamentArr.some(player => player.username === global_allUserDataArr[i].username);
 
-			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(ctx, global_allUserDataArr[i], x, y, this.state, isInTournament);
+			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(ctx, global_allUserDataArr[i], x, y, this.state, isInTournament, this.t);
 
 			if (this.needNewChallengeButtons && btn.user.username !== global_curUser
 				&& this.state !== UserHubState.INFO)

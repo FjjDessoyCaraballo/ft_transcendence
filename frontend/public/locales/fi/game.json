@@ -26,5 +26,10 @@
     "lose_progress": "(ja menetät kaiken turnauskehityksen)",
     "safe_exit": "(Voit nyt poistua turnauksesta turvallisesti)",
     "game_no": "Peli nro ",
-    "tournament winner": "TURNAUKSEN VOITTAJA(T)"
+    "tournament winner": "TURNAUKSEN VOITTAJA(T)",
+    "wins_losses": "VOITOT / TAPPIOt: ",
+    "ranking_points_caps": "RANKING-PISTEET: ",
+    "challenge": "HAASTA",
+    "add_to_tournament": "LISÄÄ TURNAAUKSEEN",
+    "remove": "POISTA"
 }

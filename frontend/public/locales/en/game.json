@@ -26,5 +26,10 @@
     "lose_progress": "(and lose all tournament progress)",
     "safe_exit": "(You can now safely exit the tournament)",
     "game_no": "Game no. ",
-    "tournament winner": "TOURNAMENT WINNER(S)"
+    "tournament winner": "TOURNAMENT WINNER(S)",
+    "wins_losses": "WINS / LOSSES: ",
+    "ranking_points_caps": "RANKING POINTS: ",
+    "challenge": "CHALLENGE",
+    "add_to_tournament": "ADD TO TOURNAMENT",
+    "remove": "REMOVE"
 }
