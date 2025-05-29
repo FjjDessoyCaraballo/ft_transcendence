@@ -31,5 +31,11 @@
     "ranking_points_caps": "RANKING POINTS: ",
     "challenge": "CHALLENGE",
     "add_to_tournament": "ADD TO TOURNAMENT",
-    "remove": "REMOVE"
+    "remove": "REMOVE",
+    "next_page": "NEXT PAGE",
+    "previous_page": "PREVIOUS PAGE",
+    "hello": "Hello ",
+    "type_password": "Please type in your password to start the game",
+    "incorrect_password": "Incorrect password. Please try again.",
+    "chosen": "/4 players chosen"
 }

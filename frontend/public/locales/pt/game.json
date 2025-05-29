@@ -31,6 +31,12 @@
     "ranking_points_caps": "PONTOS DE RANKING: ",
     "challenge": "DESAFIAR",
     "add_to_tournament": "ADICIONAR AO TORNEIO",
-    "remove": "REMOVER"
+     "remove": "REMOVER",
+    "next_page": "PRÓXIMA PÁGINA",
+    "previous_page": "PÁGINA ANTERIOR",
+    "hello": "Olá ",
+    "type_password": "Digite sua senha para iniciar o jogo",
+    "incorrect_password": "Senha incorreta. Tente novamente.",
+    "chosen": "/4 jogadores escolhidos"
 }
   

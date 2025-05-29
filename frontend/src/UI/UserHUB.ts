@@ -94,16 +94,16 @@ export class UserHUB implements IGameState
 			}
 		}
 
-		let text1 = 'RETURN TO MENU';
+		let text1 = t('return_to_menu');
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
 		const button1Y = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
 
-		let text2 = 'NEXT PAGE';
+		let text2 = t('next_page');
 		const button2X = canvas.width - ctx.measureText(text2).width - TEXT_PADDING;
 		const button2Y = 80 + TEXT_PADDING;
 
-		let text3 = 'PREVIOUS PAGE';
+		let text3 = t('previous_page');
 		const button3X = 0 + TEXT_PADDING;
 		const button3Y = 80 + TEXT_PADDING;
 
@@ -154,7 +154,7 @@ export class UserHUB implements IGameState
 				// Logic for "Remove from tournament" -button
 				const tournamentPlayer = this.tournamentArr.find(player => player.username === btn.user.username);
 
-				if (tournamentPlayer && btn.text === 'REMOVE')
+				if (tournamentPlayer && btn.text === this.t('remove'))
 				{
 					const idx = this.tournamentArr.indexOf(tournamentPlayer);
 					this.tournamentArr.splice(idx, 1);
@@ -166,9 +166,9 @@ export class UserHUB implements IGameState
 					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
 					if (passwordHeader)
 					{
-						passwordHeader.textContent = `Hello ${this.opponentName}!`;
+						passwordHeader.textContent = `${this.t('hello')}${this.opponentName}!`;
 						passwordHeader.appendChild(document.createElement('br'));
-						passwordHeader.appendChild(document.createTextNode('Please type in your password to start the game'));
+						passwordHeader.appendChild(document.createTextNode(this.t('type_password')));
 					}
 
 					const passwordModal = document.getElementById("passwordModal") as HTMLElement;
@@ -231,7 +231,7 @@ export class UserHUB implements IGameState
 			
 		} catch {
 			this.isCheckingPassword = false;
-			alert("Incorrect password. Please try again.");
+			alert(this.t('incorrect_password'));
 			passwordInput.value = ""; // Clear the input field
 		}
 
@@ -297,7 +297,7 @@ export class UserHUB implements IGameState
 
 		if (this.state === UserHubState.TOURNAMENT)
 		{
-			let playerCountText = `${this.tournamentArr.length}/4 players chosen`;
+			let playerCountText = `${this.tournamentArr.length}${this.t('chosen')}`;
 			drawCenteredText(this.canvas, this.ctx, playerCountText, '40px impact', 'white', 120)
 		}
 
@@ -322,8 +322,8 @@ export class UserHUB implements IGameState
 			// Check if we need to update the tournament button
 			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === global_allUserDataArr[i].username);
 
-			if ((isInTournament && tournamentBtn && tournamentBtn.text === 'ADD TO TOURNAMENT')
-				|| (!isInTournament && tournamentBtn && tournamentBtn.text === 'REMOVE')
+			if ((isInTournament && tournamentBtn && tournamentBtn.text === this.t('add_to_tournament'))
+				|| (!isInTournament && tournamentBtn && tournamentBtn.text === this.t('remove'))
 			)
 			{
 				const idx = this.challengeBtnArr.indexOf(tournamentBtn);

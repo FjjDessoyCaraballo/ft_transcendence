@@ -6,7 +6,6 @@ import { UserHubState, GameType } from "./Types";
 import { RankingHandler } from "../game/RankingPoints";
 import { updateUserStatsAPI } from "../services/userService";
 import { TFunction } from 'i18next';
-import { useTranslation } from 'react-i18next';
 
 /*
 OLD VERSION

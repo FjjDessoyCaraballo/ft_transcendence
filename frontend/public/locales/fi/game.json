@@ -27,9 +27,15 @@
     "safe_exit": "(Voit nyt poistua turnauksesta turvallisesti)",
     "game_no": "Peli nro ",
     "tournament winner": "TURNAUKSEN VOITTAJA(T)",
-    "wins_losses": "VOITOT / TAPPIOt: ",
+    "wins_losses": "VOITOT / TAPPIOT: ",
     "ranking_points_caps": "RANKING-PISTEET: ",
     "challenge": "HAASTA",
     "add_to_tournament": "LISÄÄ TURNAAUKSEEN",
-    "remove": "POISTA"
+    "remove": "POISTA",
+    "next_page": "SEURAAVA SIVU",
+    "previous_page": "EDELLINEN SIVU",
+    "hello": "Hei ",
+    "type_password": "Syötä salasanasi aloittaaksesi pelin",
+    "incorrect_password": "Väärä salasana. Yritä uudelleen.",
+    "chosen": "/4 pelaajaa valittu"
 }
