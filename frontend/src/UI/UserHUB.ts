@@ -94,16 +94,16 @@ export class UserHUB implements IGameState
 			}
 		}
 
-		let text1 = t('return_to_menu');
+		let text1 = 'return_to_menu';
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
-		const button1X = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
+		const button1X = (canvas.width / 2) - (ctx.measureText(t('return_to_menu')).width / 2) - TEXT_PADDING;
 		const button1Y = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
 
-		let text2 = t('next_page');
-		const button2X = canvas.width - ctx.measureText(text2).width - TEXT_PADDING;
+		let text2 = 'next_page';
+		const button2X = canvas.width - ctx.measureText(t('next_page')).width - TEXT_PADDING;
 		const button2Y = 80 + TEXT_PADDING;
 
-		let text3 = t('previous_page');
+		let text3 = 'previous_page';
 		const button3X = 0 + TEXT_PADDING;
 		const button3Y = 80 + TEXT_PADDING;
 
