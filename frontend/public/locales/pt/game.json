@@ -1,5 +1,7 @@
 {
     "welcome_gamer": "Bem-vindo, jogador!",
-    "please_login": "Faça login para jogar"
+    "please_login": "Faça login para jogar",
+    "please_choose": "Escolha o jogo que deseja jogar",
+    "currently_logged_in": "Usuário atualmente logado"
 }
   

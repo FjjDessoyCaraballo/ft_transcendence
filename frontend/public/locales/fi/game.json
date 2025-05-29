@@ -1,4 +1,6 @@
 {
     "welcome_gamer": "Tervetuloa, pelaaja!",
-    "please_login": "Kirjaudu sisään pelataksesi peliä"
+    "please_login": "Kirjaudu sisään pelataksesi peliä",
+    "please_choose": "Valitse peli, jota haluat pelata",
+    "currently_logged_in": "Kirjautunut käyttäjä"
 }

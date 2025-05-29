@@ -144,7 +144,7 @@ export class StartScreen implements IGameState
 			drawCenteredText(this.canvas, this.ctx, this.t('please_login'), '50px arial', 'white', this.canvas.height / 2 + 100);
 		else
 		{
-			drawCenteredText(this.canvas, this.ctx, 'Please choose the game you want to play', '40px arial', 'white', 390);
+			drawCenteredText(this.canvas, this.ctx, this.t('please_choose'), '40px arial', 'white', 390);
 
 			this.pongBtn.draw(ctx);
 			this.blockBattleBtn.draw(ctx);
