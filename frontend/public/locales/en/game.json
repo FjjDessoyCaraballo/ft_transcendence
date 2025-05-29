@@ -15,5 +15,16 @@
     "press_shoot": "Press the shoot key ",
     "ranking points": "Ranking points: ",
     "place": "Place: ",
-    "points": "Points: "
+    "points": "Points: ",
+    "exit_tournament": "EXIT TOURNAMENT",
+    "next_game": "NEXT GAME",
+    "username": "USERNAME",
+    "points_caps": "POINTS",
+    "coins": "COINS",
+    "pong_score": "PONG SCORE",
+    "score_board": "SCORE BOARD",
+    "lose_progress": "(and lose all tournament progress)",
+    "safe_exit": "(You can now safely exit the tournament)",
+    "game_no": "Game no. ",
+    "tournament winner": "TOURNAMENT WINNER(S)"
 }

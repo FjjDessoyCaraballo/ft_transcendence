@@ -15,5 +15,16 @@
     "press_shoot": "Paina ampumisnäppäintä",
     "ranking points": "Ranking-pisteet: ",
     "place": "Sijoitus: ",
-    "points": "Pisteet: "
+    "points": "Pisteet: ",
+    "exit_tournament": "POISTU TURNAAUKSESTA",
+    "next_game": "SEURAAVA PELI",
+    "username": "KÄYTTÄJÄTUNNUS",
+    "points_caps": "PISTEET",
+    "coins": "KOLIKOT",
+    "pong_score": "PONG-PISTEET",
+    "score_board": "TULOSTAULU",
+    "lose_progress": "(ja menetät kaiken turnauskehityksen)",
+    "safe_exit": "(Voit nyt poistua turnauksesta turvallisesti)",
+    "game_no": "Peli nro ",
+    "tournament winner": "TURNAUKSEN VOITTAJA(T)"
 }

@@ -15,6 +15,17 @@
     "press_shoot": "Pressione a tecla de tiro",
     "ranking points": "Pontos de ranking: ",
     "place": "Colocação: ",
-    "points": "Pontos: "
+    "points": "Pontos: ",
+    "exit_tournament": "SAIR DO TORNEIO",
+    "next_game": "PRÓXIMO JOGO",
+    "username": "NOME DE USUÁRIO",
+    "points_caps": "PONTOS",
+    "coins": "MOEDAS",
+    "pong_score": "PONTUAÇÃO PONG",
+    "score_board": "PLACAR",
+    "lose_progress": "(e perderá todo o progresso do torneio)",
+    "safe_exit": "(Agora você pode sair do torneio com segurança)",
+    "game_no": "Jogo nº ",
+    "tournament winner": "VENCEDOR(ES) DO TORNEIO"
 }
   

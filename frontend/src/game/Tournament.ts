@@ -90,13 +90,13 @@ export class Tournament implements IGameState
 			this.playerArr.push(tournamentObj);
 		}
 
-		let text1 = 'EXIT TOURNAMENT'; // Add a warning here that all tournament data will be lost
+		let text1 = t('exit_tournament'); // Add a warning here that all tournament data will be lost
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = 20;
 		const button1Y = 20;
 		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType, this.t);
 
-		let text2 = 'NEXT GAME';
+		let text2 = t('next_game');
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
 		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
 		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 240;
@@ -283,21 +283,21 @@ export class Tournament implements IGameState
 
 		ctx.font = '40px Impact';
 		ctx.fillStyle = 'white';
-		const usernameText = 'USERNAME';
+		const usernameText = this.t('username');
 		const usernameX = x + (colW / 2) - (ctx.measureText(usernameText).width / 2);
 		ctx.fillText(usernameText, usernameX, y + padding + 5);
 
 		ctx.strokeRect(x + colW, y, colW, colH);
-		const pointsText = 'POINTS';
+		const pointsText = this.t('points_caps');
 		const pointsX = x + colW + (colW / 2) - (ctx.measureText(pointsText).width / 2);
 		ctx.fillText(pointsText, pointsX, y + padding + 5);
 
 		ctx.strokeRect(x + colW * 2, y, colW, colH);
 		let coinText = '';
 		if (this.gameType === GameType.BLOCK_BATTLE)
-			coinText = 'COINS';
+			coinText = this.t('coins');
 		else if (this.gameType === GameType.PONG)
-			coinText = 'PONG SCORE';
+			coinText = this.t('pong_score');
 		const coinX = x + (colW * 2) + (colW / 2) - (ctx.measureText(coinText).width / 2);
 		ctx.fillText(coinText, coinX, y + padding + 5);
 
@@ -344,16 +344,16 @@ export class Tournament implements IGameState
 		if (!this.curMatch)
 		{
 			// Draw Header & Score Board
-			drawCenteredText(this.canvas, this.ctx, 'SCORE BOARD', '50px Impact', 'white', 100);
+			drawCenteredText(this.canvas, this.ctx, this.t('score_board'), '50px Impact', 'white', 100);
 			this.drawScoreBoard(ctx);
 	
 			// Draw Return button
 			this.returnMenuButton.draw(ctx);
 			let exitWarning;
 			if (!this.isFinished)
-				exitWarning = `(and lose all tournament progress)`;
+				exitWarning = this.t('lose_progress');
 			else
-				exitWarning = '(You can now safely exit the tournament)';
+				exitWarning = this.t('safe_exit')
 			ctx.font = '20px arial';
 			ctx.fillStyle = 'white';
 			const warningX = this.returnMenuButton.x;
@@ -365,7 +365,7 @@ export class Tournament implements IGameState
 			{
 				this.nextGameBtn.draw(ctx);
 
-				const nextGameNum = `Game no. ${(this.matchCounter + 1).toString()}/6`;
+				const nextGameNum = `${this.t('game_no')}${(this.matchCounter + 1).toString()}/6`;
 				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 50;
 				drawCenteredText(this.canvas, this.ctx, nextGameNum, '30px arial', 'white', gameNumY);
 
@@ -384,7 +384,7 @@ export class Tournament implements IGameState
 			{
 				let y = (this.canvas.height / 2) - 20 - TEXT_PADDING + 270;
 
-				drawCenteredText(this.canvas, this.ctx, 'TOURNAMENT WINNER(s):', '50px Impact', 'green', y);
+				drawCenteredText(this.canvas, this.ctx, this.t('tournament_winner'), '50px Impact', 'green', y);
 				y += 40
 
 				for (const player of this.tournamentWinner)
