@@ -9,5 +9,11 @@
     "play_ai": "PLAY PONG WITH AI",
     "change_game": "CHANGE GAME",
     "return_to_menu": "RETURN TO MENU",
-    "return_to_tournament": "RETURN TO TOURNAMENT"
+    "return_to_tournament": "RETURN TO TOURNAMENT",
+    "game_start": "GAME IS ABOUT TO START!",
+    "press_up": "Press te up key ",
+    "press_shoot": "Press the shoot key ",
+    "ranking points": "Ranking points: ",
+    "place": "Place: ",
+    "points": "Points: "
 }

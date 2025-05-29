@@ -24,7 +24,7 @@ export class Instructions implements IGameState
 		this.ctx = ctx;
 		this.t = t;
 		
-		let text = 'RETURN TO MENU';
+		let text = t('return_to_menu');
 		this.ctx.font = '25px arial';
 		const buttonX = (canvas.width / 2) - (this.ctx.measureText(text).width / 2) - TEXT_PADDING;
 		const buttonY = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
@@ -81,7 +81,7 @@ export class Instructions implements IGameState
 		ctx.fillRect(boxPadding, boxPadding, boxW, boxH);
 
 		// Draw header
-		const headerText = 'GAME INSTRUCTIONS';
+		/*const headerText = 'GAME INSTRUCTIONS';
 		ctx.font = '50px arial';
 		ctx.fillStyle = 'black';
 		const headerX = (this.canvas.width / 2) - (ctx.measureText(headerText).width / 2);
@@ -102,7 +102,7 @@ export class Instructions implements IGameState
 			infoY = headerY + 20 + lineHeight * lineCount; // 20 = font size
 			ctx.fillText(line, infoX, infoY);
 			lineCount++;
-		}
+		}*/
 
 		this.returnMenuButton.draw(ctx);
 	}

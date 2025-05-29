@@ -9,6 +9,12 @@
     "play_ai": "JOGAR PONG COM IA",
     "change_game": "MUDAR JOGO",
     "return_to_menu": "VOLTAR AO MENU",
-    "return_to_tournament": "VOLTAR AO TORNEIO"
+    "return_to_tournament": "VOLTAR AO TORNEIO",
+    "game_start": "O JOGO ESTÁ PRESTES A COMEÇAR!",
+    "press_up": "Pressione a tecla para cima",
+    "press_shoot": "Pressione a tecla de tiro",
+    "ranking points": "Pontos de ranking: ",
+    "place": "Colocação: ",
+    "points": "Pontos: "
 }
   

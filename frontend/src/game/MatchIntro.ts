@@ -134,15 +134,15 @@ export class MatchIntro implements IGameState
 
 		// Add the expected ranking point diff here...?
 
-		drawCenteredText(this.canvas, this.ctx, "GAME IS ABOUT TO START!", '70px Impact', DEEP_PURPLE, 100);
+		drawCenteredText(this.canvas, this.ctx, this.t('game_start'), '70px Impact', DEEP_PURPLE, 100);
 
 		let infoText = '';
 		if (this.gameType != GameType.BLOCK_BATTLE)
 		{
-			infoText = `Press the up key (${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play`;
+			infoText = `${this.t('press_up')}(${this.player1.username}: '${PONG_UP_1}' / ${this.player2.username}: '${PONG_UP_2}') when you are ready to play`;
 		}
 		else
-			infoText = `Press the shoot key (${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
+			infoText = `${this.t('press_shoot')}(${this.player1.username}: '${BB_SHOOT_1}' / ${this.player2.username}: '${BB_SHOOT_2}') when you are ready to play`;
 		drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
 
 		let p1Text = this.player1.username;
@@ -151,11 +151,11 @@ export class MatchIntro implements IGameState
 
 		let p1Rank;
 		if (!this.tournamentData1)
-			p1Rank = `Ranking points: ${this.player1.ranking_points.toFixed(2)}`;
+			p1Rank = `${this.t('ranking_points')}${this.player1.ranking_points.toFixed(2)}`;
 		else
 		{
-			p1Rank = `Place: ${this.tournamentData1.place}
-			Points: ${this.tournamentData1.tournamentPoints}`;
+			p1Rank = `${this.t('place')}${this.tournamentData1.place}
+			${this.t('points')}${this.tournamentData1.tournamentPoints}`;
 		}
 		const halfOfP1Text = ctx.measureText(p1Text).width / 2;
 		ctx.font = '30px arial';
@@ -171,11 +171,11 @@ export class MatchIntro implements IGameState
 
 		let p2Rank;
 		if (!this.tournamentData2)
-			p2Rank = `Ranking points: ${this.player2.ranking_points.toFixed(2)}`;
+			p2Rank = `${this.t('ranking_points')}${this.player2.ranking_points.toFixed(2)}`;
 		else
 		{
-			p2Rank = `Place: ${this.tournamentData2.place}
-			Points: ${this.tournamentData2.tournamentPoints}`;
+			p2Rank = `${this.t('place')}${this.tournamentData2.place}
+			${this.t('points')}${this.tournamentData2.tournamentPoints}`;
 		}
 		const halfOfP2Text = ctx.measureText(p2Text).width / 2;
 		ctx.font = '30px arial';

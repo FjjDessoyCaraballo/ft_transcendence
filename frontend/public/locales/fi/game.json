@@ -9,5 +9,11 @@
     "play_ai": "PELAA PONGIA TEKOÄLYÄ VASTAAN",
     "change_game": "VAIHDA PELIÄ",
     "return_to_menu": "PALA VALIKKOON",
-    "return_to_tournament": "PALA TURNAAUKSEEN"
+    "return_to_tournament": "PALA TURNAAUKSEEN",
+    "game_start": "PELI ALKAA PIAN!",
+    "press_up": "Paina ylänuolinäppäintä",
+    "press_shoot": "Paina ampumisnäppäintä",
+    "ranking points": "Ranking-pisteet: ",
+    "place": "Sijoitus: ",
+    "points": "Pisteet: "
 }
