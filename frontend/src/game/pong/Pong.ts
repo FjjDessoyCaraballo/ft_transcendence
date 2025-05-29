@@ -7,6 +7,7 @@ import { GameType } from "../../UI/Types";
 import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "../Constants";
 import { Player, Paddle} from "./Paddle";
 import { Ball } from "./Ball";
+import { TFunction } from 'i18next';
 
 // Game Constants
 export const PADDLE_WIDTH = 15; 
@@ -45,8 +46,9 @@ export class Pong implements IGameState {
   canvasHeight: number;
   ctx: CanvasRenderingContext2D;
   isStateReady: boolean;
+  t: TFunction;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing') {
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing', t: TFunction) {
 
 	  this.canvas = canvas;
 	  this.ctx = ctx;
@@ -61,6 +63,7 @@ export class Pong implements IGameState {
     this.gameState = state;
     this.tournamentData1 = tData1;
 	  this.tournamentData2 = tData2;
+    this.t = t;
     if (this.gameState === 'playing')
     {
       this.twoPlayerMode = true; // Two-player mode
@@ -260,16 +263,16 @@ export class Pong implements IGameState {
     if (this.twoPlayerMode)
     {
       if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG, this.t));
       else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG, this.t));
     }
     else
     {
       if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG_AI));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG_AI, this.t));
       else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI, this.t));
 	  }
   }
   drawGame()

@@ -2,5 +2,10 @@
     "welcome_gamer": "Welcome, gamer!",
     "please_login": "Please log in to play the game",
     "please_choose": "Please choose the game you want to play",
-    "currently_logged_in": "Currently loggin in user"
+    "currently_logged_in": "Currently loggin in user",
+    "you_are_playing": "You are playing:",
+    "play_single_game": "PLAY SINGLE GAME",
+    "start_tournament": "START TOURNAMENT",
+    "play_ai": "PLAY PONG WITH AI",
+    "change_game": "CHANGE GAME"
 }

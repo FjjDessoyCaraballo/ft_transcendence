@@ -7,6 +7,7 @@ import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
 import { drawCenteredText, drawText } from "./StartScreen";
 import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE } from "./Constants";
+import { TFunction } from 'i18next';
 
 
 export class MatchIntro implements IGameState
@@ -25,10 +26,12 @@ export class MatchIntro implements IGameState
 	gameType: GameType;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, player1: User, player2: User | null, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, type: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, player1: User, player2: User | null, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, type: GameType, t: TFunction)
 	{
 		this.name = GameStates.MATCH_INTRO;
+		this.t = t;
 
 		// We should create a user in the DB for AI computer. Then we could track it's win/lose stats etc :D
 		if (!player2)
@@ -113,11 +116,11 @@ export class MatchIntro implements IGameState
 			if (!this.tournamentData1)
 			{
 				if (this.gameType === GameType.BLOCK_BATTLE)
-					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.player1, this.player2, null, null));
+					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.player1, this.player2, null, null, this.t));
 				else if (this.gameType === GameType.PONG)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'playing'));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'playing', this.t));
 				else if (this.gameType === GameType.PONG_AI)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'ai'));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player1, this.player2, null, null, 'ai', this.t));
 			}
 			else
 				this.isStateReady = true;

@@ -5,6 +5,7 @@ import { Button } from "./Button";
 import { UserHubState, GameType } from "./Types";
 import { RankingHandler } from "../game/RankingPoints";
 import { updateUserStatsAPI } from "../services/userService";
+import { TFunction } from 'i18next';
 
 /*
 OLD VERSION
@@ -340,11 +341,11 @@ export class UserManager {
 	}
 
 
-	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
+	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, t: TFunction)
 	{
 		if (global_curUser)
 		{
-			drawCenteredText(canvas, ctx, 'Currently logged in user: ', '22px arial', 'white', 30);
+			drawCenteredText(canvas, ctx, t('currently_logged_in'), '22px arial', 'white', 30);
 			drawCenteredText(canvas, ctx, global_curUser, '28px arial', 'red', 60);
 		}
 	}

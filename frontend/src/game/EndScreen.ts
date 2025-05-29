@@ -7,26 +7,29 @@ import { User, UserManager } from "../UI/UserManager";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { drawCenteredText } from "./StartScreen";
+import { TFunction } from 'i18next';
 
 export class ReturnMainMenuButton extends Button
 {
 	private gameType: GameType;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
 		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
 		
 		if (this.gameType === GameType.PONG_AI)
 			this.gameType = GameType.PONG;
-		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, this.gameType));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, this.gameType, this.t));
 
 	}
 }
@@ -60,8 +63,9 @@ export class EndScreen implements IGameState
 	gameType: GameType;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType, t: TFunction)
 	{
 		this.name = GameStates.END_SCREEN;
 
@@ -74,6 +78,7 @@ export class EndScreen implements IGameState
 		this.isStateReady = false;
 		this.gameType = gameType;
 		this.savingDataToDB = false;
+		this.t = t;
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
@@ -84,7 +89,7 @@ export class EndScreen implements IGameState
 		const buttonX2 = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
 		const buttonY2 = (canvas.height / 2) - TEXT_PADDING;
 
-		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
+		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType, this.t);
 		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);

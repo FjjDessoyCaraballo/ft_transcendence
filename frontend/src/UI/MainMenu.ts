@@ -7,6 +7,7 @@ import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
 import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { MatchIntro } from "../game/MatchIntro";
+import { TFunction } from 'i18next';
 
 
 // BUTTONS
@@ -16,17 +17,19 @@ export class SingleGameButton extends Button
 	private gameType: GameType;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
 		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.SINGLE_GAME, this.gameType));
+		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.SINGLE_GAME, this.gameType, this.t));
 	}
 }
 
@@ -35,17 +38,19 @@ export class StartTournamentButton extends Button
 	private gameType: GameType;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
 		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.TOURNAMENT, this.gameType));
+		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.TOURNAMENT, this.gameType, this.t));
 	}
 }
 
@@ -70,12 +75,14 @@ export class PongAiBtn extends Button
 {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
 		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
@@ -84,7 +91,7 @@ export class PongAiBtn extends Button
 		{
 			const curUserData = global_allUserDataArr.find(user => user.username === global_curUser);
 			if (curUserData)
-				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserData, null, null, null, GameType.PONG_AI));
+				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserData, null, null, null, GameType.PONG_AI, this.t));
 		}
 
 	}
@@ -104,25 +111,27 @@ export class MainMenu implements IGameState
 	ctx: CanvasRenderingContext2D;
 	opponent: User | null;
 	gameType: GameType;
+	t: TFunction;
 	mouseMoveBound: (event: MouseEvent) => void;
 	mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, gameType: GameType, t: TFunction)
 	{		
 		this.name = GameStates.MAIN_MENU;
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.opponent = null;
 		this.gameType = gameType;
+		this.t = t;
 
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
 
 		// Define buttons
-		let text1 = 'PLAY SINGLE GAME';
+		let text1 = this.t('play_single_game');
 		const button1X = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
-		let text2 = 'START TOURNAMENT';
+		let text2 = this.t('start_tournament');
 		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
-		let text3 = 'PLAY PONG WITH AI';
+		let text3 = this.t('play_ai');
 		const button3X = (canvas.width / 2) - (ctx.measureText(text3).width / 2) - TEXT_PADDING;
 
 		const buttonYCenter = (canvas.height / 2) - 20 - TEXT_PADDING; // 20 == 40px / 2
@@ -132,13 +141,13 @@ export class MainMenu implements IGameState
 
 		// Define instruction button
 		ctx.font = '30px arial' // GLOBAL USE OF CTX!!
-		let instructText = 'CHANGE GAME';
+		let instructText = this.t('change_game');
 		const instructX = (canvas.width / 2) - (ctx.measureText(instructText).width / 2) - TEXT_PADDING;
 		const instructY = canvas.height - 100;
 
-		this.singleGameButton = new SingleGameButton(this.canvas, this.ctx, button1X, button1Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text1, 'white', '40px', 'arial', this.gameType);
-		this.startTournamentButton = new StartTournamentButton(this.canvas, this.ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '40px', 'arial', this.gameType);
-		this.pongAiBtn = new PongAiBtn(this.canvas, this.ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '40px', 'arial');
+		this.singleGameButton = new SingleGameButton(this.canvas, this.ctx, button1X, button1Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text1, 'white', '40px', 'arial', this.gameType, this.t);
+		this.startTournamentButton = new StartTournamentButton(this.canvas, this.ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '40px', 'arial', this.gameType, this.t);
+		this.pongAiBtn = new PongAiBtn(this.canvas, this.ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '40px', 'arial', this.t);
 		this.changeGameBtn = new ChangeGameBtn(this.canvas, this.ctx, instructX, instructY, '#b0332a', '#780202', instructText, 'white', '30px', 'arial');
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
@@ -194,9 +203,9 @@ export class MainMenu implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		UserManager.drawCurUser(this.canvas, ctx);
+		UserManager.drawCurUser(this.canvas, ctx, this.t);
 
-		drawCenteredText(this.canvas, this.ctx, 'You are playing:', '40px arial', 'white', 200);
+		drawCenteredText(this.canvas, this.ctx, this.t('you_are_playing'), '40px arial', 'white', 200);
 
 		if (this.gameType === GameType.BLOCK_BATTLE)
 			drawCenteredText(this.canvas, this.ctx, 'Block Battle', '40px impact', LIGHT_PURPLE, 250);

@@ -11,6 +11,7 @@ import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
+import { TFunction } from 'i18next';
 
 
 export class BlockBattle implements IGameState
@@ -28,13 +29,15 @@ export class BlockBattle implements IGameState
 	coinHandler: CoinHandler;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, t: TFunction)
 	{
 		this.name = GameStates.BLOCK_BATTLE;
 		this.isStateReady = false;
 		this.tournamentData1 = tData1;
 		this.tournamentData2 = tData2;
+		this.t = t;
 		
 		this.player1 = new Player(100, 745, 'green', user1); // Check the color later!!
 		this.player2 = new Player2(1100, 745, 'red', user2); // Check the color later!!
@@ -278,9 +281,9 @@ export class BlockBattle implements IGameState
 				const p2 = global_allUserDataArr.find(user => user.username === this.player2.userData?.username);
 	
 				if (p1 && p2 && (this.player1.health.amount === 0 || this.player2.hasWon))
-					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.BLOCK_BATTLE));
+					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.BLOCK_BATTLE, this.t));
 				else if (p1 && p2 && (this.player2.health.amount === 0 || this.player1.hasWon))
-					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.BLOCK_BATTLE));
+					global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.BLOCK_BATTLE, this.t));
 			}
 		}
 

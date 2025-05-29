@@ -30,16 +30,18 @@ export class PongBtn extends Button
 {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
 		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.PONG));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.PONG, this.t));
 	}
 }
 
@@ -47,16 +49,18 @@ export class BlockBattleBtn extends Button
 {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
 		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.BLOCK_BATTLE));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.BLOCK_BATTLE, this.t));
 	}
 }
 
@@ -84,12 +88,12 @@ export class StartScreen implements IGameState
 		ctx.font = '50px arial';
 		const pongX = (canvas.width / 2) - (ctx.measureText(pongText).width / 2) - TEXT_PADDING;
 		const pongY = 470;
-		this.pongBtn = new PongBtn(this.canvas, this.ctx, pongX, pongY, DEEP_PURPLE, PURPLE, pongText, 'white', '50px', 'arial');
+		this.pongBtn = new PongBtn(this.canvas, this.ctx, pongX, pongY, DEEP_PURPLE, PURPLE, pongText, 'white', '50px', 'arial', this.t);
 
 		const bbText = 'BLOCK BATTLE';
 		const bbX = (canvas.width / 2) - (ctx.measureText(bbText).width / 2) - TEXT_PADDING;
 		const bbY = 570;
-		this.blockBattleBtn = new BlockBattleBtn(this.canvas, this.ctx, bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial');
+		this.blockBattleBtn = new BlockBattleBtn(this.canvas, this.ctx, bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial', this.t);
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -136,7 +140,7 @@ export class StartScreen implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		UserManager.drawCurUser(this.canvas, ctx);
+		UserManager.drawCurUser(this.canvas, ctx, this.t);
 		
 		drawCenteredText(this.canvas, this.ctx, this.t('welcome_gamer'), '140px Impact', DEEP_PURPLE, 240);
 

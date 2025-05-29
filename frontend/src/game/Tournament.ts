@@ -9,6 +9,7 @@ import { EndScreen } from "./EndScreen";
 import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
 import { drawCenteredText } from "./StartScreen";
+import { TFunction } from 'i18next';
 
 export interface TournamentPlayer
 {
@@ -58,8 +59,9 @@ export class Tournament implements IGameState
 	gameType: GameType;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, players: User[], type: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, players: User[], type: GameType, t: TFunction)
 	{
 		this.name = GameStates.TOURNAMENT;
 		this.canvas = canvas;
@@ -70,6 +72,7 @@ export class Tournament implements IGameState
 		this.isFinished = false;
 		this.tournamentWinner = [];
 		this.gameType = type;
+		this.t = t;
 
 		// Create TournamentPlayer array
 		for (let i = 0; i < 4; i++)
@@ -91,7 +94,7 @@ export class Tournament implements IGameState
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = 20;
 		const button1Y = 20;
-		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
+		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType, this.t);
 
 		let text2 = 'NEXT GAME';
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
@@ -134,7 +137,7 @@ export class Tournament implements IGameState
 
 			if (player1 && player2)
 			{
-				this.curMatch = new MatchIntro(this.canvas, this.ctx, player1.user, player2.user, player1, player2, this.gameType);
+				this.curMatch = new MatchIntro(this.canvas, this.ctx, player1.user, player2.user, player1, player2, this.gameType, this.t);
 				this.curMatch.enter();
 			}
 		}
@@ -169,9 +172,9 @@ export class Tournament implements IGameState
 				{	
 
 					if (this.gameType === GameType.BLOCK_BATTLE)
-						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.user, player2.user, player1, player2);
+						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.user, player2.user, player1, player2, this.t);
 					else if (this.gameType === GameType.PONG)
-						this.curMatch = new Pong(this.canvas, this.ctx, player1.user, player2.user, player1, player2, 'playing');
+						this.curMatch = new Pong(this.canvas, this.ctx, player1.user, player2.user, player1, player2, 'playing', this.t);
 
 					this.curMatch.enter();
 				}
@@ -182,7 +185,7 @@ export class Tournament implements IGameState
 					const winner = player1.isWinner ? player1 : player2;
 					const loser = player1.isWinner ? player2 : player1;
 
-					this.curMatch = new EndScreen(this.canvas, this.ctx, winner.user, loser.user, winner, loser, this.gameType);
+					this.curMatch = new EndScreen(this.canvas, this.ctx, winner.user, loser.user, winner, loser, this.gameType, this.t);
 					
 					this.curMatch.enter();
 					player1.isWinner = false;
