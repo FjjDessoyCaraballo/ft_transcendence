@@ -3,7 +3,6 @@ const { validateFriendship } = require('../middleware/friendValidation');
 const socketManager = require('../utils/socketManager');
 
 async function gameRoutes(fastify, options) {
-  // Middleware to check authentication
   const authenticate = async (request, reply) => {
     try {
       await request.jwtVerify();
@@ -13,7 +12,7 @@ async function gameRoutes(fastify, options) {
   };
 
   // Get all matches
-  fastify.get('/matches', async (request, reply) => {
+  fastify.get('/matches', { preHandler: authenticate }, async (request, reply) => {
     const matches = fastify.db.prepare(`
       SELECT m.*, 
              u1.username as player1_name, 
@@ -31,7 +30,7 @@ async function gameRoutes(fastify, options) {
   });
 
   // Get match by ID
-  fastify.get('/match/:id', async (request, reply) => {
+  fastify.get('/match/:id', { preHandler: authenticate }, async (request, reply) => {
     const matchId = request.params.id;
 
     // Get basic match data
@@ -67,8 +66,7 @@ async function gameRoutes(fastify, options) {
     return { match, gameStats };
   });
 
-  // Get matches by player ID
-  fastify.get('/matches/player/:playerId', async (request, reply) => {
+  fastify.get('/matches/player/:playerId', { preHandler: authenticate }, async (request, reply) => {
     const playerId = request.params.playerId;
 
     const matches = fastify.db.prepare(`
@@ -88,7 +86,6 @@ async function gameRoutes(fastify, options) {
     return { matches };
   });
 
-  // Get matches for current user
   fastify.get('/my-matches', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
 
@@ -113,7 +110,6 @@ async function gameRoutes(fastify, options) {
     return { matches };
   });
 
-  // Record a new match result
   fastify.post('/record-match', { preHandler: authenticate }, async (request, reply) => {
     const { 
       player1_id, 
@@ -126,16 +122,13 @@ async function gameRoutes(fastify, options) {
       p2_new_ranking_points
     } = request.body;
 
-    // Validate input
     if (!player1_id || !player2_id || !game_type) {
       reply.code(400);
       return { error: 'Required match data missing' };
     }
 
     try {
-      // Start a transaction
       const transaction = fastify.db.transaction(() => {
-        // Get player ranking points before update
         const player1 = fastify.db.prepare(`
           SELECT ranking_points FROM users WHERE id = ?
         `).get(player1_id);
@@ -172,11 +165,9 @@ async function gameRoutes(fastify, options) {
 
         // Update player statistics
         if (winner_id) {
-          // Determine winner and loser IDs
           const winnerId = winner_id;
           const loserId = winner_id === player1_id ? player2_id : player1_id;
 
-          // Update winner stats
           if (game_type === 'pong') {
             fastify.db.prepare(`
               UPDATE users 
@@ -204,7 +195,6 @@ async function gameRoutes(fastify, options) {
             );
           }
 
-          // Update loser stats
           if (game_type === 'pong') {
             fastify.db.prepare(`
               UPDATE users 
@@ -275,7 +265,6 @@ async function gameRoutes(fastify, options) {
         return matchId;
       });
 
-      // Execute transaction
       const matchId = transaction();
       
       return { 

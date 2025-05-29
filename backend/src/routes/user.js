@@ -4,10 +4,9 @@ const path = require('path');
 const { promisify } = require('util');
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
-const uploadTracker = new Map(); // userId -> lastUploadTime
+const uploadTracker = new Map();
 
 async function userRoutes(fastify, options) {
-  // Middleware to check authentication
   const authenticate = async (request, reply) => {
     try {
       await request.jwtVerify();
@@ -25,7 +24,7 @@ async function userRoutes(fastify, options) {
   }
 
   // GET all users with statistics
-  fastify.get('/', async (request, reply) => {
+  fastify.get('/', { preHandler: authenticate }, async (request, reply) => {
     const users = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
              games_played_pong, wins_pong, losses_pong,
@@ -38,7 +37,7 @@ async function userRoutes(fastify, options) {
   });
 
 // GET user by ID
-  fastify.get('/:id', async (request, reply) => {
+  fastify.get('/:id', { preHandler: authenticate }, async (request, reply) => {
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
              games_played_pong, wins_pong, losses_pong,
@@ -58,8 +57,7 @@ async function userRoutes(fastify, options) {
   });
 
   // GET user by USERNAME
-  fastify.get('/byusername/:username', async (request, reply) => {
-
+  fastify.get('/byusername/:username', { preHandler: authenticate }, async (request, reply) => {
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
              games_played_pong, wins_pong, losses_pong,
@@ -82,7 +80,6 @@ async function userRoutes(fastify, options) {
   fastify.post('/register', async (request, reply) => {
     const { username, password } = request.body;
     
-    // Validate input
     if (!username || !password) {
       reply.code(400);
       return { error: 'Username and password are required' };
@@ -94,13 +91,10 @@ async function userRoutes(fastify, options) {
     }
     
     try {
-      // Hash the password
       const hashedPassword = await hashPassword(password);
       
-      // Default avatar
       const avatarUrl = '/public/avatars/bee.png';
       
-      // Insert the user with default values
       const result = fastify.db.prepare(`
         INSERT INTO users (
           username, password, avatar_url
@@ -124,7 +118,6 @@ async function userRoutes(fastify, options) {
         tournament_points: 0
       };
     } catch (err) {
-      // Handle duplicate username
       if (err.message.includes('UNIQUE constraint failed')) {
         reply.code(409);
         return { error: 'Username already exists' };
@@ -140,13 +133,11 @@ async function userRoutes(fastify, options) {
   fastify.post('/login', async (request, reply) => {
     const { username, password } = request.body;
     
-    // Validate input
     if (!username || !password) {
       reply.code(400);
       return { error: 'Username and password are required' };
     }
     
-    // Find user by username
     const user = fastify.db.prepare(`
       SELECT * FROM users WHERE username = ? AND deleted_at IS NULL
     `).get(username);
@@ -156,7 +147,6 @@ async function userRoutes(fastify, options) {
       return { error: 'Invalid username or password' };
     }
     
-    // Verify password
     const passwordMatch = await comparePassword(password, user.password);
     if (!passwordMatch) {
       reply.code(401);
@@ -200,7 +190,6 @@ async function userRoutes(fastify, options) {
         return { error: 'Username is required' };
       }
       
-      // Update the user
       const result = fastify.db.prepare(`
         UPDATE users 
         SET username = ?, updated_at = CURRENT_TIMESTAMP 
@@ -212,7 +201,6 @@ async function userRoutes(fastify, options) {
         return { error: 'User not found or no changes made' };
       }
       
-      // Fetch updated user data
       const updatedUser = fastify.db.prepare(`
         SELECT id, username, avatar_url, ranking_points,
                games_played_pong, wins_pong, losses_pong,
@@ -224,7 +212,6 @@ async function userRoutes(fastify, options) {
       
       return updatedUser;
     } catch (err) {
-      // Handle duplicate username
       if (err.message.includes('UNIQUE constraint failed')) {
         reply.code(409);
         return { error: 'Username already exists' };
@@ -268,7 +255,6 @@ async function userRoutes(fastify, options) {
       return { error: 'Current password is incorrect' };
     }
     
-    // Hash new password
     const hashedPassword = await hashPassword(newPassword);
     
     // Update password
@@ -406,8 +392,7 @@ async function userRoutes(fastify, options) {
   });
 
   // Update rankings after a match (for internal use)
-  fastify.post('/update-stats', async (request, reply) => {
-
+  fastify.post('/update-stats', { preHandler: authenticate }, async (request, reply) => {
     const { winner, loser, gameTypeString } = request.body;
     
     if (!winner || !loser || !gameTypeString) {
