@@ -38,5 +38,5 @@
     "hello": "Hello ",
     "type_password": "Please type in your password to start the game",
     "incorrect_password": "Incorrect password. Please try again.",
-    "chosen": "/4 players chosen",
+    "chosen": "/4 players chosen"
 }
