@@ -17,6 +17,7 @@ import { panuMatchHistory } from './PANU_TEST_DATA';
 import { User, MatchData } from './UserManager';
 import MatchStatsPopup from './MatchStatsPopup';
 import 'chart.js/auto';
+import { useTranslation } from 'react-i18next';
 
 
 // Plugin for Charts
@@ -51,6 +52,7 @@ type DashboardProps = {
 };
 
 export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
+  const { t } = useTranslation('dashboard');
   const [selectedMatch, setSelectedMatch] = useState<MatchData | null>(null);
 
   // A test for now, because the match history API is not ready!!
@@ -61,7 +63,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 
   // --- Win/Loss Pie Chart ---
   const winLossPie = {
-    labels: ['Wins', 'Losses'],
+    labels: [t('wins'), t('losses')],
     datasets: [
       {
         data: [user.wins_pong + user.wins_blockbattle, user.losses_pong + user.losses_blockbattle],
@@ -79,7 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
     ),
     datasets: [
       {
-        label: 'Ranking Points',
+        label: t('ranking_points'),
         data: matchHistory.map((match) =>
           match.player1_id === 0 ? match.player1_rank : match.player2_rank
         ),
@@ -135,7 +137,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
     labels: ['Pong', 'Blockbattle'],
     datasets: [
       {
-        label: 'Games Played',
+        label: t('games_played'),
         data: [user.games_played_pong, user.games_played_blockbattle],
         backgroundColor: ['#800080', '#4B0082'],
       },
@@ -161,14 +163,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 			<strong className="inline-block">{match.game_type.toUpperCase()}</strong> — {matchDate}
 			<span className="inline-block ml-2">{match.game_type === 'pong' ? '🏓' : '⚔️'}</span>
 		</p>
-        <p className="font-mono text-lg"><strong>Opponent:</strong> Player #{opponentId}</p>
-        <p className="font-mono text-lg"><strong>Duration:</strong> {match.game_duration}s</p>
+        <p className="font-mono text-lg"><strong>{t('opponent')}</strong> {t('player')} #{opponentId}</p>
+        <p className="font-mono text-lg"><strong>{t('duration')}</strong> {match.game_duration}s</p>
         <p className="font-mono text-lg">{isWinner ? '✅ Win' : '❌ Loss'}</p>
         <button
           onClick={() => setSelectedMatch(match)}
           className="mt-4 bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-700"
         >
-          View Details
+          {t('view_details')}
         </button>
       </div>
     );
@@ -198,17 +200,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
     {/* Player Info Panel */}
       <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-purple-100 via-white to-purple-100 p-6 rounded-xl border border-purple-300 shadow-lg">
         <h2 className="titles text-[#6B21A8] mb-4">
-          Welcome to Dashboard, <span className="font-semibold">{user.username}</span> 👋
+          {t('welcome')} <span className="font-semibold">{user.username}</span> 👋
         </h2>
         <div className="flex flex-wrap justify-center gap-12">
-          <div className="texts">🎖️ Current ranking: <strong>{user.ranking_points.toFixed(2)}</strong></div>
-          <div className="texts">📅 Joined: {new Date(user.created_at).toLocaleDateString()}</div>
+          <div className="texts">🎖️ {t('current_ranking')} <strong>{user.ranking_points.toFixed(2)}</strong></div>
+          <div className="texts">📅 {t('joined')} {new Date(user.created_at).toLocaleDateString()}</div>
         </div>
       </div>
 
     {/* Ranking Progression Chart */}
       <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
-        <h3 className="texts font-bold text-[#6B21A8] mb-4 text-2xl">📈 Ranking Progression</h3>
+        <h3 className="texts font-bold text-[#6B21A8] mb-4 text-2xl">📈 {t('ranking_progression')}</h3>
         <div className="w-full h-[400px] p-2 border border-[#4B0082] rounded-md bg-white shadow-sm">
           <Line data={rankingLine} options={lineOptions} />
         </div>
@@ -216,14 +218,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 
     {/* Match Statistics */}
 		<div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
-			<h3 className="texts font-bold text-[#6B21A8] mb-4 text-2xl">📊 Match Statistics</h3>
+			<h3 className="texts font-bold text-[#6B21A8] mb-4 text-2xl">📊 {t('match_statistics')}</h3>
 			<div className="flex flex-wrap justify-between gap-12">
 				
 				{/* Stats Box */}
 				<div className="flex flex-col justify-center w-full md:w-2/5 p-6 bg-white rounded-md border border-[#4B0082] shadow-sm">
-					<div className="texts mb-2">📊 Matches Played: <strong>{matchesPlayed}</strong></div>
-					<div className="texts mb-2">📅 Avg Games Per Day: <strong>{avgGamesPerDay}</strong></div>
-					<div className="texts mb-2">🎮 Favorite Game: <strong>{favoriteGame}</strong></div>
+					<div className="texts mb-2">📊 {t('matches_played')} <strong>{matchesPlayed}</strong></div>
+					<div className="texts mb-2">📅 {t('avg_games_per_day')} <strong>{avgGamesPerDay}</strong></div>
+					<div className="texts mb-2">🎮 {t('faavorite_game')} <strong>{favoriteGame}</strong></div>
 				</div>
 
 				{/* Win/Loss Pie Chart */}
@@ -244,7 +246,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 
     {/* Match History Cards */}
 		<div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
-			<h3 className="titles text-[#6B21A8] mb-4 text-2xl">📜 Match History</h3>
+			<h3 className="titles text-[#6B21A8] mb-4 text-2xl">📜 {t('match_history')}</h3>
 			<div className="flex flex-wrap justify-between gap-12 overflow-y-auto max-h-[600px] border border-[#4B0082]">
 				<div className="flex flex-col items-center w-full">{matchCards}</div>
 			</div>
