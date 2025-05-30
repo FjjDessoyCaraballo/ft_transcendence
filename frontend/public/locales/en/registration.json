@@ -4,7 +4,7 @@
     "choose_username": "Choose a username (max 20 characters)",
     "password": "Password",
     "create_password": "Create a password",
-    "comfirm_password": "Confirm Password",
+    "confirm_password": "Confirm Password",
     "confirm_your_password": "Confirm Your Password",
     "cancel": "Cancel",
     "register": "Register",

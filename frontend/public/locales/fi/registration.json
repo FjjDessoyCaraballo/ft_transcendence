@@ -4,7 +4,7 @@
     "choose_username": "Valitse käyttäjätunnus (enintään 20 merkkiä)",
     "password": "Salasana",
     "create_password": "Luo salasana",
-    "comfirm_password": "Vahvista salasana",
+    "confirm_password": "Vahvista salasana",
     "confirm_your_password": "Vahvista salasanasi",
     "cancel": "Peruuta",
     "register": "Rekisteröidy",

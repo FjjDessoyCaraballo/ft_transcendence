@@ -4,7 +4,7 @@
     "choose_username": "Escolha um nome de usuário (máx. 20 caracteres)",
     "password": "Senha",
     "create_password": "Crie uma senha",
-    "comfirm_password": "Confirmar senha",
+    "confirm_password": "Confirmar senha",
     "confirm_your_password": "Confirme sua senha",
     "cancel": "Cancelar",
     "register": "Registrar",

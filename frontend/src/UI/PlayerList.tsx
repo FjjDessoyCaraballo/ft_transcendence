@@ -12,6 +12,7 @@ import {
   rejectFriendRequest,
   removeFriend
 } from '../services/friendService';
+import { useTranslation } from 'react-i18next';
 
 // Extend the User interface with friendshipStatus for UI logic
 interface ExtendedUser extends User {
@@ -28,6 +29,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation('players');
 
   // URL base for fetching user avatars
   const backendBaseUrl = 'https://localhost:3443';
@@ -73,7 +75,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         setPlayers(extendedUsers); // Update state
       } catch (error) {
         console.error('Failed to fetch data:', error);
-        setError('Failed to load players. Please try again later.');
+        setError(t('player_fail'));
       } finally {
         setIsLoading(false);
       }
@@ -95,7 +97,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to send friend request:', error);
-      setError('Failed to send friend request. Please try again.');
+      setError(t('request_fail'));
     }
   };
 
@@ -112,7 +114,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to accept friend request:', error);
-      setError('Failed to accept friend request. Please try again.');
+      setError(t('accept_fail'));
     }
   };
 
@@ -129,7 +131,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to reject friend request:', error);
-      setError('Failed to reject friend request. Please try again.');
+      setError(t('reject_fail'));
     }
   };
 
@@ -146,7 +148,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to remove friend:', error);
-      setError('Failed to remove friend. Please try again.');
+      setError(t('remove_fail'));
     }
   };
 
@@ -163,7 +165,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             onClick={() => handleRemoveFriend(player.id)}
             className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white"
           >
-            ✖️ Unfriend
+            ✖️ {t('unfriend')}
           </button>
         );
       case 'pending_received':
@@ -173,13 +175,13 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
               onClick={() => handleAcceptFriendRequest(player.id)}
               className="px-3 py-2 rounded-md bg-green-500 hover:bg-green-600 text-white"
             >
-              ✅ Accept
+              ✅ {t('accept')}
             </button>
             <button
               onClick={() => handleRejectFriendRequest(player.id)}
               className="px-3 py-2 rounded-md bg-gray-500 hover:bg-gray-600 text-white"
             >
-              ❌ Reject
+              ❌ {t('reject')}
             </button>
           </div>
         );
@@ -189,7 +191,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             disabled
             className="px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-yellow-500 text-white cursor-not-allowed"
           >
-            ⏳ Request Sent
+            ⏳ {t('request_sent')}
           </button>
         );
       default:
@@ -198,7 +200,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
             onClick={() => handleSendFriendRequest(player.id)}
             className="px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-purple-500 hover:bg-purple-700 text-white"
           >
-            ➕ Add Friend
+            ➕ {t('add_friend')}
           </button>
         );
     }
@@ -210,7 +212,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
 
   // Show loading state
   if (isLoading) {
-    return <div className="p-6 w-full flex justify-center">Loading players...</div>;
+    return <div className="p-6 w-full flex justify-center">{t('loading_players')}</div>;
   }
 
   // Show error if any occurred
@@ -224,7 +226,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       {/* Display pending friend requests if any */}
       {pendingRequests.length > 0 && (
         <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 p-6 rounded-xl border border-yellow-300 bg-yellow-50 shadow-md">
-          <h2 className="titles text-yellow-700 mb-4 text-xl">📬 Friend Requests</h2>
+          <h2 className="titles text-yellow-700 mb-4 text-xl">📬 {t('friend_requests')}</h2>
           <div className="flex flex-wrap gap-4">
             {pendingRequests.map((player) => (
               <div key={player.id} className="flex items-center gap-4 p-3 bg-white border border-yellow-300 rounded-lg shadow-sm">
@@ -239,13 +241,13 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                     onClick={() => handleAcceptFriendRequest(player.id)}
                     className="px-3 py-1 rounded-md bg-green-500 hover:bg-green-600 text-white"
                   >
-                    Accept
+                    {t('accept')}
                   </button>
                   <button
                     onClick={() => handleRejectFriendRequest(player.id)}
                     className="px-3 py-1 rounded-md bg-gray-500 hover:bg-gray-600 text-white"
                   >
-                    Reject
+                    {t('reject')}
                   </button>
                 </div>
               </div>
@@ -257,7 +259,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       {/* Display all players (excluding pending requests) */}
       <div className="p-6 w-full flex flex-col items-center">
         <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
-          <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 Hi {global_curUser}! Welcome to the Player Hub!</h2>
+          <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 {t('hi')} {global_curUser}! {t('welcome')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...nonPendingPlayers]
@@ -285,8 +287,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                       {isLoggedInUser ? 'You' : player.username}
                       {player.friendshipStatus === 'friend' && ' 👥'}
                     </h3>
-                    <p className="texts mb-4 text-sm">🏓 Pong games played: <strong>{player.games_played_pong}</strong></p>
-                    <p className="texts mb-4 text-sm">🟩 Block Battle games played: <strong>{player.games_played_blockbattle}</strong></p>
+                    <p className="texts mb-4 text-sm">🏓 {t('pong_played')} <strong>{player.games_played_pong}</strong></p>
+                    <p className="texts mb-4 text-sm">🟩 {t('block_battle_played')} <strong>{player.games_played_blockbattle}</strong></p>
 
                     <div className="flex gap-2 mt-auto">
                       {getFriendActionButton(player)}
@@ -295,7 +297,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                           onClick={() => navigate('/dashboard')}
                           className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
                         >
-                          More Stats
+                          {t('more_stats')}
                         </button>
                       )}
                     </div>

@@ -1,0 +1,19 @@
+{
+    "player_fail": "Failed to load players. Please try again later.",
+    "request_fail": "Failed to send friend request. Please try again.",
+    "accept_fail": "Failed to accept friend request. Please try again.",
+    "reject_fail": "Failed to reject friend request. Please try again.",
+    "remove_fail": "Failed to remove friend. Please try again.",
+    "unfriend": "Unfriend",
+    "accept": "Accept",
+    "reject": "Reject",
+    "request_sent": "Request Sent",
+    "add_friend": "Add Friend",
+    "loading_players": "Loading players...",
+    "friend_requests": "Friend Requests",
+    "hi": "Hi",
+    "welcome": "Welcome to the Player Hub!",
+    "pong_played": "Pong games played:",
+    "block_battle_played": "Block Battle games played:",
+    "more_stats": "More Stats"
+}

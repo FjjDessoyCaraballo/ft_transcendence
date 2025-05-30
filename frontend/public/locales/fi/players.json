@@ -1,0 +1,19 @@
+{
+  "player_fail": "Pelaajien lataus epäonnistui. Yritä myöhemmin uudelleen.",
+  "request_fail": "Kaveripyyntöä ei voitu lähettää. Yritä uudelleen.",
+  "accept_fail": "Kaveripyynnön hyväksyminen epäonnistui. Yritä uudelleen.",
+  "reject_fail": "Kaveripyynnön hylkääminen epäonnistui. Yritä uudelleen.",
+  "remove_fail": "Kaverin poistaminen epäonnistui. Yritä uudelleen.",
+  "unfriend": "Poista kaveri",
+  "accept": "Hyväksy",
+  "reject": "Hylkää",
+  "request_sent": "Pyyntö lähetetty",
+  "add_friend": "Lisää kaveri",
+  "loading_players": "Ladataan pelaajia...",
+  "friend_requests": "Kaveripyynnöt",
+  "hi": "Hei",
+  "welcome": "Tervetuloa pelaajakeskukseen!",
+  "pong_played": "Pelatut Pong-pelit:",
+  "block_battle_played": "Pelatut Block Battle -pelit:",
+  "more_stats": "Lisää tilastoja"
+}
