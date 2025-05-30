@@ -268,7 +268,6 @@ export const getEndScreenData = async (id: number): Promise<User> => {
  * @param username Username to fetch
  * @returns Promise with user data
  */
-/*
 export const getUserDataByUsername = async (username: string): Promise<User> => {
   try {
     return await apiRequest(`/users/by-username/${username}`);
@@ -276,7 +275,7 @@ export const getUserDataByUsername = async (username: string): Promise<User> => 
       throw error;
   }
 };
-*/
+
 
 /**
  * Get all registered users in an array.

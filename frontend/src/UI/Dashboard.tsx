@@ -215,7 +215,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
     {/* Player Info Panel */}
       <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-purple-100 via-white to-purple-100 p-6 rounded-xl border border-purple-300 shadow-lg">
         <h2 className="titles text-[#6B21A8] mb-4">
-          Welcome to Dashboard, <span className="font-semibold">{user.username}</span> 👋
+          Game statistics of <span className="font-semibold">{user.username}</span> 👋
         </h2>
         <div className="flex flex-wrap justify-center gap-12">
           <div className="texts">🎖️ Current ranking: <strong>{user.ranking_points.toFixed(2)}</strong></div>

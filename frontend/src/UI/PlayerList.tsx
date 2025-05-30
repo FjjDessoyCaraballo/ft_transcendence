@@ -298,7 +298,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                       {getFriendActionButton(player)}
                       {(isLoggedInUser || player.friendshipStatus === 'friend') && (
                         <button
-                          onClick={() => navigate('/dashboard')}
+                          onClick={() => navigate(`/dashboard/${player.username}`)}
                           className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
                         >
                           More Stats

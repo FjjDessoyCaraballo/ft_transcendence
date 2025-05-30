@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from '../UI/Header';
 import { GameCanvas } from '../UI/GameCanvas';
-import { Dashboard } from '../UI/Dashboard';
+import { DashboardWrapper } from '../UI/DashboardWrapper';
 import { PlayerList } from '../UI/PlayerList';
 import { Instructions } from '../UI/Instructions';
 import { User } from '../UI/UserManager';
@@ -35,10 +35,17 @@ export default function App() {
 
   const onLogOut = () =>
   {
-	console.log('HEADER: Executing OnLogOut');
+	console.log('APP: Executing OnLogOut');
 
 	setIsLoggedIn(false);
 	setDashboardUserData(null);
+  }
+
+  const onLogIn = () =>
+  {
+	console.log('APP: Executing OnLogIn');
+
+	setIsLoggedIn(true);
   }
 
   const handleShowDashboard = async () => {
@@ -56,19 +63,13 @@ export default function App() {
 
   return (
     <>
-      <Header onHeaderLogOut={onLogOut}/>
+      <Header onHeaderLogOut={onLogOut} onHeaderLogIn={onLogIn}/>
       <main className="pt-32">
         <Routes>
           <Route path="/" element={<GameCanvas isLoggedIn={isLoggedIn} />} />
           <Route
-            path="/dashboard"
-            element={
-              dashboardUserData ? (
-                <Dashboard userData={dashboardUserData} />
-              ) : (
-                <div>Loading... if this takes long, please verify that you are logged in</div>
-              )
-            }
+            path="/dashboard/:username"
+            element={ <DashboardWrapper /> }
           />
           <Route
             path="/playerlist"

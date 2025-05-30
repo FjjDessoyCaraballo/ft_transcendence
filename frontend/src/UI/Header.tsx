@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onHeaderLogOut: () => void;
+  onHeaderLogIn: () => void
 }
 
 export interface WindowManager {
@@ -16,12 +17,13 @@ export interface WindowManager {
   onDecline: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut} ) => {
+export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn} ) => {
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
+  const [loggedInUserData, setLoggedInUserData] = useState<User | null>(null);
   const navigate = useNavigate();
 
   console.log('Header isLoggedIn state:', isLoggedIn);
@@ -29,7 +31,9 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut} ) => {
  useEffect(() => {
   	const checkLoginStatus = async () => {
 		try {
-			await checkIsLoggedIn();
+			const userData = await getLoggedInUserData();
+			if (userData)
+				setLoggedInUserData(userData);
 			setIsLoggedIn(true);
 		} catch (err) {
 			setIsLoggedIn(false);
@@ -117,19 +121,21 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut} ) => {
   return (
     <>
       <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[200] shadow-md">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
-            Transcendence
-          </h1>
-          <h4 className="p-5 pb-2 m-0 text-1xl font-mono font-bold text-[#4B0082]">
-            A Dads and Coders Inc. product
-          </h4>
-          <div className="buttonsDiv place-items-right">
+        <div className="container mx-auto px-0 py-3 flex justify-between items-center">
+			<div className="flex flex-col">
+				<h1 className="p-1 pb-1 m-0 text-4xl font-mono font-bold text-[#4B0082]">
+					Transcendence
+				</h1>
+				<h4 className="p-5 pt-0 m-0 text-1xl font-mono font-bold text-[#4B0082]">
+					A Dads and Coders Inc. product
+				</h4>
+			</div>
+			<div className="buttonsDiv flex flex-wrap gap-2 justify-end">
             {isLoggedIn ? (
               <>
                 <button className="buttonsStyle" onClick={() => navigate('/')}>Game</button>
                 <button className="buttonsStyle" onClick={() => navigate('/instructions')}>Instructions</button>
-                <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>Dashboard</button>
+                <button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>Dashboard</button>
                 <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
                 <button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
               </>
@@ -165,6 +171,7 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut} ) => {
           onAccept={() => {
             setShowLogin(false);
             setIsLoggedIn(true);
+			onHeaderLogIn();
             sessionStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
             setWindowOpen(false);

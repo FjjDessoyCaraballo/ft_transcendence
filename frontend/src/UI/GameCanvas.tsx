@@ -25,6 +25,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevTimestampRef = useRef<number>(0);
 
+  console.log('GameCanvas isLoggedIn: ', isLoggedIn);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
