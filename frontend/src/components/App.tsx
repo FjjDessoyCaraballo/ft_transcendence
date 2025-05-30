@@ -35,7 +35,7 @@ export default function App() {
 
   const onLogOut = () =>
   {
-	console.log('APP: Executing OnLogOut');
+	console.log('HEADER: Executing OnLogOut');
 
 	setIsLoggedIn(false);
 	setDashboardUserData(null);
