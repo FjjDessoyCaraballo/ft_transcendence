@@ -31,10 +31,16 @@ export interface pongMatchData {
 
 // Game Constants
 export const PADDLE_WIDTH = 15; 
-export const PADDLE_HEIGHT = 100;
-export const PADDLE_SPEED = 10;
+export const PADDLE_HEIGHT = 110;
+export const PADDLE_SPEED = 500;
 export const BALL_SIZE = 15;
 export const BUFFER = 15;
+export const MAX_BALL_SPEED = 1500;
+export const WINNING_SCORE = 5;
+export const AI_UPDATE_INTERVAL = 1000;
+export const INITIAL_BALLSPEED_X = 800;
+export const INITIAL_BALLSPEED_Y = 25;
+
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
@@ -69,8 +75,8 @@ export class Pong implements IGameState {
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, AIData: User | null, state: 'ai' | 'playing', isTournament: boolean) {
 
-	this.canvas = canvas;
-	this.ctx = ctx;
+	  this.canvas = canvas;
+	  this.ctx = ctx;
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
     this.aiTargetY = (this.canvasHeight - PADDLE_HEIGHT) / 2; // AI's current target
@@ -235,38 +241,50 @@ export class Pong implements IGameState {
     return ballY; // Return the predicted Y position of the ball
   }
 
-  updatePlayerPositions() {
+  updatePlayerPositions(deltaTime: number) {
     // Player 1 movement
 	if (!this.player1)
 		return ;
     if (this.keysPressed[PONG_UP_1]) 
-      this.player1.paddle.moveUp();
+      this.player1.paddle.moveUp(deltaTime);
     if (this.keysPressed[PONG_DOWN_1]) 
-      this.player1.paddle.moveDown();
+      this.player1.paddle.moveDown(deltaTime);
 
     if (this.twoPlayerMode && this.player2) {
       // Player 2 movement
       if (this.keysPressed[PONG_UP_2]) 
-        this.player2.paddle.moveUp();
+        this.player2.paddle.moveUp(deltaTime);
       if (this.keysPressed[PONG_DOWN_2]) 
-        this.player2.paddle.moveDown();
+        this.player2.paddle.moveDown(deltaTime);
     } 
     else {
-      const now = performance.now();
-      if (now - this.aiLastUpdateTime >= 1000 && this.player2) { // Only update AI's target once per second
-        this.aiTargetY = this.predictBallY(this.ball.x, this.ball.y, this.ball.speedX, this.ball.speedY, this.player2.paddle.x);
-        this.aiLastUpdateTime = now;
+
+		if (!this.player2)
+			return ;
+
+      if (this.ball.speedX < 0) {
+        this.player1.paddle.stayInBounds(this.canvasHeight);
+        this.player2.paddle.stayInBounds(this.canvasHeight);
+        return ; //Prevents unnecessary calculations if the ball is moving away from the AI paddle
       }
 
-      // AI movement toward target using same speed as human
-	  if (!this.player2)
-		return ;
+      const now = performance.now();
+
+      if (now - this.aiLastUpdateTime >= 1000) {
+        this.aiTargetY = this.predictBallY(
+          this.ball.x, this.ball.y,
+          this.ball.speedX, this.ball.speedY,
+          this.player2.paddle.x
+        );
+        this.aiLastUpdateTime = now;
+      }
+      // Move paddle smoothly toward predicted Y
       const paddleCenter = this.player2.paddle.y + PADDLE_HEIGHT / 2;
-      if (paddleCenter < this.aiTargetY - PADDLE_SPEED) {
-        this.player2.paddle.moveDown();
-      } 
-      else if (paddleCenter > this.aiTargetY + PADDLE_SPEED) {
-        this.player2.paddle.moveUp();
+
+      if (paddleCenter < this.aiTargetY - PADDLE_SPEED * deltaTime) {
+        this.player2.paddle.moveDown(deltaTime);
+      } else if (paddleCenter > this.aiTargetY + PADDLE_SPEED * deltaTime) {
+        this.player2.paddle.moveUp(deltaTime);
       }
     }
     this.player1.paddle.stayInBounds(this.canvasHeight);
@@ -286,18 +304,19 @@ export class Pong implements IGameState {
     document.removeEventListener('keyup', this.handleKeyUp.bind(this));
 	}
 
-  updateGame() {
+  updateGame(deltaTime: number) {
+
 	if (!this.player1 || !this.player2)
 		return ;
 
-    this.updatePlayerPositions();
-    this.ball.move();
+    this.updatePlayerPositions(deltaTime);
+    this.ball.move(deltaTime);
     this.ball.checkCollisions(this.player1.paddle, this.player2.paddle, this.canvasHeight, this.canvasWidth);
 
     // Reset ball if missed and count score
     if (this.ball.x < 0) {
       this.player2.score++;
-      if (this.player2.score === 5) {
+      if (this.player2.score === WINNING_SCORE) {
         this.state = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player2;
@@ -308,7 +327,7 @@ export class Pong implements IGameState {
 
     if (this.ball.x > this.canvasWidth) {
       this.player1.score++;
-      if (this.player1.score === 5) {
+      if (this.player1.score === WINNING_SCORE) {
         this.state = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player1;
@@ -318,9 +337,9 @@ export class Pong implements IGameState {
     }
   }
 
-  update() {
+  update(deltaTime: number) {
 		if (this.state === 'playing')
-			this.updateGame();
+			this.updateGame(deltaTime);
   }
 
 
@@ -429,7 +448,6 @@ export class Pong implements IGameState {
     }
 
   }
-
   drawGame()
   {
 

@@ -19,7 +19,7 @@ RUN apt-get update && \
 RUN npm install --no-audit --production
 
 # Create directories
-RUN mkdir -p /app/data /app/certs
+RUN mkdir -p /app/data
 RUN chmod 700 /app/data
 
 # Copy the application code

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Dashboard } from './Dashboard'
-import { GameCanvas } from './GameCanvas';
 import { RegistrationPopup } from './Registration';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
 import { getLoggedInUserData, checkIsLoggedIn, getMatchHistoryByID } from '../services/userService';
 import { User } from './UserManager';
+import { useNavigate } from 'react-router-dom';
+
 
 interface HeaderProps {
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export interface WindowManager {
@@ -22,13 +22,7 @@ export const Header: React.FC<HeaderProps> = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
-
-  // State management for Dashboard
-  const [isGameVisible, setIsGameVisible] = useState(true);
-  const [buttonText, setButtonText] = useState('Dashboard');
-  const [isDashboardVisible, setIsDashboardVisible] = useState(false);
-  const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
-
+  const navigate = useNavigate();
 
  useEffect(() => {
   	const checkLoginStatus = async () => {
@@ -37,10 +31,10 @@ export const Header: React.FC<HeaderProps> = () => {
 			setIsLoggedIn(true);
 		} catch (err) {
 			setIsLoggedIn(false);
-			setIsGameVisible(true);
-			setIsDashboardVisible(false);
-			setDashboardUserData(null);
-			setButtonText('Dashboard');
+	//		setIsGameVisible(true);
+	//		setIsDashboardVisible(false);
+	//		setDashboardUserData(null);
+	//		setButtonText('Dashboard');
 		}
   };
 
@@ -53,25 +47,31 @@ export const Header: React.FC<HeaderProps> = () => {
   };
 }, []);
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    sessionStorage.removeItem('logged-in');
+    navigate('/');
+  };
+
   const HandleRegistrationClick = () => {
-    if (windowOpen === false)
-    {
-      setWindowOpen(true);
+    if (!windowOpen) {
       setShowRegistration(true);
+      setWindowOpen(true);
     }
   };
 
   const HandleLoginClick = () => {
-  if (windowOpen === false) {
-      setWindowOpen(true)
+    if (!windowOpen) {
       setShowLogin(true);
+      setWindowOpen(true);
     }
-  }
+  };
 
   const HandleSettingsClick = () => {
     setShowSettings(true);
   }
 
+  /*
   // Dashboard state change functions
   const handleDashboardClick = async () => {
 
@@ -98,14 +98,14 @@ export const Header: React.FC<HeaderProps> = () => {
     setIsGameVisible(true);
     setIsDashboardVisible(false);
     setButtonText('Dashboard');
-  };
+  }; */
 
   const onStartScreenLoginFail = () => {
 	setIsLoggedIn(false);
-	setIsGameVisible(true);
-	setIsDashboardVisible(false);
-	setDashboardUserData(null);
-	setButtonText('Dashboard');
+//	setIsGameVisible(true);
+//	setIsDashboardVisible(false);
+//	setDashboardUserData(null);
+//	setButtonText('Dashboard');
   }
 
   return (
@@ -120,49 +120,35 @@ export const Header: React.FC<HeaderProps> = () => {
           </h4>
           <div className="buttonsDiv place-items-right">
             {isLoggedIn ? (
-			<>
-				<button
-  				className="buttonsStyle"
-  				onClick={isGameVisible ? handleDashboardClick : handleBackToGameClick}>
-  				{buttonText}
-				</button>
-              
-              <button
-              className="buttonsStyle"
-              onClick={HandleSettingsClick}>
-              Settings
-            </button>
-			</>
-          ) : (
-            <>
-
-              <button 
-                className="buttonsStyle"
-                onClick={HandleLoginClick}>
-                Login
-              </button>
-              <button 
-              /* I had to override the container px because string was too large */
-                className="buttonsStyle px-1"
-                onClick={HandleRegistrationClick}>
-                Registration
-              </button>
-            </>
-          )}
+              <>
+                <button className="buttonsStyle" onClick={() => navigate('/')}>Game</button>
+                <button className="buttonsStyle" onClick={() => navigate('/instructions')}>Instructions</button>
+                <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>Dashboard</button>
+                <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
+                <button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
+              </>
+            ) : (
+              <>
+                <button className="buttonsStyle" onClick={HandleLoginClick}>
+                  Login
+                </button>
+                <button className="buttonsStyle px-1" onClick={HandleRegistrationClick}>
+                  Registration
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
-      
+
       {/* Popups */}
       {showRegistration && (
         <RegistrationPopup
           onAccept={() => {
-            console.log('GDPR accepted');
             setShowRegistration(false);
             setWindowOpen(false);
           }}
           onDecline={() => {
-            console.log('GDPR declined');
             setShowRegistration(false);
             setWindowOpen(false);
           }}
@@ -171,7 +157,6 @@ export const Header: React.FC<HeaderProps> = () => {
       {showLogin && (
         <LoginPopup
           onAccept={() => {
-            console.log('Login successful');
             setShowLogin(false);
             setIsLoggedIn(true);
             sessionStorage.setItem('logged-in', 'true');
@@ -179,7 +164,6 @@ export const Header: React.FC<HeaderProps> = () => {
             setWindowOpen(false);
           }}
           onDecline={() => {
-            console.log('Login failed/canceled');
             setShowLogin(false);
             setWindowOpen(false);
           }}
@@ -187,19 +171,10 @@ export const Header: React.FC<HeaderProps> = () => {
       )}
       {showSettings && (
         <SettingsPopup
-          onClick={() => {
-            console.log('Settings clicked');
-            setShowSettings(false);
-          }}
+          onClick={() => setShowSettings(false)}
+          onLogout={handleLogout}
         />
       )}
-
-	<main className="pt-32"> {/* or adjust to match header height */}
-	{isGameVisible && <GameCanvas isLoggedIn={isLoggedIn} onStartScreenLoginFail={onStartScreenLoginFail}/>}
-	{isDashboardVisible && dashboardUserData && <Dashboard userData={dashboardUserData}/>}
-	</main>
-	
     </>
-
   );
 };

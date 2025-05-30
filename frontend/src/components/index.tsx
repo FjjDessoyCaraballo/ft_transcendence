@@ -1,7 +1,28 @@
 import '../styles/main.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Header } from '../UI/Header'
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('No root element found');
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);
+
+
+/*import '../styles/main.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Header } from '../UI/Header'*/
 
 /*
 
@@ -16,7 +37,7 @@ stateManager.changeState(new StartScreen(canvas));
 
 */
 
-const headerContainer = document.createElement('header');
+/*const headerContainer = document.createElement('header');
 headerContainer.id = 'header-container';
 document.body.appendChild(headerContainer);
 
@@ -27,7 +48,7 @@ root.render(
 	<React.StrictMode>
 		<Header onClick={() => console.log('Header clicked')} />
 	</React.StrictMode>
-);
+);*/
 
 /*
 function updateGame(deltaTime: number) {

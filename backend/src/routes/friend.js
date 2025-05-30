@@ -4,7 +4,6 @@ const socketManager = require('../utils/socketManager');
 async function friendRoutes(fastify, options) {
   const friendRepo = new FriendRepository(fastify.db);
   
-  // Middleware to check authentication
   const authenticate = async (request, reply) => {
     try {
       await request.jwtVerify();
@@ -20,12 +19,20 @@ async function friendRoutes(fastify, options) {
     return { friends };
   });
 
-  // Get pending friend requests
+  // Get pending received friend requests
   fastify.get('/requests', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
     const requests = friendRepo.getPendingRequests(userId);
     return { requests };
   });
+
+  // Get pending sent friend requests
+  fastify.get('/sent-requests', { preHandler: authenticate }, async (request, reply) => {
+    const userId = request.user.id;
+    const sentRequests = friendRepo.getSentRequests(userId);
+    return { sentRequests };
+  });
+
 
   // Send friend request
   fastify.post('/request/:friendId', { preHandler: authenticate }, async (request, reply) => {
@@ -38,23 +45,19 @@ async function friendRoutes(fastify, options) {
     }
 
     try {
-      // Check if user exists
       const friend = fastify.db.prepare('SELECT id FROM users WHERE id = ?').get(friendId);
       if (!friend) {
         reply.code(404);
         return { error: 'User not found' };
       }
 
-      // Check if already friends
       if (friendRepo.areFriends(userId, friendId)) {
         reply.code(409);
         return { error: 'Already friends' };
       }
 
-      // Send request
       friendRepo.sendRequest(userId, friendId);
 
-      // Emit notification to the target user
       const friendSocket = socketManager.getSocket(friendId);
       if (friendSocket) {
         friendSocket.emit('friend_request_received', {

@@ -1,11 +1,11 @@
-import { PADDLE_HEIGHT, PADDLE_WIDTH, BALL_SIZE, BUFFER } from "./Pong";
+import { PADDLE_HEIGHT, PADDLE_WIDTH, BALL_SIZE, BUFFER, MAX_BALL_SPEED, INITIAL_BALLSPEED_X, INITIAL_BALLSPEED_Y } from "./Pong";
 import { Paddle } from "./Paddle";
 
 export class Ball {
   x: number;
   y: number;
-  speedX: number = 16 * -1;
-  speedY: number = 0.5 * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative;
+  speedX: number = INITIAL_BALLSPEED_X * -1;
+  speedY: number = INITIAL_BALLSPEED_Y * (Math.random() > 0.5 ? 1 : -1); // 50% chance positive or negative;
   currentRallyLen: number = 0;
   totalHits: number = 0;
   longestRally: number = 0;
@@ -16,9 +16,9 @@ export class Ball {
     this.y = (canvasHeight - PADDLE_HEIGHT) / 2;
   }
 
-  move() {
-    this.x += this.speedX;
-    this.y += this.speedY;
+  move(deltaTime: number) {
+    this.x += this.speedX * deltaTime;
+    this.y += this.speedY * deltaTime;
   }
 
   checkCollisions(player1: Paddle, player2: Paddle, canvasHeight: number, canvasWidth: number) {
@@ -43,7 +43,8 @@ export class Ball {
         const bounceAngle = normalized * Math.PI / 4; // -1 (-45 degrees) to 1 (+45 degrees)
         const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2); // keep same speed after bounce (pythagoras)
       
-        this.speedX = Math.cos(bounceAngle) * speed; // reflected to right
+        const newSpeed = Math.min(speed * 1.025, MAX_BALL_SPEED);
+        this.speedX = Math.cos(bounceAngle) * newSpeed; // reflected to right
         this.speedY = Math.sin(bounceAngle) * speed;
       
         // Make sure ball is moving right
@@ -61,7 +62,8 @@ export class Ball {
         const bounceAngle = normalized * Math.PI / 4;
         const speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2);
       
-        this.speedX = -Math.cos(bounceAngle) * speed; // reflected to left
+        const newSpeed = Math.min(speed * 1.025, MAX_BALL_SPEED);
+        this.speedX = -Math.cos(bounceAngle) * newSpeed; // reflected to left
         this.speedY = Math.sin(bounceAngle) * speed;
       
         if (this.speedX > 0) 
@@ -88,12 +90,12 @@ export class Ball {
   
     setTimeout(() => {
       if (twoPlayerMode) {
-        this.speedX = 16 * (Math.random() > 0.5 ? 1 : -1);
-        this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
+        this.speedX = INITIAL_BALLSPEED_X * (Math.random() > 0.5 ? 1 : -1);
+        this.speedY = INITIAL_BALLSPEED_Y * (Math.random() > 0.5 ? 1 : -1);
       }
       else {
-        this.speedX = 16 * -1;
-        this.speedY = 0.5 * (Math.random() > 0.5 ? 1 : -1);
+        this.speedX = INITIAL_BALLSPEED_X * -1;
+        this.speedY = INITIAL_BALLSPEED_Y * (Math.random() > 0.5 ? 1 : -1);
       }
     }, 1000); // 1000ms = 1 second delay
   }
