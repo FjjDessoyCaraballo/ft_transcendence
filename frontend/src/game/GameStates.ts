@@ -50,6 +50,22 @@ export class GameStateManager {
 			return this.currentState.name;
 	}
 
+	getLoggedInStatus(): boolean
+	{
+		if (!this.currentState)
+			return false;
+
+		return this.currentState.isLoggedIn;
+	}
+
+	setLoggedInStatus(newStatus: boolean): void
+	{
+		if (!this.currentState)
+			return ;
+
+		this.currentState.isLoggedIn = newStatus; 
+	}
+
 }
 
 
@@ -59,6 +75,7 @@ export interface IGameState {
 	name: GameStates;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	isLoggedIn: boolean;
     enter(): void;
     exit(): void;
     update(deltaTime: number): void;

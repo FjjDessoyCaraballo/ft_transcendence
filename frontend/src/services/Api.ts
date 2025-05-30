@@ -1,4 +1,4 @@
-const API_URL = 'https://localhost:3443/api';
+const API_URL = 'https://localhost:3443/api'; // This is exposed... I think it might be a security threat
 import { getToken } from './TokenService'
 
 /**

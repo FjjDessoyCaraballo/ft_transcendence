@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { WindowManager } from './Header';
 import { setToken, getToken } from '../services/TokenService';
-import { updateAllUserDataArr, updateCurUser } from './GameCanvas';
-import { getAllUsers, loginUser } from '../services/userService'
+import { loginUser } from '../services/userService'
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
@@ -44,26 +43,15 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
       } else {
         console.error('No token received from server.')
       }
-		  const userDataArr = await getAllUsers(); // Fetch all user data, JUST A TEST
       sessionStorage.setItem('logged-in', 'true');
-	    updateCurUser(username);
-	    updateAllUserDataArr(userDataArr); // TEST
 	        
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
     } catch (error) {
       setErrorMessage('Login failed.');
       console.error('Login failed.');
-	    updateCurUser(null);
     }
 
-	try {
-
-	} catch (error) {
-      setErrorMessage('User data fetch failed. Please try again');
-      console.error('User data fetch failed.');
-	  updateCurUser(null);
-    }
 
   };
 

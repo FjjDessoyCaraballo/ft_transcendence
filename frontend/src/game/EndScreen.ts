@@ -6,7 +6,8 @@ import { TEXT_PADDING } from "./Constants";
 import { User, UserManager } from "../UI/UserManager";
 import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
-import { drawCenteredText } from "./StartScreen";
+import { drawCenteredText, StartScreen } from "./StartScreen";
+import { getEndScreenData } from "../services/userService";
 
 export class ReturnMainMenuButton extends Button
 {
@@ -47,33 +48,36 @@ class ReturnToTournamentBtn extends Button
 export class EndScreen implements IGameState
 {
 	name: GameStates;
-	winner: User;
-	loser: User;
-	tournamentData1: TournamentPlayer | null;
-	tournamentData2: TournamentPlayer | null;
+	winner: User | null;
+	loser: User | null;
+	AIData: User | null;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	returnMenuButton: ReturnMainMenuButton;
 	returnToTournamentBtn: ReturnToTournamentBtn;
 	isStateReady: boolean;
-	savingDataToDB: boolean;
 	gameType: GameType;
+	isDataReady: boolean;
+	isTournament: boolean;
+	isLoggedIn: boolean = false;
+	showLoadingText: boolean;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winner: User, loser: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winnerId: number, loserId: number, gameType: GameType, isTournament: boolean, AIData: User | null)
 	{
 		this.name = GameStates.END_SCREEN;
 
 		this.canvas = canvas;
 		this.ctx = ctx;
-		this.winner = winner;
-		this.loser = loser;
-		this.tournamentData1 = tData1;
-		this.tournamentData2 = tData2;
+		this.winner = null;
+		this.loser = null;
 		this.isStateReady = false;
 		this.gameType = gameType;
-		this.savingDataToDB = false;
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		this.isTournament = isTournament;
+		this.AIData = AIData;
 
 		let text1 = 'RETURN TO MENU';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
@@ -87,11 +91,39 @@ export class EndScreen implements IGameState
 		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
 		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
 
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		this.fetchPlayerData(winnerId, loserId);
+
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
 
-		if (!this.tournamentData1 && this.gameType !== GameType.PONG_AI)
-			this.saveUserDataToDB();
+	}
+
+	async fetchPlayerData(winnerId: number, loserId: number)
+	{
+		try
+		{
+			if (winnerId != -1)
+				this.winner = await getEndScreenData(winnerId);
+			else
+				this.winner = this.AIData;
+
+			if (loserId != -1)
+				this.loser = await getEndScreenData(loserId);
+			else
+				this.loser = this.AIData;
+
+			this.isDataReady = true;
+		}
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
+			console.log("END SCREEN: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.isDataReady = false;
+		}
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -104,7 +136,7 @@ export class EndScreen implements IGameState
 		const x = (event.clientX - rect.left) * scaleX;
 		const y = (event.clientY - rect.top) * scaleY;
 
-		if (!this.tournamentData1)
+		if (!this.isTournament)
 			this.returnMenuButton.checkMouse(x, y);
 		else
 			this.returnToTournamentBtn.checkMouse(x, y);
@@ -113,7 +145,7 @@ export class EndScreen implements IGameState
 
 	mouseClickCallback()
 	{
-		if (!this.tournamentData1)
+		if (!this.isTournament)
 			this.returnMenuButton.checkClick();
 		else
 		{
@@ -134,29 +166,27 @@ export class EndScreen implements IGameState
 		this.canvas.removeEventListener('click', this.mouseClickBound);
 	}
 
-	async saveUserDataToDB()
-	{
-		this.savingDataToDB = true;
-
-		try {
-			await UserManager.updateUserStats(this.winner, this.loser, this.gameType);
-		} catch {
-
-			// Is this enough? Or do we need more error handling...?
-			alert('User data saving failed');
-			console.log('User data saving failed');
-		}
-
-		this.savingDataToDB = false;
-
-	}
-
 	update(deltaTime: number)
 	{
 	}
 
 	render(ctx: CanvasRenderingContext2D)
 	{
+		if (!this.isDataReady)
+		{
+			if (!this.showLoadingText)
+				return ;
+
+			const loadingHeader = 'Fetching user data, please wait.';
+			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+			return ;
+		}
+
+		if (!this.winner || !this.loser)
+			return ;
+
 		const text = this.winner.username + ' wins the game!';
 		drawCenteredText(this.canvas, this.ctx, text, '40px arial', '#1cc706', 200);
 
@@ -168,7 +198,7 @@ export class EndScreen implements IGameState
 				drawCenteredText(this.canvas, this.ctx, 'Great job, humans ROCK!!', '30px arial', 'white', 300);
 
 		}
-		else if (!this.tournamentData1)
+		else if (!this.isTournament)
 		{
 			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, winnerRankText, '30px arial', 'white', 300);
@@ -177,12 +207,10 @@ export class EndScreen implements IGameState
 			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 
-		if (!this.tournamentData1 && !this.savingDataToDB)
+		if (!this.isTournament)
 			this.returnMenuButton.draw(ctx);
-		else if (!this.savingDataToDB)
-			this.returnToTournamentBtn.draw(ctx);
 		else
-			drawCenteredText(this.canvas, this.ctx, 'Sending data to backend, please wait', '30px arial', 'white', this.canvas.height - 100);
+			this.returnToTournamentBtn.draw(ctx);
 
 
 	}

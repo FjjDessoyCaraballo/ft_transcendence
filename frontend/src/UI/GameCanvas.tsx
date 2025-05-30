@@ -4,23 +4,9 @@ import { StartScreen } from '../game/StartScreen';
 import { WALL_THICKNESS, FLOOR_THICKNESS } from '../game/Constants';
 import { User } from './UserManager';
 
-// GLOBAL GAME VARIABLES
-export let global_curUser: string | null = null;
-export function updateCurUser(newUser: string | null) {
-  global_curUser = newUser;
-}
-
-export let global_allUserDataArr: User[] = [];
-export function updateAllUserDataArr(newData: User[]) {
-  global_allUserDataArr = newData;
-}
-
-// JUST A TEST until localHost is completely removed
-if (localStorage.getItem('logged-in') === 'true' && global_curUser === null)
-	localStorage.setItem('logged-in', 'false');
-
 export const global_stateManager = new GameStateManager();
 
+// Maybe move this inside classes...?
 export const global_gameArea = {
 			minX: WALL_THICKNESS,
 			maxX: 1200 - WALL_THICKNESS,
@@ -28,10 +14,18 @@ export const global_gameArea = {
 		};
 
 
+interface GameCanvasProps {
+  isLoggedIn: boolean;
+//  onStartScreenLoginFail: () => void;
+}
+
+
 // COMPONENT
-export const GameCanvas: React.FC = () => {
+export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevTimestampRef = useRef<number>(0);
+
+  console.log('GameCanvas isLoggedIn: ', isLoggedIn);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -46,11 +40,17 @@ export const GameCanvas: React.FC = () => {
       const deltaTime = (timestamp - prevTimestampRef.current) / 1000;
       prevTimestampRef.current = timestamp;
 
-      if (!global_curUser && global_stateManager.getStateName() !== GameStates.START_SCREEN) {
-        global_stateManager.changeState(new StartScreen(canvas, ctx));
-      }
-
       global_stateManager.update(deltaTime);
+
+	  if (global_stateManager.getStateName() === GameStates.START_SCREEN 
+	  && !global_stateManager.getLoggedInStatus() && isLoggedIn)
+	  {
+		console.log('Game loop onStartScreenLoginFail');
+	//	onStartScreenLoginFail();
+		global_stateManager.setLoggedInStatus(true); // Seems counter intuitive, but prevents unnecessary extra runs of this error handling in the future =)
+	  }
+
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       global_stateManager.render(ctx);
 
@@ -61,7 +61,7 @@ export const GameCanvas: React.FC = () => {
 
     return () => cancelAnimationFrame(animationFrameId); // ✅ cleanup
 
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <canvas
@@ -69,6 +69,7 @@ export const GameCanvas: React.FC = () => {
       id="gameCanvas"
       width="1200"
       height="800"
+	  className="m-4"
     />
   );
 };

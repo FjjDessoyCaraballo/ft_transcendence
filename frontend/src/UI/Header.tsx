@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { RegistrationPopup } from './Registration';
-import { LoginPopup } from './Login';
-import { SettingsPopup } from './Settings';
+import { LoginPopup } from './Login'
+import { SettingsPopup } from './Settings'
+import { getLoggedInUserData, checkIsLoggedIn, getMatchHistoryByID } from '../services/userService';
+import { User } from './UserManager';
+import { useNavigate } from 'react-router-dom';
+
 
 interface HeaderProps {
-  onClick?: () => void;
+  onHeaderLogOut: () => void;
+  onHeaderLogIn: () => void
 }
 
 export interface WindowManager {
@@ -13,33 +17,47 @@ export interface WindowManager {
   onDecline: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = () => {
+export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn} ) => {
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
+  const [loggedInUserData, setLoggedInUserData] = useState<User | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const loginStatus = sessionStorage.getItem('logged-in');
-      setIsLoggedIn(loginStatus === 'true');
-    };
+  console.log('Header isLoggedIn state:', isLoggedIn);
 
-    checkLoginStatus();
+ useEffect(() => {
+  	const checkLoginStatus = async () => {
+		try {
+			const userData = await getLoggedInUserData();
+			if (userData)
+				setLoggedInUserData(userData);
+			setIsLoggedIn(true);
+		} catch (err) {
+			setIsLoggedIn(false);
+	//		setIsGameVisible(true);
+	//		setIsDashboardVisible(false);
+	//		setDashboardUserData(null);
+	//		setButtonText('Dashboard');
+		}
+  };
 
-    const handleLoginChange = () => {
-      checkLoginStatus();
-    };
+  checkLoginStatus();
 
-    window.addEventListener('loginStatusChanged', handleLoginChange);
-    return () => {
-      window.removeEventListener('loginStatusChanged', handleLoginChange);
-    };
-  }, []);
+  window.addEventListener('loginStatusChanged', checkLoginStatus);
+
+  return () => {
+    window.removeEventListener('loginStatusChanged', checkLoginStatus);
+  };
+}, []);
 
   const handleLogout = () => {
+
+	console.log('HEADER: Executing OnLogOut');
+
+	onHeaderLogOut();
     setIsLoggedIn(false);
     sessionStorage.removeItem('logged-in');
     navigate('/');
@@ -61,24 +79,63 @@ export const Header: React.FC<HeaderProps> = () => {
 
   const HandleSettingsClick = () => {
     setShowSettings(true);
+  }
+
+  /*
+  // Dashboard state change functions
+  const handleDashboardClick = async () => {
+
+	try {
+		const userData = await getLoggedInUserData();
+
+		if (userData)
+		{
+			userData.match_history = await getMatchHistoryByID(userData.id);
+		}
+
+		setDashboardUserData(userData);
+		setIsGameVisible(false);
+		setIsDashboardVisible(true);
+		setButtonText('To Game');
+	} catch {
+		alert("Error while fetching user data for Dashboard; are you sure you're logged in...?");
+		console.log("Error while fetching user data for Dashboard");
+	}
   };
+
+  const handleBackToGameClick = () => {
+	setDashboardUserData(null);
+    setIsGameVisible(true);
+    setIsDashboardVisible(false);
+    setButtonText('Dashboard');
+  }; */
+
+  const onStartScreenLoginFail = () => {
+	setIsLoggedIn(false);
+//	setIsGameVisible(true);
+//	setIsDashboardVisible(false);
+//	setDashboardUserData(null);
+//	setButtonText('Dashboard');
+  }
 
   return (
     <>
       <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[200] shadow-md">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
-            Transcendence
-          </h1>
-          <h4 className="p-5 pb-2 m-0 text-1xl font-mono font-bold text-[#4B0082]">
-            A Dads and Coders Inc. product
-          </h4>
-          <div className="buttonsDiv place-items-right">
+        <div className="container mx-auto px-0 py-3 flex justify-between items-center">
+			<div className="flex flex-col">
+				<h1 className="p-1 pb-1 m-0 text-4xl font-mono font-bold text-[#4B0082]">
+					Transcendence
+				</h1>
+				<h4 className="p-5 pt-0 m-0 text-1xl font-mono font-bold text-[#4B0082]">
+					A Dads and Coders Inc. product
+				</h4>
+			</div>
+			<div className="buttonsDiv flex flex-wrap gap-2 justify-end">
             {isLoggedIn ? (
               <>
                 <button className="buttonsStyle" onClick={() => navigate('/')}>Game</button>
                 <button className="buttonsStyle" onClick={() => navigate('/instructions')}>Instructions</button>
-                <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>Dashboard</button>
+                <button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>Dashboard</button>
                 <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
                 <button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
               </>
@@ -114,6 +171,7 @@ export const Header: React.FC<HeaderProps> = () => {
           onAccept={() => {
             setShowLogin(false);
             setIsLoggedIn(true);
+			onHeaderLogIn();
             sessionStorage.setItem('logged-in', 'true');
             window.dispatchEvent(new Event('loginStatusChanged'));
             setWindowOpen(false);

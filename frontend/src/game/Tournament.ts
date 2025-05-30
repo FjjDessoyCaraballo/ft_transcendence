@@ -8,28 +8,22 @@ import { MatchIntro } from "./MatchIntro";
 import { EndScreen } from "./EndScreen";
 import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
-import { drawCenteredText } from "./StartScreen";
+import { drawCenteredText, StartScreen } from "./StartScreen";
+import { Weapon } from "./Weapons";
+import { endTournamentAPI, getTournamentEndScreenData, getTournamentPlayers } from "../services/userService";
+import { global_stateManager } from "../UI/GameCanvas";
 
 export interface TournamentPlayer
 {
-	id: number;
+	tournamentId: number;
 	user: User;
 	tournamentPoints: number;
 	place: number;
 	coinsCollected: number;
 	pongPointsScored: number;
 	isWinner: boolean;
+	bbWeapons: Weapon [];
 }
-
-const GameOrder: [number, number][] = [
-	[0, 1],
-	[2, 3],
-	[0, 2],
-	[1, 3],
-	[3, 0],
-	[2, 1]
-];
-
 
 export class NextGameBtn extends Button
 {
@@ -49,43 +43,35 @@ export class Tournament implements IGameState
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	playerArr: TournamentPlayer [];
-	curMatch: MatchIntro | BlockBattle | Pong | EndScreen | null;
+	curState: MatchIntro | BlockBattle | Pong | EndScreen | null;
 	matchCounter: number;
 	isFinished: boolean;
 	tournamentWinner: TournamentPlayer [];
 	returnMenuButton: ReturnMainMenuButton;
 	nextGameBtn: NextGameBtn;
 	gameType: GameType;
+	isDataReady: boolean;
+	showLoadingText: boolean;
+	isSettingEndScreen: boolean;
+	isEndingTournament: boolean = false;
+	isLoggedIn: boolean = false;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, players: User[], type: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: GameType)
 	{
 		this.name = GameStates.TOURNAMENT;
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.playerArr = [];
-		this.curMatch = null;
+		this.curState = null;
 		this.matchCounter = 0;
 		this.isFinished = false;
 		this.tournamentWinner = [];
 		this.gameType = type;
-
-		// Create TournamentPlayer array
-		for (let i = 0; i < 4; i++)
-		{
-			let tournamentObj: TournamentPlayer = {
-				id: i,
-				user: players[i],
-				place: 0,
-				tournamentPoints: 0,
-				coinsCollected: 0,
-				pongPointsScored: 0,
-				isWinner: false
-			};
-
-			this.playerArr.push(tournamentObj);
-		}
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		this.isSettingEndScreen = false;
 
 		let text1 = 'EXIT TOURNAMENT'; // Add a warning here that all tournament data will be lost
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
@@ -99,8 +85,35 @@ export class Tournament implements IGameState
 		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 240;
 		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial');
 
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		this.fetchTournamentData();
+
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
+	}
+
+	async fetchTournamentData()
+	{
+		try
+		{
+			this.playerArr = await getTournamentPlayers();
+			if (!this.playerArr || this.playerArr.length === 0)
+			{
+				console.log("TOURNAMENT: User data fetch failed");
+				return ;
+			}
+
+			this.isDataReady = true;
+		}
+		catch (error) {
+			alert(`User data fetch failed! ${error}`);
+			console.log("TOURNAMENT: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.isDataReady = false;
+		}
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -127,16 +140,8 @@ export class Tournament implements IGameState
 		
 		if (!this.isFinished && this.nextGameBtn.checkClick())
 		{
-			const id1 = GameOrder[this.matchCounter][0];
-			const id2 = GameOrder[this.matchCounter][1];
-			const player1 = this.playerArr.find(player => player.id === id1);
-			const player2 = this.playerArr.find(player => player.id === id2);
-
-			if (player1 && player2)
-			{
-				this.curMatch = new MatchIntro(this.canvas, this.ctx, player1.user, player2.user, player1, player2, this.gameType);
-				this.curMatch.enter();
-			}
+			this.curState = new MatchIntro(this.canvas, this.ctx, this.gameType, true);
+			this.curState.enter();
 		}
 	}
 
@@ -152,107 +157,121 @@ export class Tournament implements IGameState
 		this.canvas.removeEventListener('click', this.mouseClickBound);
 	}
 
+	async setupEndScreen()
+	{
+		this.isSettingEndScreen = true;
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		try {
+
+			const endScreenData = await getTournamentEndScreenData();
+
+			const winner = endScreenData.winner;
+			const loser = endScreenData.loser;
+			this.playerArr = endScreenData.playerArr; // update player arr for tournament after every game
+			this.matchCounter = endScreenData.matchCount;
+			if (this.matchCounter === 6)
+				this.isFinished = true;
+
+
+			this.curState = new EndScreen(this.canvas, this.ctx, winner.user.id, loser.user.id, this.gameType, true, null);
+			this.curState.enter();
+
+			// Sort players based on points
+			if (this.gameType === GameType.BLOCK_BATTLE)
+			{
+				this.playerArr.sort((a, b) => {
+					if (b.tournamentPoints !== a.tournamentPoints)
+						return b.tournamentPoints - a.tournamentPoints;
+					return b.coinsCollected - a.coinsCollected;
+				})
+			}
+			else if (this.gameType === GameType.PONG)
+			{
+				this.playerArr.sort((a, b) => {
+					if (b.tournamentPoints !== a.tournamentPoints)
+						return b.tournamentPoints - a.tournamentPoints;
+					return b.pongPointsScored - a.pongPointsScored;
+				})
+			}
+
+			this.isDataReady = true;
+			this.isSettingEndScreen = false;
+
+		} catch (error) {
+
+			alert(`User data fetch failed, returning to Start Screen! ${error}`);
+			console.log("TOURNAMENT: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.isDataReady = false;
+
+		}
+
+	}
+
+	async endTournament()
+	{
+		this.isEndingTournament = true;
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		try {
+
+			const winnerArr = await endTournamentAPI();
+
+			this.tournamentWinner = winnerArr;
+			this.isDataReady = true;
+			this.isEndingTournament = false;
+
+		} catch (error) {
+
+			alert(`User data fetch failed, returning to Start Screen! ${error}`);
+			console.log("TOURNAMENT: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.isDataReady = false;
+
+		}
+
+	}
+
 	update(deltaTime: number)
 	{
-		if (this.curMatch)
+		if (this.curState)
 		{
-			this.curMatch.update(deltaTime);
-			if (this.curMatch.isStateReady)
+			this.curState.update(deltaTime);
+			if (this.curState.isStateReady)
 			{
-				const id1 = GameOrder[this.matchCounter][0];
-				const id2 = GameOrder[this.matchCounter][1];
-				const player1 = this.playerArr.find(player => player.id === id1);
-				const player2 = this.playerArr.find(player => player.id === id2);
-				this.curMatch.exit();
+				this.curState.exit();
 				
-				if (this.curMatch.name === GameStates.MATCH_INTRO && player1 && player2)
+				if (this.curState.name === GameStates.MATCH_INTRO)
 				{	
-
 					if (this.gameType === GameType.BLOCK_BATTLE)
-						this.curMatch = new BlockBattle(this.canvas, this.ctx, player1.user, player2.user, player1, player2);
+						this.curState = new BlockBattle(this.canvas, this.ctx, [], [], true);
 					else if (this.gameType === GameType.PONG)
-						this.curMatch = new Pong(this.canvas, this.ctx, player1.user, player2.user, player1, player2, 'playing');
+						this.curState = new Pong(this.canvas, this.ctx, null, 'playing', true);
 
-					this.curMatch.enter();
+					this.curState.enter();
 				}
-				else if ((this.curMatch.name === GameStates.BLOCK_BATTLE || this.curMatch.name === GameStates.PONG) 
-				&& player1 && player2)
+				else if ((this.curState.name === GameStates.BLOCK_BATTLE || this.curState.name === GameStates.PONG))
 				{
-
-					const winner = player1.isWinner ? player1 : player2;
-					const loser = player1.isWinner ? player2 : player1;
-
-					this.curMatch = new EndScreen(this.canvas, this.ctx, winner.user, loser.user, winner, loser, this.gameType);
-					
-					this.curMatch.enter();
-					player1.isWinner = false;
-					player2.isWinner = false;
-
-					// Sort players based on points
-					if (this.gameType === GameType.BLOCK_BATTLE)
-					{
-						this.playerArr.sort((a, b) => {
-							if (b.tournamentPoints !== a.tournamentPoints)
-								return b.tournamentPoints - a.tournamentPoints;
-							return b.coinsCollected - a.coinsCollected;
-						})
-					}
-					else if (this.gameType === GameType.PONG)
-					{
-						this.playerArr.sort((a, b) => {
-							if (b.tournamentPoints !== a.tournamentPoints)
-								return b.tournamentPoints - a.tournamentPoints;
-							return b.pongPointsScored - a.pongPointsScored;
-						})
-					}
-
+					if (!this.isSettingEndScreen)
+						this.setupEndScreen()
 				}
 				else
 				{
-					this.curMatch = null;
-					this.matchCounter++;
-					if (this.matchCounter === 6)
+					this.curState = null;
+					if (this.isFinished && !this.isEndingTournament)
 					{
-						this.isFinished = true;
-						this.findWinner();
+						this.endTournament();
 					}
 				}
-			}
-		}
-	}
-
-	findWinner(): void
-	{
-		// Sort players based on points
-		if (this.gameType === GameType.BLOCK_BATTLE)
-		{
-			this.playerArr.sort((a, b) => {
-				if (b.tournamentPoints !== a.tournamentPoints)
-					return b.tournamentPoints - a.tournamentPoints;
-				return b.coinsCollected - a.coinsCollected;
-			})
-		}
-		else if (this.gameType === GameType.PONG)
-		{
-			this.playerArr.sort((a, b) => {
-				if (b.tournamentPoints !== a.tournamentPoints)
-					return b.tournamentPoints - a.tournamentPoints;
-				return b.pongPointsScored - a.pongPointsScored;
-			})
-		}
-
-		this.tournamentWinner.push(this.playerArr[0]);
-
-		if (this.playerArr[0].tournamentPoints === this.playerArr[1].tournamentPoints
-			&& this.playerArr[0].coinsCollected === this.playerArr[1].coinsCollected
-			&& this.playerArr[0].pongPointsScored === this.playerArr[1].pongPointsScored)
-		{
-			for (let i = 1; i < 4; i++)
-			{
-				if (this.playerArr[i].tournamentPoints === this.playerArr[0].tournamentPoints
-					&& this.playerArr[i].coinsCollected === this.playerArr[0].coinsCollected
-					&& this.playerArr[i].pongPointsScored === this.playerArr[0].pongPointsScored)
-					this.tournamentWinner.push(this.playerArr[i]);
 			}
 		}
 	}
@@ -338,7 +357,20 @@ export class Tournament implements IGameState
 	render(ctx: CanvasRenderingContext2D)
 	{
 
-		if (!this.curMatch)
+		if (!this.isDataReady)
+		{
+			if (!this.showLoadingText)
+				return ;
+
+			const loadingHeader = 'Fetching user data, please wait.';
+			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+			return ;
+		}
+
+
+		if (!this.curState)
 		{
 			// Draw Header & Score Board
 			drawCenteredText(this.canvas, this.ctx, 'SCORE BOARD', '50px Impact', 'white', 100);
@@ -366,7 +398,7 @@ export class Tournament implements IGameState
 				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 50;
 				drawCenteredText(this.canvas, this.ctx, nextGameNum, '30px arial', 'white', gameNumY);
 
-				const id1 = GameOrder[this.matchCounter][0];
+	/*			const id1 = GameOrder[this.matchCounter][0];
 				const id2 = GameOrder[this.matchCounter][1];
 				const player1 = this.playerArr.find(player => player.id === id1);
 				const player2 = this.playerArr.find(player => player.id === id2);
@@ -374,7 +406,7 @@ export class Tournament implements IGameState
 				if (player1 && player2)
 					playerInfo = `(${player1.user.username} vs ${player2.user.username})`;
 				const playerInfoY = gameNumY + 26;
-				drawCenteredText(this.canvas, this.ctx, playerInfo, '25px arial', 'red', playerInfoY);
+				drawCenteredText(this.canvas, this.ctx, playerInfo, '25px arial', 'red', playerInfoY); */
 
 			}
 			else
@@ -394,7 +426,7 @@ export class Tournament implements IGameState
 		}
 		else
 		{
-			this.curMatch.render(ctx);
+			this.curState.render(ctx);
 		}
 
 	}

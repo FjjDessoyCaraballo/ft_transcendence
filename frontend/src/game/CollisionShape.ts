@@ -1,4 +1,3 @@
-import { BULLET_DMG } from "./Constants";
 
 export enum collType
 {
@@ -69,7 +68,7 @@ export class CollisionShape
 			return false;
 	}
 
-	checkBulletCollision(obj: CollisionShape): boolean
+	checkBulletCollision(obj: CollisionShape, damage: number): boolean
 	{
 		if (this.x + this.width < obj.x ||
             this.x > obj.x + obj.width ||
@@ -83,7 +82,7 @@ export class CollisionShape
 			return false;
 
 		// The 'obj' has to be of type PLAYER and this has to be of type BULLET
-		obj.master.health.takeDmg(BULLET_DMG);
+		obj.master.health.takeDmg(damage);
 		this.master.isValid = false;
 
 		return true;
