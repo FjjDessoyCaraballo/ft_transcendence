@@ -17,8 +17,9 @@
         @apply mb-6 font-mono text-lg text-left;
     }
     .buttonsStyle {
-        @apply inline-flex items-center justify-center px-4 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082] whitespace-nowrap;
+        @apply inline-flex items-center justify-center px-4 py-2 min-w-[100px] rounded bg-[#800080] text-white font-mono text-sm text-center transition-colors hover:bg-[#4B0082] whitespace-nowrap;
     }
+
     .buttonsDiv {
         @apply flex p-3 justify-center space-x-8;
     }
