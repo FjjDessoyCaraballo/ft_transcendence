@@ -163,7 +163,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         return (
           <button
             onClick={() => handleRemoveFriend(player.id)}
-            className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white"
           >
             ✖️ {t('unfriend')}
           </button>
@@ -173,13 +173,13 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
           <div className="flex gap-2">
             <button
               onClick={() => handleAcceptFriendRequest(player.id)}
-              className="px-3 py-2 rounded-md bg-green-500 hover:bg-green-600 text-white"
+              className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-500 hover:bg-green-600 text-white"
             >
               ✅ {t('accept')}
             </button>
             <button
               onClick={() => handleRejectFriendRequest(player.id)}
-              className="px-3 py-2 rounded-md bg-gray-500 hover:bg-gray-600 text-white"
+              className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-gray-500 hover:bg-gray-600 text-white"
             >
               ❌ {t('reject')}
             </button>
@@ -189,7 +189,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         return (
           <button
             disabled
-            className="px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-yellow-500 text-white cursor-not-allowed"
+            className="inline-flex items-center justify-center px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-yellow-500 text-white cursor-not-allowed"
           >
             ⏳ {t('request_sent')}
           </button>
@@ -198,7 +198,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         return (
           <button
             onClick={() => handleSendFriendRequest(player.id)}
-            className="px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-purple-500 hover:bg-purple-700 text-white"
+            className="inline-flex items-center justify-center px-4 py-2 min-w-max whitespace-nowrap rounded-md bg-purple-500 hover:bg-purple-700 text-white"
           >
             ➕ {t('add_friend')}
           </button>
@@ -239,13 +239,13 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                 <div className="ml-auto flex gap-2">
                   <button
                     onClick={() => handleAcceptFriendRequest(player.id)}
-                    className="px-3 py-1 rounded-md bg-green-500 hover:bg-green-600 text-white"
+                    className="inline-flex items-center justify-center px-3 py-1 rounded-md bg-green-500 hover:bg-green-600 text-white"
                   >
                     {t('accept')}
                   </button>
                   <button
                     onClick={() => handleRejectFriendRequest(player.id)}
-                    className="px-3 py-1 rounded-md bg-gray-500 hover:bg-gray-600 text-white"
+                    className="inline-flex items-center justify-center px-3 py-1 rounded-md bg-gray-500 hover:bg-gray-600 text-white"
                   >
                     {t('reject')}
                   </button>
@@ -295,7 +295,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                       {(isLoggedInUser || player.friendshipStatus === 'friend') && (
                         <button
                           onClick={() => navigate('/dashboard')}
-                          className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
+                          className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
                         >
                           {t('more_stats')}
                         </button>
