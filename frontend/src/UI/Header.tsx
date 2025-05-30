@@ -71,9 +71,13 @@ export const Header: React.FC<HeaderProps> = () => {
     <>
       <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[200] shadow-md">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082]">
+          <h1
+            className="p-5 pb-2 m-0 text-4xl font-mono font-bold text-[#4B0082] cursor-pointer"
+            onClick={() => navigate('/')}
+          >
             Transcendence
           </h1>
+
           <h4 className="p-5 pb-2 m-0 text-1xl font-mono font-bold text-[#4B0082]">
             A Dads and Coders Inc. product
           </h4>
@@ -97,7 +101,6 @@ export const Header: React.FC<HeaderProps> = () => {
             </div>
             {isLoggedIn ? (
               <>
-                <button className="buttonsStyle" onClick={() => navigate('/')}>{t('game')}</button>
                 <button className="buttonsStyle" onClick={() => navigate('/instructions')}>{t('instructions')}</button>
                 <button className="buttonsStyle" onClick={() => navigate('/dashboard')}>{t('dashboard')}</button>
                 <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>{t('players')}</button>
