@@ -16,11 +16,12 @@ export const global_gameArea = {
 
 interface GameCanvasProps {
   isLoggedIn: boolean;
+  onStartScreenLoginFail: () => void;
 }
 
 
 // COMPONENT
-export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn }) => {
+export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onStartScreenLoginFail }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevTimestampRef = useRef<number>(0);
 
@@ -33,18 +34,21 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn }) => {
     // Start screen
     global_stateManager.changeState(new StartScreen(canvas, ctx));
 
-	/*
-
-		ADD THE INTERVAL PING TO BACKEND HERE
-		The backend should also authenticate
-
-	*/
-
     const gameLoop = (timestamp: number) => {
       const deltaTime = (timestamp - prevTimestampRef.current) / 1000;
       prevTimestampRef.current = timestamp;
 
       global_stateManager.update(deltaTime);
+
+	  if (global_stateManager.getStateName() === GameStates.START_SCREEN 
+	  && !global_stateManager.getLoggedInStatus() && isLoggedIn)
+	  {
+		console.log('Game loop onStartScreenLoginFail');
+		onStartScreenLoginFail();
+		global_stateManager.setLoggedInStatus(true); // Seems counter intuitive, but prevents unnecessary extra runs of this error handling in the future =)
+	  }
+
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       global_stateManager.render(ctx);
 

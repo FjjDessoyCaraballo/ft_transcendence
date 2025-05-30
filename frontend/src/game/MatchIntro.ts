@@ -39,6 +39,7 @@ export class MatchIntro implements IGameState
 	isTournament: boolean;
 	isDataReady: boolean;
 	showLoadingText: boolean;
+	isLoggedIn: boolean = false;
 	isSavingData: boolean = false;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
@@ -272,9 +273,9 @@ export class MatchIntro implements IGameState
 				if (this.gameType === GameType.BLOCK_BATTLE)
 					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.p1Weapons, this.p2Weapons, false));
 				else if (this.gameType === GameType.PONG && this.player1Data && this.player2Data)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, null, 'playing'));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, null, 'playing', false));
 				else if (this.gameType === GameType.PONG_AI && this.player1Data && this.player2Data)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player2Data, 'ai'));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player2Data, 'ai', false));
 			}
 			else
 			{

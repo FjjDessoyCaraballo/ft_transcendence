@@ -13,6 +13,7 @@ let globalTournamentObj = {
 		[3, 0],
 		[2, 1]
 	],
-	matchCounter: 0
+	matchCounter: 0,
+	gameType: '' // pong or blockbattle
  };
 module.exports = { globalObj, globalTournamentObj };

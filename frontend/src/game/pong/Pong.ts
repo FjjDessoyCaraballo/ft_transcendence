@@ -7,7 +7,7 @@ import { GameType } from "../../UI/Types";
 import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "../Constants";
 import { Player, Paddle} from "./Paddle";
 import { Ball } from "./Ball";
-import { getLoggedInUserData, getOpponentData } from "../../services/userService";
+import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, recordTournamentMatchResult } from "../../services/userService";
 import { drawCenteredText } from "../StartScreen";
 import { UserManager } from "../../UI/UserManager";
 import { StartScreen } from "../StartScreen";
@@ -65,8 +65,9 @@ export class Pong implements IGameState {
   showLoadingText: boolean;
   savingDataToDB: boolean;
   saveReady: boolean;
+  isLoggedIn: boolean = false;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, AIData: User | null, state: 'ai' | 'playing') {
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, AIData: User | null, state: 'ai' | 'playing', isTournament: boolean) {
 
 	this.canvas = canvas;
 	this.ctx = ctx;
@@ -100,14 +101,54 @@ export class Pong implements IGameState {
 		this.showLoadingText = true;
 	}, 500); 
 
-	this.fetchUserData();
+	if (!isTournament)
+		this.fetchUserData();
+	else
+		this.fetchNextTournamentData();
 
     // Listen for key events
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
     document.addEventListener('keyup', this.handleKeyUp.bind(this));
   }
 
-  async fetchUserData()
+	async fetchNextTournamentData()
+	{
+		try {
+		const response = await getNextTournamentGameData();
+  
+		this.tournamentData1 = response[0];
+		this.tournamentData2 = response[1];
+  
+		this.player1 = new Player(this.tournamentData1.user, new Paddle(BUFFER, this.canvasHeight)); //STAT
+    	this.player2 = new Player(this.tournamentData2.user, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+  
+		this.gameStats = {
+			date: new Date(),
+			game_type: 'pong',
+			startTime: Date.now(),
+			player1_id: this.tournamentData1.user.id,
+			player1_rank: this.tournamentData1.user.ranking_points,
+			player2_id: this.tournamentData2.user.id,
+			player2_rank: this.tournamentData2.user.ranking_points,
+			game_duration: -1,
+			winner_id: -1,
+			longest_rally: 0,
+			avg_rally: 0,
+			player1_points: 0,
+			player2_points: 0
+		}
+  
+		this.isDataReady = true;
+		}
+		catch (error) {
+			alert(`User data fetch failed, returning to Start Screen! ${error}`)
+			console.log("PONG: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.isDataReady = false;
+		}
+	}
+
+	async fetchUserData()
 	{
 		try
 		{
@@ -305,6 +346,30 @@ export class Pong implements IGameState {
 		this.saveReady = true;
 	}
 
+	async saveTournamentGameDataToDB(winner: User)
+	{
+		if (!this.gameStats || !this.player1 || !this.player2 || !this.player1.user || !this.player2.user)
+			return ;
+
+		this.gameStats.winner_id = winner.id;
+		this.savingDataToDB = true;
+
+		try {
+
+			await recordTournamentMatchResult(this.player1.user, this.player2.user, this.gameStats);
+			this.isStateReady = true;
+
+		} catch (error) {
+
+			alert(`User data saving failed, returning to Start Screen! ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.savingDataToDB = false;
+			return ;
+		}
+
+		this.saveReady = true;
+	}
+
   drawResult() {
 
 	if (!this.player1 || !this.player2 || !this.gameStats)
@@ -324,45 +389,29 @@ export class Pong implements IGameState {
 		return ;
 	}
 
-    // Tournament ending
-    if (this.tournamentData1 && this.tournamentData2)
-    {
-
-      if (this.winner === this.player1)
-      {
-        this.tournamentData1.tournamentPoints++;
-        this.tournamentData1.pongPointsScored += this.player1.score;
-        this.tournamentData2.pongPointsScored += this.player2.score;
-        this.tournamentData1.isWinner = true;
-      }	
-      else if (this.winner === this.player2)
-      {
-        this.tournamentData2.tournamentPoints++;
-        this.tournamentData1.pongPointsScored += this.player1.score;
-        this.tournamentData2.pongPointsScored += this.player2.score;
-        this.tournamentData2.isWinner = true;
-      }
-              
-      this.isStateReady = true;
-      return ;
-    }
-
-    // GAME STATS FOR CURRENT GAME - NOT USING YET
-    // const player1Username = this.player1.user.username;
-    // const player2Username = this.player2.user.username;
-    // const winnerUsername = this.winner?.user.username || '';
-    // const gameType = this.twoPlayerMode ? 'PONG' : 'PONG_AI';
-    // const durationMs = this.duration;
-    // const averageRally = this.averageRally;
-    // const longestRally = this.ball.longestRally;
-    // const player1Score = this.player1.score;
-    // const player2Score = this.player2.score;
-
 	this.gameStats.game_duration = (Date.now() - this.gameStats.startTime) / 1000; // in seconds
 	this.gameStats.avg_rally = this.averageRally;
 	this.gameStats.longest_rally = this.ball.longestRally;
 	this.gameStats.player1_points = this.player1.score;
 	this.gameStats.player2_points = this.player2.score;
+
+    // Tournament ending
+    if (this.tournamentData1 && this.tournamentData2)
+    {
+		if (!this.savingDataToDB)
+		{
+			if (this.winner === this.player1)
+			{
+				this.saveTournamentGameDataToDB(this.tournamentData1.user);
+			}
+			else if (this.winner === this.player2)
+			{
+				this.saveTournamentGameDataToDB(this.tournamentData2.user);
+			}
+		}
+
+		return ;
+    }
 
     // Regular ending
 	if (!this.savingDataToDB && this.winner)

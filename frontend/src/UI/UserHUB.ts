@@ -58,6 +58,7 @@ export class UserHUB implements IGameState
 	userDataArr: User [];
 	isDataReady: boolean;
 	showLoadingText: boolean;
+	isLoggedIn: boolean = false;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 	submitPasswordBound: () => void;
@@ -136,7 +137,7 @@ export class UserHUB implements IGameState
 				await startNewTournament();
 				
 				const loggedInPlayer: TournamentPlayer = {
-					id: 0,
+					tournamentId: 0,
 					user: this.loggedInUserData,
 					tournamentPoints: 0,
 					place: 0,

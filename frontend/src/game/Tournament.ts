@@ -10,12 +10,12 @@ import { GameType } from "../UI/Types";
 import { Pong } from "./pong/Pong";
 import { drawCenteredText, StartScreen } from "./StartScreen";
 import { Weapon } from "./Weapons";
-import { getTournamentEndScreenData, getTournamentPlayers } from "../services/userService";
+import { endTournamentAPI, getTournamentEndScreenData, getTournamentPlayers } from "../services/userService";
 import { global_stateManager } from "../UI/GameCanvas";
 
 export interface TournamentPlayer
 {
-	id: number;
+	tournamentId: number;
 	user: User;
 	tournamentPoints: number;
 	place: number;
@@ -53,6 +53,8 @@ export class Tournament implements IGameState
 	isDataReady: boolean;
 	showLoadingText: boolean;
 	isSettingEndScreen: boolean;
+	isEndingTournament: boolean = false;
+	isLoggedIn: boolean = false;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
@@ -70,24 +72,6 @@ export class Tournament implements IGameState
 		this.isDataReady = false;
 		this.showLoadingText = false;
 		this.isSettingEndScreen = false;
-
-		/*
-		// Create TournamentPlayer array
-		for (let i = 0; i < 4; i++)
-		{
-			let tournamentObj: TournamentPlayer = {
-				id: i,
-				user: players[i],
-				place: 0,
-				tournamentPoints: 0,
-				coinsCollected: 0,
-				pongPointsScored: 0,
-				isWinner: false,
-				bbWeapons: []
-			};
-
-			this.playerArr.push(tournamentObj);
-		} */
 
 		let text1 = 'EXIT TOURNAMENT'; // Add a warning here that all tournament data will be lost
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
@@ -190,6 +174,9 @@ export class Tournament implements IGameState
 			const loser = endScreenData.loser;
 			this.playerArr = endScreenData.playerArr; // update player arr for tournament after every game
 			this.matchCounter = endScreenData.matchCount;
+			if (this.matchCounter === 6)
+				this.isFinished = true;
+
 
 			this.curState = new EndScreen(this.canvas, this.ctx, winner.user.id, loser.user.id, this.gameType, true, null);
 			this.curState.enter();
@@ -226,6 +213,34 @@ export class Tournament implements IGameState
 
 	}
 
+	async endTournament()
+	{
+		this.isEndingTournament = true;
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		try {
+
+			const winnerArr = await endTournamentAPI();
+
+			this.tournamentWinner = winnerArr;
+			this.isDataReady = true;
+			this.isEndingTournament = false;
+
+		} catch (error) {
+
+			alert(`User data fetch failed, returning to Start Screen! ${error}`);
+			console.log("TOURNAMENT: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			this.isDataReady = false;
+
+		}
+
+	}
+
 	update(deltaTime: number)
 	{
 		if (this.curState)
@@ -240,7 +255,7 @@ export class Tournament implements IGameState
 					if (this.gameType === GameType.BLOCK_BATTLE)
 						this.curState = new BlockBattle(this.canvas, this.ctx, [], [], true);
 					else if (this.gameType === GameType.PONG)
-						this.curState = new Pong(this.canvas, this.ctx, null, 'playing');
+						this.curState = new Pong(this.canvas, this.ctx, null, 'playing', true);
 
 					this.curState.enter();
 				}
@@ -252,49 +267,11 @@ export class Tournament implements IGameState
 				else
 				{
 					this.curState = null;
-					if (this.matchCounter === 6)
+					if (this.isFinished && !this.isEndingTournament)
 					{
-						// Move this to backend as well, at least partially
-						this.isFinished = true;
-						this.findWinner();
+						this.endTournament();
 					}
 				}
-			}
-		}
-	}
-
-	findWinner(): void
-	{
-		// Sort players based on points
-		if (this.gameType === GameType.BLOCK_BATTLE)
-		{
-			this.playerArr.sort((a, b) => {
-				if (b.tournamentPoints !== a.tournamentPoints)
-					return b.tournamentPoints - a.tournamentPoints;
-				return b.coinsCollected - a.coinsCollected;
-			})
-		}
-		else if (this.gameType === GameType.PONG)
-		{
-			this.playerArr.sort((a, b) => {
-				if (b.tournamentPoints !== a.tournamentPoints)
-					return b.tournamentPoints - a.tournamentPoints;
-				return b.pongPointsScored - a.pongPointsScored;
-			})
-		}
-
-		this.tournamentWinner.push(this.playerArr[0]);
-
-		if (this.playerArr[0].tournamentPoints === this.playerArr[1].tournamentPoints
-			&& this.playerArr[0].coinsCollected === this.playerArr[1].coinsCollected
-			&& this.playerArr[0].pongPointsScored === this.playerArr[1].pongPointsScored)
-		{
-			for (let i = 1; i < 4; i++)
-			{
-				if (this.playerArr[i].tournamentPoints === this.playerArr[0].tournamentPoints
-					&& this.playerArr[i].coinsCollected === this.playerArr[0].coinsCollected
-					&& this.playerArr[i].pongPointsScored === this.playerArr[0].pongPointsScored)
-					this.tournamentWinner.push(this.playerArr[i]);
 			}
 		}
 	}

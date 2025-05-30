@@ -33,7 +33,6 @@ export class CoinHandler {
 	{
 		if (this.platformsFull)
 		{
-			console.log("Platforms are full"); // REMOVE THIS LATER
 			return ;
 		}
 

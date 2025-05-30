@@ -158,6 +158,20 @@ export const startNewTournament = async (): Promise< {status: string} > => {
 };
 
 /**
+ * End Tournament. Backend will verify results and return the winner user(s)
+ * 
+ * @returns Promise with winner user(s) data
+ */
+export const endTournamentAPI = async (): Promise< TournamentPlayer[] > => {
+  try {
+    	return await apiRequest(`/users/end-tournament`);
+  } catch (error) {
+    	throw error;
+  }
+};
+
+
+/**
  * Check from backend if Tournament is ready to be played (meaning, if it already has have 4 validated players)
  * 
  */
@@ -304,11 +318,6 @@ export const recordMatchResult = async (player1: User, player2: User, matchData:
  */
 export const recordTournamentMatchResult = async (player1: User, player2: User, matchData: bbMatchData | pongMatchData): Promise<{ status: string }> => {
   try {
-
-	console.log('Record Tournament match');
-	console.log('Winner ID:', matchData.winner_id);
-
-
 
     return await apiRequest('/games/record-tournament-match', {
       method: 'POST',

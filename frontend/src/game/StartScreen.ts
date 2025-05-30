@@ -72,6 +72,7 @@ export class StartScreen implements IGameState
 	loggedInUserData: User | null;
 	isDataReady: boolean;
 	showLoggedOutText: boolean;
+	isLoggedIn: boolean = true;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
@@ -112,12 +113,16 @@ export class StartScreen implements IGameState
 			if (!this.loggedInUserData)
 				console.log("START SCREEN: No user is logged in, so the game cannot be played");
 			else
+			{
 				this.isDataReady = true;
+				this.isLoggedIn = true;
+			}
 		}
 		catch {
 			console.log("START SCREEN: No user is logged in, so the game cannot be played");
 			this.loggedInUserData = null;
 			this.isDataReady = false;
+			this.isLoggedIn = false;
 		}
 	}
 

@@ -246,6 +246,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
 	globalTournamentObj.tournamentArr.length = 0;
 	globalTournamentObj.matchCounter = 0;
+	globalTournamentObj.gameType = '';
 
 	const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
@@ -263,7 +264,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     }
 
 	const tournamentPlayer = {
-		id: 0,
+		tournamentId: 0,
 		user: user,
 		place: 1,
 		tournamentPoints: 0,
@@ -277,6 +278,102 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
     return {status: 'OK'};
 });
+
+	// End tournament helper function
+	function findWinner(gameType)
+	{
+		const playerArr = globalTournamentObj.tournamentArr;
+
+		// Sort players based on points
+		if (gameType === 'blockbattle')
+		{
+			playerArr.sort((a, b) => {
+				if (b.tournamentPoints !== a.tournamentPoints)
+					return b.tournamentPoints - a.tournamentPoints;
+				return b.coinsCollected - a.coinsCollected;
+			})
+		}
+		else if (gameType === 'pong')
+		{
+			playerArr.sort((a, b) => {
+				if (b.tournamentPoints !== a.tournamentPoints)
+					return b.tournamentPoints - a.tournamentPoints;
+				return b.pongPointsScored - a.pongPointsScored;
+			})
+		}
+
+		const winnerArr = [];
+
+		winnerArr.push(playerArr[0]);
+
+		if (playerArr[0].tournamentPoints === playerArr[1].tournamentPoints
+			&& playerArr[0].coinsCollected === playerArr[1].coinsCollected
+			&& playerArr[0].pongPointsScored === playerArr[1].pongPointsScored)
+		{
+			for (let i = 1; i < 4; i++)
+			{
+				if (playerArr[i].tournamentPoints === playerArr[0].tournamentPoints
+					&& playerArr[i].coinsCollected === playerArr[0].coinsCollected
+					&& playerArr[i].pongPointsScored === playerArr[0].pongPointsScored)
+					winnerArr.push(playerArr[i]);
+			}
+		}
+
+		return winnerArr;
+
+	}
+
+	// End tournament
+	fastify.get('/end-tournament', { preHandler: authenticate }, async (request, reply) => {
+
+		// Validate tournament state
+		if (globalTournamentObj.tournamentArr.length !== 4 || globalTournamentObj.matchCounter !== 6) {
+			reply.code(400);
+			return { error: 'Tournament data error' };
+		}
+
+		const winnerArr = findWinner(globalTournamentObj.gameType);
+		if (!winnerArr || winnerArr.length === 0) {
+			reply.code(400);
+			return { error: 'Tournament data error; no winner found' };
+		}
+
+		try {
+
+			const transaction = fastify.db.transaction(() => {
+				for (let i = 0; i < 4; i++) {
+				const userId = globalTournamentObj.tournamentArr[i].user.id;
+				const points = globalTournamentObj.tournamentArr[i].tournamentPoints;
+
+				fastify.db.prepare(`
+					UPDATE users 
+					SET tournaments_played = tournaments_played + 1,
+						tournament_points = tournament_points + ?,
+						updated_at = CURRENT_TIMESTAMP
+					WHERE id = ?
+				`).run(points, userId);
+
+				if (winnerArr.some(p => p.user.id === userId)) {
+					fastify.db.prepare(`
+					UPDATE users 
+					SET tournaments_won = tournaments_won + 1
+					WHERE id = ?
+					`).run(userId);
+				}
+				}
+			});
+
+			transaction(); // Execute the batched transaction
+
+		} catch (err) {
+			fastify.log.error(err);
+			reply.code(500);
+			return { error: 'Failed to end tournament', message: err.message };
+		}
+
+		return winnerArr;
+	});
+
 
   // Verify tournament player
   fastify.post('/verify-tournament-player', { preHandler: authenticate }, async (request, reply) => {
@@ -327,7 +424,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       }
 
 	const tournamentPlayer = {
-		id: globalTournamentObj.tournamentArr.length,
+		tournamentId: globalTournamentObj.tournamentArr.length,
 		user: opponentData,
 		place: globalTournamentObj.tournamentArr.length + 1,
 		tournamentPoints: 0,
@@ -464,6 +561,12 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       id: user.id,
       username: user.username
     });
+
+	// Just in case, initialize all global backend game variables
+	global.opponentData = null;
+	globalTournamentObj.gameType = '';
+	globalTournamentObj.matchCounter = 0;
+	globalTournamentObj.tournamentArr.length = 0;
     
     return { 
       token,

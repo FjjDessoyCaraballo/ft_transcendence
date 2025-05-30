@@ -59,6 +59,7 @@ export class EndScreen implements IGameState
 	gameType: GameType;
 	isDataReady: boolean;
 	isTournament: boolean;
+	isLoggedIn: boolean = false;
 	showLoadingText: boolean;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;

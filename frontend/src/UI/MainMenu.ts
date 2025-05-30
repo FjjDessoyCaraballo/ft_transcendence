@@ -112,6 +112,7 @@ export class MainMenu implements IGameState
 	loggedInUserData: User | null;
 	isDataReady: boolean;
 	showLoadingText: boolean;
+	isLoggedIn: boolean = false;
 	mouseMoveBound: (event: MouseEvent) => void;
 	mouseClickBound: () => void;
 

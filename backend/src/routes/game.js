@@ -242,7 +242,8 @@ async function gameRoutes(fastify, options) {
 
 		const p1StartRank = p1StartRankRow.ranking_points;
 		const p2StartRank = p2StartRankRow.ranking_points;
-
+		player1.ranking_points = p1StartRank; // making sure user ranking matches the databae data
+		player2.ranking_points = p2StartRank;
 
 		if (matchData.winner_id === player1.id)
 			RankingHandler.updateRanking(player1, player2);
@@ -409,6 +410,8 @@ async function gameRoutes(fastify, options) {
 	|| (matchData.winner_id !== player1.id && matchData.winner_id !== player2.id)) {
 
 		globalTournamentObj.tournamentArr.length = 0; // Reset tournament arr from backend
+		globalTournamentObj.matchCounter = 0;
+		globalTournamentObj.gameType = '';
 		reply.code(400);
 		return { error: 'Bad user data; are you cheating...?' };
     }
@@ -416,12 +419,15 @@ async function gameRoutes(fastify, options) {
 	// Validate match data
 	if (!validateMatchData(matchData)) {
 		globalTournamentObj.tournamentArr.length = 0; // Reset tournament arr from backend
+		globalTournamentObj.matchCounter = 0;
+		globalTournamentObj.gameType = '';
 		reply.code(400);
 		return { error: 'Bad match data; are you cheating...?' };
     }
 
 	if (matchData.game_type === 'blockbattle')
 	{
+		globalTournamentObj.gameType = 'blockbattle';
 		if (matchData.winner_id === player2.id)
 		{
 			player2TournamentObj.tournamentPoints++;
@@ -437,19 +443,42 @@ async function gameRoutes(fastify, options) {
 			player1TournamentObj.isWinner = true;
 		}
 
-		const sortedPlayerArr = [...globalTournamentObj.tournamentArr].sort((a, b) => {
+	/*	const sortedPlayerArr = [...globalTournamentObj.tournamentArr].sort((a, b) => {
 			if (b.tournamentPoints !== a.tournamentPoints)
 				return b.tournamentPoints - a.tournamentPoints;
 			return b.coinsCollected - a.coinsCollected;
 		});
 
 		for (let i = 0; i < sortedPlayerArr.length; i++)
-			sortedPlayerArr[i].place = i + 1;
+			sortedPlayerArr[i].place = i + 1; */
 	}
-	// add Pong here
-    	
+	else if (matchData.game_type === 'pong')
+	{
+		globalTournamentObj.gameType = 'pong';
+		if (matchData.winner_id === player2.id)
+		{
+			player2TournamentObj.tournamentPoints++;
+			player2TournamentObj.pongPointsScored += matchData.player2_points;
+			player1TournamentObj.pongPointsScored += matchData.player1_points;
+			player2TournamentObj.isWinner = true;
+		}
+		else
+		{
+			player1TournamentObj.tournamentPoints++;
+			player2TournamentObj.pongPointsScored += matchData.player2_points;
+			player1TournamentObj.pongPointsScored += matchData.player1_points;
+			player1TournamentObj.isWinner = true;
+		}
 
+	/*	const sortedPlayerArr = [...globalTournamentObj.tournamentArr].sort((a, b) => {
+			if (b.tournamentPoints !== a.tournamentPoints)
+				return b.tournamentPoints - a.tournamentPoints;
+			return b.pongPointsScored - a.pongPointsScored;
+		});
 
+		for (let i = 0; i < sortedPlayerArr.length; i++)
+			sortedPlayerArr[i].place = i + 1; */
+	}
       
     return {status: 'OK'};
   });
@@ -466,6 +495,8 @@ fastify.get('/get-tournament-end-screen-data', { preHandler: authenticate }, asy
 
 	if (!player1Obj.isWinner && !player2Obj.isWinner) {
 		globalTournamentObj.tournamentArr.length = 0; // Reset tournament arr from backend
+		globalTournamentObj.matchCounter = 0;
+		globalTournamentObj.gameType = '';
 		reply.code(400);
 		return { error: 'Tournament data error; no winner found!' };
     }

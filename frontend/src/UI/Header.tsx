@@ -36,7 +36,6 @@ export const Header: React.FC<HeaderProps> = () => {
 			await checkIsLoggedIn();
 			setIsLoggedIn(true);
 		} catch (err) {
-			console.log('HEADER: No one is logged in');
 			setIsLoggedIn(false);
 			setIsGameVisible(true);
 			setIsDashboardVisible(false);
@@ -53,7 +52,6 @@ export const Header: React.FC<HeaderProps> = () => {
     window.removeEventListener('loginStatusChanged', checkLoginStatus);
   };
 }, []);
-
 
   const HandleRegistrationClick = () => {
     if (windowOpen === false)
@@ -101,6 +99,14 @@ export const Header: React.FC<HeaderProps> = () => {
     setIsDashboardVisible(false);
     setButtonText('Dashboard');
   };
+
+  const onStartScreenLoginFail = () => {
+	setIsLoggedIn(false);
+	setIsGameVisible(true);
+	setIsDashboardVisible(false);
+	setDashboardUserData(null);
+	setButtonText('Dashboard');
+  }
 
   return (
     <>
@@ -189,7 +195,7 @@ export const Header: React.FC<HeaderProps> = () => {
       )}
 
 	<main className="pt-32"> {/* or adjust to match header height */}
-	{isGameVisible && <GameCanvas isLoggedIn={isLoggedIn} />}
+	{isGameVisible && <GameCanvas isLoggedIn={isLoggedIn} onStartScreenLoginFail={onStartScreenLoginFail}/>}
 	{isDashboardVisible && dashboardUserData && <Dashboard userData={dashboardUserData}/>}
 	</main>
 	
