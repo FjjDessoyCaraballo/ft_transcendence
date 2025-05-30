@@ -59,9 +59,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   const handleSelectMatch = async (id: number) => {
   
 	try {
-		const userData = await getMatchByID(id);
+		const userMatchData = await getMatchByID(id);
 		
-		setSelectedMatch(userData);
+		setSelectedMatch(userMatchData);
 		
 	} catch {
 		alert("Error while fetching user data for MatchStatsPopUp.");

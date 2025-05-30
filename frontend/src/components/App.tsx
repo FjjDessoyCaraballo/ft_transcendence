@@ -1,57 +1,72 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from '../UI/Header';
-import { GameCanvas, global_curUser } from '../UI/GameCanvas';
+import { GameCanvas } from '../UI/GameCanvas';
 import { Dashboard } from '../UI/Dashboard';
 import { PlayerList } from '../UI/PlayerList';
 import { Instructions } from '../UI/Instructions';
 import { User } from '../UI/UserManager';
-import { getUserDataByUsername } from '../services/userService';
+import { getLoggedInUserData, getMatchHistoryByID } from '../services/userService';
 
 export default function App() {
   const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
 
   // Fetch user data whenever the route is /dashboard
   useEffect(() => {
     const fetchDashboardData = async () => {
-      if (location.pathname === '/dashboard' && global_curUser) {
+      if (location.pathname === '/dashboard') {
         try {
-          const user = await getUserDataByUsername(global_curUser);
-          setDashboardUserData(user);
+			const user = await getLoggedInUserData();
+			if (user)
+				user.match_history = await getMatchHistoryByID(user.id);
+			setDashboardUserData(user);
+			setIsLoggedIn(true);
         } catch (err) {
-          console.error('Failed to fetch user data', err);
+			console.error('Failed to fetch user data', err);
+			setIsLoggedIn(false);
         }
       }
     };
 
     fetchDashboardData();
-  }, [location.pathname]);
+  }, [location.pathname, isLoggedIn]);
+
+  const onLogOut = () =>
+  {
+	console.log('APP: Executing OnLogOut');
+
+	setIsLoggedIn(false);
+	setDashboardUserData(null);
+  }
 
   const handleShowDashboard = async () => {
-    if (global_curUser) {
-      try {
-        const user = await getUserDataByUsername(global_curUser);
-        setDashboardUserData(user);
-      } catch (err) {
-        console.error('Error showing dashboard:', err);
-      }
-    }
+	try {
+		const user = await getLoggedInUserData();
+		if (user)
+			user.match_history = await getMatchHistoryByID(user.id);
+		setDashboardUserData(user);
+		setIsLoggedIn(true);
+	} catch (err) {
+		console.error('Error showing dashboard:', err);
+		setIsLoggedIn(false);
+	}
   };
 
   return (
     <>
-      <Header />
+      <Header onHeaderLogOut={onLogOut}/>
       <main className="pt-32">
         <Routes>
-          <Route path="/" element={<GameCanvas />} />
+          <Route path="/" element={<GameCanvas isLoggedIn={isLoggedIn} />} />
           <Route
             path="/dashboard"
             element={
               dashboardUserData ? (
                 <Dashboard userData={dashboardUserData} />
               ) : (
-                <div>Loading...</div>
+                <div>Loading... if this takes long, please verify that you are logged in</div>
               )
             }
           />

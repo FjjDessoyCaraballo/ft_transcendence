@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 interface HeaderProps {
-  onClick?: () => void;
+  onHeaderLogOut: () => void;
 }
 
 export interface WindowManager {
@@ -16,13 +16,15 @@ export interface WindowManager {
   onDecline: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = () => {
+export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut} ) => {
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
   const navigate = useNavigate();
+
+  console.log('Header isLoggedIn state:', isLoggedIn);
 
  useEffect(() => {
   	const checkLoginStatus = async () => {
@@ -48,6 +50,10 @@ export const Header: React.FC<HeaderProps> = () => {
 }, []);
 
   const handleLogout = () => {
+
+	console.log('HEADER: Executing OnLogOut');
+
+	onHeaderLogOut();
     setIsLoggedIn(false);
     sessionStorage.removeItem('logged-in');
     navigate('/');
