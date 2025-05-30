@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Dashboard } from "./Dashboard";
 import { User } from "./UserManager";
 import { getMatchHistoryByID, getUserDataByUsername } from "../services/userService";
 
-export const DashboardWrapper: React.FC = () => {
+interface DashboardProp {
+  isLoggedIn: boolean;
+}
+
+export const DashboardWrapper: React.FC<DashboardProp> = ( {isLoggedIn} ) => {
   const { username } = useParams();
   const [dashboardUserData, setDashboardUserData] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchData = async () => {
@@ -23,14 +26,20 @@ export const DashboardWrapper: React.FC = () => {
       } catch (err) {
         setError('Failed to fetch user data');
         console.error(err);
-		navigate('/');
       }
     };
 
     fetchData();
-  }, [username]);
+  }, [username, isLoggedIn]);
 
-  if (error) return <div>{error}</div>;
+	if (error)
+	{
+		return (
+		<div className="max-w-screen-xl mx-auto my-6 p-4 bg-[#F3E8FF] border border-[#6B21A8] rounded-lg shadow-md text-[#6B21A8] font-mono font-bold text-center text-lg">
+			Failed to fetch user data. <br/> This might be because of connection issues, so please log out and try to log in again!
+		</div>
+	)
+	}
 
   return dashboardUserData ? (
     <Dashboard userData={dashboardUserData} />
