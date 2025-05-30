@@ -63,15 +63,13 @@ export abstract class Button
 	}
 
 
-	draw(ctx: CanvasRenderingContext2D, t: TFunction)
+	draw(ctx: CanvasRenderingContext2D, t: TFunction) // may have to pass canvas into here too...
 	{
+		ctx.font = this.textSize + ' ' + this.font;
 		const translatedText = t(this.textKey);
-		console.log('1');
-		console.log(t('start_tournament'));
-		console.log('2');
-		console.log(this.textKey);
-		console.log('3');
-		console.log(t(this.textKey));
+		const textMetrics1 = ctx.measureText(translatedText);
+		this.width = textMetrics1.width + 2 * TEXT_PADDING;
+		this.x = 600 - (ctx.measureText(translatedText).width / 2) - TEXT_PADDING; //magic number 600 is canvas width / 2
 		let color;
 
 		if (this.isHover)
