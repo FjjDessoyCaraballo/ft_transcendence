@@ -35,6 +35,7 @@ sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS users (
   tournaments_played INTEGER DEFAULT 0,          -- Total number of tournaments played
   tournaments_won INTEGER DEFAULT 0,             -- Total number of tournaments won
   tournament_points INTEGER DEFAULT 0,           -- Overall tournament points
+  pref_lang TEXT DEFAULT 'English',              -- Preferred language (English, Finnish, Portuguese)
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the user was created
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the user was last updated
   deleted_at DATETIME DEFAULT NULL               -- Timestamp for soft deletion (NULL if not deleted)
