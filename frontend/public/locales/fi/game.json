@@ -38,5 +38,16 @@
     "hello": "Hei ",
     "type_password": "Syötä salasanasi aloittaaksesi pelin",
     "incorrect_password": "Väärä salasana. Yritä uudelleen.",
-    "chosen": "/4 pelaajaa valittu"
+    "chosen": "/4 pelaajaa valittu",
+    "data_fail": "Käyttäjätietojen haku epäonnistui, palataan päävalikkoon!",
+    "weapon_fail": "Asetietojen tallennus epäonnistui, palataan päävalikkoon!",
+    "damage": "VAHINKO:",
+    "cooldown": "LATAUSAIKA:",
+    "data_fetch": "Haetaan käyttäjätietoja, odota hetki.",
+    "info_loading": "Jos tämä kestää yli 10 sekuntia, yritä kirjautua ulos ja takaisin sisään.",
+    "left_and_right": "Käytä VASENTA ja OIKEAA nuolinäppäintä vaihtaaksesi aseita.",
+    "shoot": "Käytä AMMUNTA-näppäintä ottaaksesi aseen käyttöön tai pois käytöstä",
+    "pistol": "Kätevä perusase",
+    "bazooka": "Erittäin voimakas, mutta melko hidas",
+    "land_mine": "Räjähtää, jos astut sen päälle!"
 }

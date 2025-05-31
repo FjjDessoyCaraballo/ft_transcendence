@@ -26,7 +26,7 @@ export class MatchIntro implements IGameState
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	gameType: GameType;
-	weaponOptions: Weapon[] = [new Pistol(), new Bazooka(), new LandMine()]; // add new weapons here
+	weaponOptions: Weapon[];
 	p1Weapons: Weapon [] = [];
 	p2Weapons: Weapon [] = [];
 	weaponIdx1: number;
@@ -53,6 +53,7 @@ export class MatchIntro implements IGameState
 		this.isDataReady = false;
 		this.showLoadingText = false;
 		this.t = t;
+		this.weaponOptions = [new Pistol(t), new Bazooka(t), new LandMine(t)]
 
 		// We should create a user in the DB for AI computer. Then we could track it's win/lose stats etc :D
 		if (type === GameType.PONG_AI)
@@ -137,7 +138,7 @@ export class MatchIntro implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("MATCH INTRO: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -159,7 +160,7 @@ export class MatchIntro implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("MATCH INTRO: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -298,7 +299,7 @@ export class MatchIntro implements IGameState
 
 		} catch (error) {
 
-			alert(`Weapon data save failed, returning to main menu! ${error}`)
+			alert(`${this.t('weapon_fail')} ${error}`)
 			console.log("MATCH INTRO: Weapon data saving failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			// Is it a bad idea to exit to StartScreen mid tournament...?
@@ -368,12 +369,12 @@ export class MatchIntro implements IGameState
 		const descriptY = nameY + 40;
 		ctx.fillText(descript, descriptX, descriptY);
 
-		const damage = `DAMAGE: ${curWeapon.damage}`;
+		const damage = `${this.t('damage')} ${curWeapon.damage}`;
 		const damageX = infoBox1X + 20;
 		const damageY = descriptY + 50;
 		ctx.fillText(damage, damageX, damageY);
 
-		const cooldown = `COOLDOWN: ${curWeapon.cooldown / 1000}s`;
+		const cooldown = `${this.t('cooldown')} ${curWeapon.cooldown / 1000}s`;
 		const cooldownX = infoBox1X + infoBoxW - 20 - ctx.measureText(cooldown).width;
 		ctx.fillText(cooldown, cooldownX, damageY);
 
@@ -430,11 +431,11 @@ export class MatchIntro implements IGameState
 		const descript2X = infoBox2X + infoBoxW / 2 - ctx.measureText(descript2).width / 2;
 		ctx.fillText(descript2, descript2X, descriptY);
 
-		const damage2 = `DAMAGE: ${curWeapon2.damage}`;
+		const damage2 = `${this.t('damage')} ${curWeapon2.damage}`;
 		const damage2X = infoBox2X + 20;
 		ctx.fillText(damage2, damage2X, damageY);
 
-		const cooldown2 = `COOLDOWN: ${curWeapon2.cooldown / 1000}s`;
+		const cooldown2 = `${this.t('cooldown')} ${curWeapon2.cooldown / 1000}s`;
 		const cooldown2X = infoBox2X + infoBoxW - 20 - ctx.measureText(cooldown2).width;
 		ctx.fillText(cooldown2, cooldown2X, damageY);
 
@@ -449,9 +450,9 @@ export class MatchIntro implements IGameState
 			if (!this.showLoadingText)
 				return ;
 
-			const loadingHeader = 'Fetching user data, please wait.';
+			const loadingHeader = this.t('data_fetch');
 			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
-			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			const loadingInfo = this.t('info_loading');
 			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
 			return ;
 		}
@@ -472,9 +473,9 @@ export class MatchIntro implements IGameState
 		}
 		else
 		{
-			infoText = 'Use LEFT and RIGHT keys to navigate through weapons.';
+			infoText = this.t('left_and_right');
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
-			infoText = 'Use SHOOT key to equip/unequip weapons.';
+			infoText = this.t('shoot');
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 185);
 		}
 

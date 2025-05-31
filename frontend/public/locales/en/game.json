@@ -38,5 +38,16 @@
     "hello": "Hello ",
     "type_password": "Please type in your password to start the game",
     "incorrect_password": "Incorrect password. Please try again.",
-    "chosen": "/4 players chosen"
+    "chosen": "/4 players chosen",
+    "data_fail": "User data fetch failed, returning to main menu!",
+    "weapon_fail": "Weapon data savw failed, returning to main menu!",
+    "damage": "DAMAGE:",
+    "cooldown": "COOLDOWN:",
+    "data_fetch": "Fetching user data, please wait.",
+    "info_loading": "If this takes more than 10 seconds, please try to log out and in again.",
+    "left_and_right": "Use LEFT and RIGHT keys to navigate through weapons.",
+    "shoot": "Use SHOOT key to equip/unequip weapons",
+    "pistol": "A handy basic weapon",
+    "bazooka": "Very powerful, but kinda slow",
+    "land_mine": "Will detonate if you step on it!"
 }

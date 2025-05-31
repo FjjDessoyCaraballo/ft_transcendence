@@ -11,19 +11,19 @@ import { TournamentPlayer } from './Tournament';
 import { CoinHandler } from './CoinHandler';
 import { COIN_SPAWN_TIME } from './Constants';
 import { GameType } from '../UI/Types';
-import { TFunction } from 'i18next';
 import { Bazooka, LandMine, Pistol, Weapon } from './Weapons';
 import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, recordTournamentMatchResult } from '../services/userService';
 import { drawCenteredText, StartScreen } from './StartScreen';
+import { TFunction } from 'i18next';
 
-function createWeapon(name: string) : Weapon{
 
+function createWeapon(name: string, t: TFunction) : Weapon{
 	if (name === 'Pistol')
-		return new Pistol();
+		return new Pistol(t);
 	else if (name === 'Bazooka')
-		return new Bazooka();
+		return new Bazooka(t);
 	else
-		return new LandMine();
+		return new LandMine(t);
 }
 
 export interface bbMatchData {
@@ -143,10 +143,10 @@ export class BlockBattle implements IGameState
 		this.tournamentData1 = response[0];
 		this.tournamentData2 = response[1];
 
-		const p1w1 = createWeapon(this.tournamentData1.bbWeapons[0].name);
-		const p1w2 = createWeapon(this.tournamentData1.bbWeapons[1].name);
-		const p2w1 = createWeapon(this.tournamentData2.bbWeapons[0].name);
-		const p2w2 = createWeapon(this.tournamentData2.bbWeapons[1].name);
+		const p1w1 = createWeapon(this.tournamentData1.bbWeapons[0].name, this.t);
+		const p1w2 = createWeapon(this.tournamentData1.bbWeapons[1].name, this.t);
+		const p2w1 = createWeapon(this.tournamentData2.bbWeapons[0].name, this.t);
+		const p2w2 = createWeapon(this.tournamentData2.bbWeapons[1].name, this.t);
 
 		this.player1 = new Player(100, 745, 'green', this.tournamentData1.user, p1w1, p1w2);
 		this.player2 = new Player2(1100, 745, 'red', this.tournamentData2.user, p2w1, p2w2);

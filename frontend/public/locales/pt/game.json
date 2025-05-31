@@ -38,6 +38,17 @@
     "hello": "Olá ",
     "type_password": "Digite sua senha para iniciar o jogo",
     "incorrect_password": "Senha incorreta. Tente novamente.",
-    "chosen": "/4 jogadores escolhidos"
+    "chosen": "/4 jogadores escolhidos",
+    "data_fail": "Falha ao buscar os dados do usuário, retornando ao menu principal!",
+    "weapon_fail": "Falha ao salvar os dados da arma, retornando ao menu principal!",
+    "damage": "DANO:",
+    "cooldown": "TEMPO DE RECARGA:",
+    "data_fetch": "Buscando dados do usuário, por favor aguarde.",
+    "info_loading": "Se isso levar mais de 10 segundos, tente sair e entrar novamente.",
+    "left_and_right": "Use as teclas ESQUERDA e DIREITA para navegar pelas armas.",
+    "shoot": "Use a tecla DISPARAR para equipar/desequipar armas",
+    "pistol": "Uma arma básica e prática",
+    "bazooka": "Muito poderosa, mas um pouco lenta",
+    "land_mine": "Vai explodir se você pisar nela!"
 }
   
