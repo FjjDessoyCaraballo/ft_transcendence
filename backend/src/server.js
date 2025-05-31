@@ -147,9 +147,11 @@ fastify.ready().then(() => {
     });
   });
 });
-
+// register ratelimit
+fastify.register(require('./plugins/rateLimit'))
 // Register routes
 fastify.register(require('./routes'));
+
 
 // Start the server
 const start = async () => {

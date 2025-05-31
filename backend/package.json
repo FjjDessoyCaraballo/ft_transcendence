@@ -23,7 +23,8 @@
 	  "better-sqlite3": "^8.0.0",
 	  "dotenv": "^16.0.0",
 	  "fastify": "^4.0.0",
-	  "fastify-socket.io": "^4.0.0"
+	  "fastify-socket.io": "^4.0.0",
+	  "@fastify/rate-limit": "^8.0.0"
 	},
 	"devDependencies": {
 	  "nodemon": "^2.0.0"
