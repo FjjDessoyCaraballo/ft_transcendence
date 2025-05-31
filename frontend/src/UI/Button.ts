@@ -90,6 +90,9 @@ export abstract class Button
 		else if (this.textKey === 'previous_page') {
 			this.x = 0 + TEXT_PADDING;
 		}
+		else if (this.textKey === 'next_game') {
+			this.x = (1200 * 0.75) - (ctx.measureText(translatedText).width / 2) - TEXT_PADDING;
+		}
 		else {
 			//This is fine for all centred buttons
 			this.x = 600 - (ctx.measureText(translatedText).width / 2) - TEXT_PADDING; //magic number 600 is canvas width / 2

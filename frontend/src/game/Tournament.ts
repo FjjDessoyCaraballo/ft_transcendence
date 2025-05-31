@@ -1,5 +1,5 @@
 import { GameStates, IGameState, } from "./GameStates";
-import { TEXT_PADDING } from "./Constants";
+import { DEEP_PURPLE, TEXT_PADDING } from "./Constants";
 import { User } from "../UI/UserManager";
 import { ReturnMainMenuButton } from "./EndScreen";
 import { BlockBattle } from "./BlockBattle";
@@ -56,6 +56,7 @@ export class Tournament implements IGameState
 	isSettingEndScreen: boolean;
 	isEndingTournament: boolean = false;
 	isLoggedIn: boolean = false;
+	gameOrder: [number, number][];
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 	t: TFunction;
@@ -76,6 +77,15 @@ export class Tournament implements IGameState
 		this.isSettingEndScreen = false;
 		this.t = t;
 
+		this.gameOrder = [
+			[0, 1],
+			[2, 3],
+			[0, 2],
+			[1, 3],
+			[3, 0],
+			[2, 1]
+		];
+
 		let text1 = 'exit_tournament'; // Add a warning here that all tournament data will be lost
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = 20;
@@ -84,8 +94,8 @@ export class Tournament implements IGameState
 
 		let text2 = 'next_game';
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
-		const button2X = (canvas.width / 2) - (ctx.measureText(t('next_game')).width / 2) - TEXT_PADDING;
-		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 240;
+		const button2X = (canvas.width * 0.75) - (ctx.measureText(t('next_game')).width / 2) - TEXT_PADDING;
+		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 200;
 		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial', t);
 
 		setTimeout(() => {
@@ -282,7 +292,7 @@ export class Tournament implements IGameState
 	drawScoreBoard(ctx: CanvasRenderingContext2D)
 	{
 		const colW = 300;
-		const colH = 80;
+		const colH = 60;
 		let x = this.canvas.width / 2 - colW * 1.5;
 		let y = 170;
 		const padding = 45;
@@ -357,6 +367,49 @@ export class Tournament implements IGameState
 		}
 	}
 
+	drawMatchOrder()
+	{
+		let NameXCenter = this.canvas.width * 0.5;
+		let matchNumX = NameXCenter - 270;
+		let drawY = (this.canvas.height / 2) - 20 - TEXT_PADDING + 150;
+
+		for (let i = 0; i < 6; i++)
+		{
+			const player1TournamentId = this.gameOrder[i][0];
+			const player2TournamentId = this.gameOrder[i][1];
+			const player1Obj = this.playerArr.find(p => p.tournamentId === player1TournamentId);
+			const player2Obj = this.playerArr.find(p => p.tournamentId === player2TournamentId);
+
+			if (!player1Obj || !player2Obj)
+				continue ;
+
+			// Determine color
+			let color;
+			if (i < this.matchCounter)
+				color = 'gray';
+			else if (i === this.matchCounter)
+				color = 'green';
+			else
+				color = DEEP_PURPLE;
+
+			this.ctx.font = '30px arial';
+			this.ctx.fillStyle = color;
+
+			// Draw match number
+			const matchNumText = `Match ${i + 1}:`;
+			this.ctx.fillText(matchNumText, matchNumX, drawY);
+
+			// Draw matchup names
+			const matchupText = `${player1Obj.user.username} vs ${player2Obj.user.username}`;
+			const textLen = this.ctx.measureText(`${player1Obj.user.username} vs ${player2Obj.user.username}`).width;
+			const matchupX = NameXCenter - (textLen / 2);
+			this.ctx.fillText(matchupText, matchupX, drawY);
+
+			drawY += 38;
+
+		}
+	}
+
 	render(ctx: CanvasRenderingContext2D)
 	{
 
@@ -378,6 +431,10 @@ export class Tournament implements IGameState
 			// Draw Header & Score Board
 			drawCenteredText(this.canvas, this.ctx, this.t('score_board'), '50px Impact', 'white', 150);
 			this.drawScoreBoard(ctx);
+
+			if (!this.isFinished)
+				this.drawMatchOrder();
+			
 	
 			// Draw Return button
 			this.returnMenuButton.draw(ctx, this.t, 0);
@@ -396,25 +453,10 @@ export class Tournament implements IGameState
 			if (!this.isFinished)
 			{
 				this.nextGameBtn.draw(ctx, this.t, 0);
-
-				const nextGameNum = `${this.t('game_no')}${(this.matchCounter + 1).toString()}/6`;
-				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 50;
-				drawCenteredText(this.canvas, this.ctx, nextGameNum, '30px arial', 'white', gameNumY);
-
-	/*			const id1 = GameOrder[this.matchCounter][0];
-				const id2 = GameOrder[this.matchCounter][1];
-				const player1 = this.playerArr.find(player => player.id === id1);
-				const player2 = this.playerArr.find(player => player.id === id2);
-				let playerInfo = '';
-				if (player1 && player2)
-					playerInfo = `(${player1.user.username} vs ${player2.user.username})`;
-				const playerInfoY = gameNumY + 26;
-				drawCenteredText(this.canvas, this.ctx, playerInfo, '25px arial', 'red', playerInfoY); */
-
 			}
 			else
 			{
-				let y = (this.canvas.height / 2) - 20 - TEXT_PADDING + 270;
+				let y = (this.canvas.height / 2) - 20 - TEXT_PADDING + 220;
 
 				drawCenteredText(this.canvas, this.ctx, this.t('tournament_winner'), '50px Impact', 'green', y);
 				y += 40
