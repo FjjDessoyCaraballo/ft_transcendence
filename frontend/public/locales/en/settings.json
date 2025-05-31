@@ -7,5 +7,13 @@
     "close": "Close",
     "settings": "Settings",
     "logout": "Logout",
-    "success": "Account successfully deleted"
+    "success": "Account successfully deleted",
+    "select_language": "Select Language",
+    "preferred_language": "Preferred Language",
+    "set_preferred_language": "Set Preferred Language",
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading...",
+    "load_failed": "Failed to load preferred language.",
+    "update_failed": "Failed to update preferred language."
 }
