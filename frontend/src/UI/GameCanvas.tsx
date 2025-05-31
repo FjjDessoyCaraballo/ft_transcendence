@@ -15,16 +15,15 @@ export const global_gameArea = {
 
 
 interface GameCanvasProps {
-  isLoggedIn: boolean;
+	onCanvasLogOut: () => void;
+	isLoggedIn: boolean;
 }
 
 
 // COMPONENT
-export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn }) => {
+export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onCanvasLogOut }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevTimestampRef = useRef<number>(0);
-
-  console.log('GameCanvas isLoggedIn: ', isLoggedIn);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,7 +44,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn }) => {
 	  && !global_stateManager.getLoggedInStatus() && isLoggedIn)
 	  {
 		console.log('Game loop onStartScreenLoginFail');
-	//	onStartScreenLoginFail();
+		onCanvasLogOut();
 		global_stateManager.setLoggedInStatus(true); // Seems counter intuitive, but prevents unnecessary extra runs of this error handling in the future =)
 	  }
 
