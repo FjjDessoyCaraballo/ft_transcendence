@@ -202,7 +202,7 @@ export class UserManager {
 		// Create challenge button
 		if (state === UserHubState.SINGLE_GAME)
 		{
-			let text = t('challenge');
+			let text = 'challenge';
 			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
 			const buttonY = infoHeight - buttonOffset;
 			const challengeButton = new ChallengeButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user, t);
@@ -214,14 +214,14 @@ export class UserManager {
 
 			if (!isInTournament)
 			{
-				let text = t('add_to_tournament');
+				let text = 'add_to_tournament';
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 - 20;
 				const buttonY = infoHeight - buttonOffset;
 				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user, t);
 			}
 			else
 			{
-				let text = t('remove');
+				let text = 'remove';
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 + 40;
 				const buttonY = infoHeight - buttonOffset;
 				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user, t);
