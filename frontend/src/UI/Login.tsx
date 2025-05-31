@@ -3,6 +3,8 @@ import { WindowManager } from './Header';
 import { setToken, getToken } from '../services/TokenService';
 import { loginUser } from '../services/userService'
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
@@ -10,6 +12,8 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const { t } = useTranslation('login');
+  const navigate = useNavigate();
+  
 
   const HandleCancel = () => {
     // Clear form data and close the popup
@@ -49,6 +53,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
 	        
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
+	  navigate('/')
     } catch (error) {
       setErrorMessage('Login failed.');
       console.error('Login failed.');

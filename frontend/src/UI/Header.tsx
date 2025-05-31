@@ -123,18 +123,19 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn} )
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center z-[200] shadow-md">
-        <div className="container mx-auto px-0 py-3 flex justify-between items-center">
+	<header className="w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center shadow-md z-[200]">
+		{/* Full-width container so background spans fully */}
+		<div className="w-full px-4 py-2 flex justify-between items-center max-w-screen-2xl mx-auto">
 			<div className="flex flex-col">
-				<h1 className="p-1 pb-1 m-0 text-4xl font-mono font-bold text-[#4B0082]">
-					Transcendence
-				</h1>
-				<h4 className="p-5 pt-0 m-0 text-1xl font-mono font-bold text-[#4B0082]">
-					A Dads and Coders Inc. product
-				</h4>
+			<h1 className="p-1 pb-1 m-0 text-4xl font-mono font-bold text-[#4B0082]">
+				Transcendence
+			</h1>
+			<h4 className="p-2 pt-0 m-0 text-1xl font-mono font-bold text-[#4B0082]">
+				A Dads and Coders Inc. product
+			</h4>
 			</div>
-			<div className="buttonsDiv flex flex-wrap gap-2 justify-end">
-          {/* Language switcher */}
+			<div className="buttonsDiv flex flex-wrap gap-1 justify-end overflow-x-auto">
+        {/* Language switcher */}
             <div className="flex gap-2 items-center text-sm">
               <label htmlFor="language" className="text-[#4B0082] font-bold">🌐</label>
               <select
@@ -151,27 +152,24 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn} )
                 <option value="pt">PT</option>
               </select>
             </div>
-            {isLoggedIn ? (
-              <>
-                <button className="buttonsStyle" onClick={() => navigate('/')}>{t('game')}</button>
-                <button className="buttonsStyle" onClick={() => navigate('/instructions')}>{t('instructions')}</button>
-                <button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>{t('dashboard')}</button>
-                <button className="buttonsStyle" onClick={() => navigate('/playerlist')}>{t('players')}</button>
-                <button className="buttonsStyle" onClick={HandleSettingsClick}>{t('settings')}</button>
-              </>
-            ) : (
-              <>
-                <button className="buttonsStyle" onClick={HandleLoginClick}>
-                  {t('login')}
-                </button>
-                <button className="buttonsStyle px-1" onClick={HandleRegistrationClick}>
-                  {t('registration')}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+			{isLoggedIn ? (
+				<>
+				<button className="buttonsStyle" onClick={() => navigate('/')}>{t('game')}</button>
+				<button className="buttonsStyle" onClick={() => navigate('/instructions')}>{t('instructions')}</button>
+				<button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>{t('dashboard')}</button>
+				<button className="buttonsStyle" onClick={() => navigate('/playerlist')}>{t('players')}</button>
+				<button className="buttonsStyle" onClick={HandleSettingsClick}>{t('settings')}</button>
+				</>
+			) : (
+				<>
+				<button className="buttonsStyle" onClick={HandleLoginClick}>{t('login')}</button>
+				<button className="buttonsStyle px-1" onClick={HandleRegistrationClick}>{t('registration')}</button>
+				</>
+			)}
+			</div>
+		</div>
+	</header>
+
 
       {/* Popups */}
       {showRegistration && (

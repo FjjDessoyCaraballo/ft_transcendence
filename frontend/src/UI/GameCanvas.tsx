@@ -17,7 +17,6 @@ export const global_gameArea = {
 
 interface GameCanvasProps {
   isLoggedIn: boolean;
-//  onStartScreenLoginFail: () => void;
 }
 
 
@@ -67,12 +66,15 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn }) => {
   }, [isLoggedIn]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      id="gameCanvas"
-      width="1200"
-      height="800"
-	  className="m-4"
-    />
+	<div className="pt-8 mb-8 flex justify-center">
+		<canvas
+			ref={canvasRef}
+			id="gameCanvas"
+			width="1200"
+			height="800"
+			className="border-2 border-[#FFFFF0] max-w-full max-h-[80vh] bg-black"
+		/>
+	</div>
+
   );
 };

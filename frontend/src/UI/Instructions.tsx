@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 export const Instructions: React.FC = () => {
   const { t } = useTranslation('instructions');
   return (
-    <div className="w-full max-w-4xl min-w-[600px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-purple-300 shadow-lg">
+    <div className="mt-8 w-full max-w-4xl min-w-[600px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-purple-300 shadow-lg">
       <div className="space-y-8">
 
         <div>

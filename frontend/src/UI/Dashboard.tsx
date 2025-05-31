@@ -215,7 +215,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   return (
     <div className="p-6 flex flex-col w-full">
     {/* Player Info Panel */}
-      <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-purple-100 via-white to-purple-100 p-6 rounded-xl border border-purple-300 shadow-lg">
+      <div className="w-full max-w-4xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-purple-100 via-white to-purple-100 p-6 rounded-xl border border-purple-300 shadow-lg">
         <h2 className="titles text-[#6B21A8] mb-4">
           Game statistics of <span className="font-semibold">{user.username}</span> 👋
         </h2>
@@ -226,7 +226,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
       </div>
 
     {/* Ranking Progression Chart */}
-      <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
+      <div className="w-full max-w-4xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
         <h3 className="texts font-bold text-[#6B21A8] mb-4 text-2xl">📈 {t('ranking_progression')}</h3>
         <div className="w-full h-[400px] p-2 border border-[#4B0082] rounded-md bg-white shadow-sm">
           <Line data={rankingLine} options={lineOptions} />
@@ -234,7 +234,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
       </div>
 
     {/* Match Statistics */}
-		<div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
+		<div className="w-full max-w-4xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
 			<h3 className="texts font-bold text-[#6B21A8] mb-4 text-2xl">📊 {t('match_statistics')}</h3>
 			<div className="flex flex-wrap justify-between gap-12">
 				
@@ -262,7 +262,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 		</div>
 
     {/* Match History Cards */}
-		<div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
+		<div className="w-full max-w-4xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
 			<h3 className="titles text-[#6B21A8] mb-4 text-2xl">📜 {t('match_history')}</h3>
 			<div className="flex flex-wrap justify-between gap-12 overflow-y-auto max-h-[600px] border border-[#4B0082]">
 				<div className="flex flex-col items-center w-full">{matchCards}</div>

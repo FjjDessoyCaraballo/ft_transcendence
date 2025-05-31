@@ -144,7 +144,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 	return (
 	<>
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-		  <div className="bg-white rounded-lg shadow-lg w-[400px] max-w-[90%] overflow-hidden mx-auto">
+			<div className="bg-white rounded-lg shadow-lg w-[400px] max-w-[90%] max-h-[80vh] overflow-y-auto mx-auto">
 			<div className="p-6 bg-[#4B0082] text-white">
 			  <h2 className="text-2xl font-bold font-mono">{t('settings')}</h2>
 			</div>
