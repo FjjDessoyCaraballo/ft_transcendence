@@ -268,12 +268,12 @@ export class MainMenu implements IGameState
 			drawCenteredText(this.canvas, this.ctx, 'Pong', '40px impact', LIGHT_PURPLE, 250);
 
 
-		this.singleGameButton.draw(ctx, this.t);
-		this.startTournamentButton.draw(ctx, this.t);
-		this.changeGameBtn.draw(ctx, this.t);
+		this.singleGameButton.draw(ctx, this.t, 0);
+		this.startTournamentButton.draw(ctx, this.t, 0);
+		this.changeGameBtn.draw(ctx, this.t, 0);
 
 		if (this.gameType === GameType.PONG)
-			this.pongAiBtn.draw(ctx, this.t);
+			this.pongAiBtn.draw(ctx, this.t, 0);
 	}
 	
 }

@@ -213,9 +213,9 @@ export class EndScreen implements IGameState
 		}
 
 		if (!this.isTournament)
-			this.returnMenuButton.draw(ctx, this.t);
+			this.returnMenuButton.draw(ctx, this.t, 0);
 		else
-			this.returnToTournamentBtn.draw(ctx, this.t);
+			this.returnToTournamentBtn.draw(ctx, this.t, 0);
 
 
 	}

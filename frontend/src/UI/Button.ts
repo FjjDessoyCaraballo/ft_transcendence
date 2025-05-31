@@ -63,16 +63,37 @@ export abstract class Button
 	}
 
 
-	draw(ctx: CanvasRenderingContext2D, t: TFunction) // may have to pass canvas into here too...
+	draw(ctx: CanvasRenderingContext2D, t: TFunction, x: number) // may have to pass canvas into here too... dont need y
 	{
+		const avatarW = 200;
+		const boxPadding = 40;
+		const boxX = x + avatarW + 20;
+		const infoWidth = 200;
+
 		const translatedText = t(this.textKey);
 		ctx.font = this.textSize + ' ' + this.font;
-
-		//This is fine for all centred buttons
 		const textMetrics1 = ctx.measureText(translatedText);
 		this.width = textMetrics1.width + 2 * TEXT_PADDING;
-		this.x = 600 - (ctx.measureText(translatedText).width / 2) - TEXT_PADDING; //magic number 600 is canvas width / 2
 
+		if (this.textKey === 'challenge') {
+			this.x = boxX + boxPadding * 2 + infoWidth * 2;
+		}
+		else if (this.textKey === 'add_to_tournament') {
+			this.x = boxX + boxPadding * 2 + infoWidth * 2 - 20;
+		}
+		else if (this.textKey === 'remove') {
+			this.x = boxX + boxPadding * 2 + infoWidth * 2 + 40;
+		}
+		else if (this.textKey === 'next_page') {
+			this.x = 1200 - ctx.measureText(translatedText).width - TEXT_PADDING;
+		}
+		else if (this.textKey === 'previous_page') {
+			this.x = 0 + TEXT_PADDING;
+		}
+		else {
+			//This is fine for all centred buttons
+			this.x = 600 - (ctx.measureText(translatedText).width / 2) - TEXT_PADDING; //magic number 600 is canvas width / 2
+		}
 		let color;
 
 		if (this.isHover)

@@ -226,7 +226,7 @@ export class UserHUB implements IGameState
 				// Logic for "Remove from tournament" -button
 				const tournamentPlayer = this.tournamentArr.find(player => player.user.username === btn.user.username);
 
-				if (tournamentPlayer && btn.textKey === this.t('remove'))
+				if (tournamentPlayer && btn.textKey === 'remove')
 				{
 					this.removeTournamenPlayer(tournamentPlayer);
 				}
@@ -429,11 +429,11 @@ export class UserHUB implements IGameState
 		if (this.needNewChallengeButtons)
 			this.needNewChallengeButtons = false;
 
-		this.returnMenuButton.draw(ctx, this.t);
+		this.returnMenuButton.draw(ctx, this.t, 0);
 
 		if (this.userStartIdx < this.userDataArr.length - 3)
 		{
-			this.nextPageButton.draw(ctx, this.t);
+			this.nextPageButton.draw(ctx, this.t, 0);
 			this.isNextActive = true;
 		}
 		else
@@ -441,14 +441,16 @@ export class UserHUB implements IGameState
 
 		if (this.userStartIdx != 0)
 		{
-			this.prevPageButton.draw(ctx, this.t);
+			this.prevPageButton.draw(ctx, this.t, 0);
 			this.isPrevActive = true;
 		}
 		else
 			this.isPrevActive = false;
 
-		for (const btn of this.challengeBtnArr)
-			btn.draw(ctx, this.t);
+		for (const btn of this.challengeBtnArr) {
+			btn.draw(ctx, this.t, x);
+			y += 185;
+		}
 		
 	}
 }

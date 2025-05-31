@@ -380,7 +380,7 @@ export class Tournament implements IGameState
 			this.drawScoreBoard(ctx);
 	
 			// Draw Return button
-			this.returnMenuButton.draw(ctx, this.t);
+			this.returnMenuButton.draw(ctx, this.t, 0);
 			let exitWarning;
 			if (!this.isFinished)
 				exitWarning = this.t('lose_progress');
@@ -395,7 +395,7 @@ export class Tournament implements IGameState
 			// Draw Next game button || Winner announcement
 			if (!this.isFinished)
 			{
-				this.nextGameBtn.draw(ctx, this.t);
+				this.nextGameBtn.draw(ctx, this.t, 0);
 
 				const nextGameNum = `${this.t('game_no')}${(this.matchCounter + 1).toString()}/6`;
 				const gameNumY = this.nextGameBtn.y + this.nextGameBtn.height + 50;

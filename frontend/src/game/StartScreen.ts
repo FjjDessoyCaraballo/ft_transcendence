@@ -184,8 +184,8 @@ export class StartScreen implements IGameState
 		{
 			drawCenteredText(this.canvas, this.ctx, this.t('please_choose'), '40px arial', 'white', 390);
 
-			this.pongBtn.draw(ctx, this.t);
-			this.blockBattleBtn.draw(ctx, this.t);
+			this.pongBtn.draw(ctx, this.t, 0);
+			this.blockBattleBtn.draw(ctx, this.t, 0);
 		}
 	}
 
