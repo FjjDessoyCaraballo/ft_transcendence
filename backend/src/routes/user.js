@@ -10,6 +10,10 @@ const { globalObj, globalTournamentObj } = require('./sharedObjects');
 const uploadTracker = new Map();
 
 async function userRoutes(fastify, options) {
+  
+    // Valid language options
+  const validLanguages = ['English', 'Finnish', 'Portuguese'];
+  
   const authenticate = async (request, reply) => {
     try {
       await request.jwtVerify();
@@ -29,7 +33,7 @@ async function userRoutes(fastify, options) {
 
   // CHECK if we have logged in user (based on JWT token)
   fastify.get('/is-logged-in', { preHandler: authenticate }, async (request, reply) => {
-	return {status: 'OK'};
+    return {status: 'OK'};
   });
 
 
@@ -39,7 +43,8 @@ async function userRoutes(fastify, options) {
       SELECT id, username, avatar_url, ranking_points,
              games_played_pong, wins_pong, losses_pong,
              games_played_blockbattle, wins_blockbattle, losses_blockbattle,
-             tournaments_played, tournaments_won, tournament_points
+             tournaments_played, tournaments_won, tournament_points,
+             pref_lang
       FROM users
       WHERE deleted_at IS NULL
     `).all();
@@ -55,7 +60,7 @@ fastify.get('/logged-in-user-data', { preHandler: authenticate }, async (request
              games_played_pong, wins_pong, losses_pong,
              games_played_blockbattle, wins_blockbattle, losses_blockbattle,
              tournaments_played, tournaments_won, tournament_points,
-             created_at, updated_at
+             pref_lang, created_at, updated_at
       FROM users 
       WHERE id = ? AND deleted_at IS NULL
     `).get(request.user.id);
@@ -66,6 +71,59 @@ fastify.get('/logged-in-user-data', { preHandler: authenticate }, async (request
     }
     
     return user;
+});
+
+// GET user's preferred language
+fastify.get('/language', { preHandler: authenticate }, async (request, reply) => {
+  const userId = request.user.id;
+  
+  const user = fastify.db.prepare(`
+    SELECT pref_lang
+    FROM users 
+    WHERE id = ? AND deleted_at IS NULL
+  `).get(userId);
+  
+  if (!user) {
+    reply.code(404);
+    return { error: 'User not found' };
+  }
+  
+  return { language: user.pref_lang };
+});
+
+// Update user's preferred language
+fastify.put('/language', { preHandler: authenticate }, async (request, reply) => {
+  const userId = request.user.id;
+  const { language } = request.body;
+  
+  try {
+    if (!language) {
+      reply.code(400);
+      return { error: 'Language is required' };
+    }
+    
+    if (!validLanguages.includes(language)) {
+      reply.code(400);
+      return { error: `Language must be one of: ${validLanguages.join(', ')}` };
+    }
+    
+    const result = fastify.db.prepare(`
+      UPDATE users 
+      SET pref_lang = ?, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ? AND deleted_at IS NULL
+    `).run(language, userId);
+    
+    if (result.changes === 0) {
+      reply.code(404);
+      return { error: 'User not found or no changes made' };
+    }
+    
+    return { success: true, language };
+  } catch (err) {
+    fastify.log.error(err);
+    reply.code(500);
+    return { error: 'Internal server error' };
+  }
 });
 
 // GET current opponent's user info
@@ -86,7 +144,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
              games_played_pong, wins_pong, losses_pong,
              games_played_blockbattle, wins_blockbattle, losses_blockbattle,
              tournaments_played, tournaments_won, tournament_points,
-             created_at, updated_at
+             pref_lang, created_at, updated_at
       FROM users 
       WHERE id = ? AND deleted_at IS NULL
     `).get(request.params.id);
@@ -123,7 +181,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
              games_played_pong, wins_pong, losses_pong,
              games_played_blockbattle, wins_blockbattle, losses_blockbattle,
              tournaments_played, tournaments_won, tournament_points,
-             created_at, updated_at
+             pref_lang, created_at, updated_at
       FROM users 
       WHERE username = ? AND deleted_at IS NULL
     `).get(request.params.username);
@@ -138,7 +196,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
   // Register new user
   fastify.post('/register', async (request, reply) => {
-    const { username, password } = request.body;
+    const { username, password, language } = request.body;
     
     if (!username || !password) {
       reply.code(400);
@@ -150,6 +208,16 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       return { error: 'password too weak'}
     }
     
+
+    let userLanguage = 'English';
+    if (language) {
+      if (!validLanguages.includes(language)) {
+        reply.code(400);
+        return { error: `Language must be one of: ${validLanguages.join(', ')}` };
+      }
+      userLanguage = language;
+    }
+    
     try {
       const hashedPassword = await hashPassword(password);
       
@@ -157,9 +225,9 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       
       const result = fastify.db.prepare(`
         INSERT INTO users (
-          username, password, avatar_url
-        ) VALUES (?, ?, ?)
-      `).run(username, hashedPassword, avatarUrl);
+          username, password, avatar_url, pref_lang
+        ) VALUES (?, ?, ?, ?)
+      `).run(username, hashedPassword, avatarUrl, userLanguage);
       
       reply.code(201);
       return { 
@@ -175,7 +243,8 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
         losses_blockbattle: 0,
         tournaments_played: 0,
         tournaments_won: 0,
-        tournament_points: 0
+        tournament_points: 0,
+        pref_lang: userLanguage
       };
     } catch (err) {
       if (err.message.includes('UNIQUE constraint failed')) {
@@ -216,7 +285,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       return { error: 'Invalid username or password' };
     }
     
-	globalObj.opponentData = {
+    globalObj.opponentData = {
         id: user.id,
         username: user.username,
         avatar_url: user.avatar_url,
@@ -229,7 +298,8 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
         losses_blockbattle: user.losses_blockbattle,
         tournaments_played: user.tournaments_played,
         tournaments_won: user.tournaments_won,
-        tournament_points: user.tournament_points
+        tournament_points: user.tournament_points,
+        pref_lang: user.pref_lang
       }
     
     return {status: 'OK'};
@@ -247,7 +317,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
              games_played_pong, wins_pong, losses_pong,
              games_played_blockbattle, wins_blockbattle, losses_blockbattle,
              tournaments_played, tournaments_won, tournament_points,
-             created_at, updated_at
+             pref_lang, created_at, updated_at
       FROM users 
       WHERE id = ? AND deleted_at IS NULL
     `).get(request.user.id);
@@ -414,7 +484,8 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
         losses_blockbattle: user.losses_blockbattle,
         tournaments_played: user.tournaments_played,
         tournaments_won: user.tournaments_won,
-        tournament_points: user.tournament_points
+        tournament_points: user.tournament_points,
+        pref_lang: user.pref_lang
       }
 
 	const tournamentPlayer = {
@@ -574,7 +645,8 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
         losses_blockbattle: user.losses_blockbattle,
         tournaments_played: user.tournaments_played,
         tournaments_won: user.tournaments_won,
-        tournament_points: user.tournament_points
+        tournament_points: user.tournament_points,
+        pref_lang: user.pref_lang
       }
     };
   });
@@ -875,7 +947,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
              games_played_pong, wins_pong, losses_pong,
              games_played_blockbattle, wins_blockbattle, losses_blockbattle,
              tournaments_played, tournaments_won, tournament_points,
-             created_at, updated_at
+             pref_lang, created_at, updated_at
       FROM users 
       WHERE id = ? AND deleted_at IS NULL
     `).get(userId);
