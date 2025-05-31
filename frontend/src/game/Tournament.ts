@@ -376,7 +376,7 @@ export class Tournament implements IGameState
 		if (!this.curState)
 		{
 			// Draw Header & Score Board
-			drawCenteredText(this.canvas, this.ctx, this.t('score_board'), '50px Impact', 'white', 100);
+			drawCenteredText(this.canvas, this.ctx, this.t('score_board'), '50px Impact', 'white', 150);
 			this.drawScoreBoard(ctx);
 	
 			// Draw Return button
