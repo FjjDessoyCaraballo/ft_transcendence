@@ -66,7 +66,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 		setSelectedMatch(userMatchData);
 		
 	} catch {
-		alert("Error while fetching user data for MatchStatsPopUp.");
+		alert(t('error'));
 		console.log("Error while fetching user data for MatchStatsPopUp");
 	}
 	};

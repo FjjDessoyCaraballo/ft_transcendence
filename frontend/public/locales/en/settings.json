@@ -6,5 +6,6 @@
     "contribute": "Contribute",
     "close": "Close",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "success": "Account successfully deleted"
 }

@@ -32,5 +32,6 @@
   "game_statistics_of": "Estatísticas do jogo de",
   "like_both": "Você gosta dos dois igualmente",
   "win": "Vitória",
-  "loss": "Derrota"
+  "loss": "Derrota",
+  "error": "Erro ao buscar os dados do usuário para o MatchStatsPopUp"
 }

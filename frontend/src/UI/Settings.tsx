@@ -22,7 +22,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 		try {
 			await deleteUserAccount()
 			.then(() => {
-				alert("Account successfully deleted");
+				alert(t('success'));
 				sessionStorage.setItem('logged-in', 'false');
 				window.dispatchEvent(new Event('loginStatusChanged'));
 				onConfirm();

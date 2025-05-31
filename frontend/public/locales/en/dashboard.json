@@ -32,5 +32,6 @@
     "game_statistics_of": "Game statistics of",
     "like_both": "You like them both equally",
     "win": "Win",
-    "loss": "Loss"
+    "loss": "Loss",
+    "error": "Error while fetching user data for MatchStatsPopUp"
 }

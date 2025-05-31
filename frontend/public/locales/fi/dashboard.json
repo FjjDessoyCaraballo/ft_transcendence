@@ -32,5 +32,6 @@
   "game_statistics_of": "Pelitilastot pelaajalta",
   "like_both": "Pidät heistä molemmista yhtä paljon",
   "win": "Voitto",
-  "loss": "Tappio"
+  "loss": "Tappio",
+  "error": "Virhe haettaessa käyttäjätietoja MatchStatsPopUpia varten"
 }
