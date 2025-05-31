@@ -150,7 +150,7 @@ export class Pong implements IGameState {
 		this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to Start Screen! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("PONG: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -202,7 +202,7 @@ export class Pong implements IGameState {
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("PONG: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -359,7 +359,7 @@ export class Pong implements IGameState {
 			await UserManager.updateUserStats(this.player1.user, this.player2.user, this.gameStats);
 		} catch (error){
 
-			alert(`User data saving failed! ${error}`);
+			alert(`${this.t('saving_failed')} ${error}`);
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;
@@ -383,7 +383,7 @@ export class Pong implements IGameState {
 
 		} catch (error) {
 
-			alert(`User data saving failed, returning to Start Screen! ${error}`);
+			alert(`${this.t('saving_failed')} ${error}`);
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;

@@ -40,7 +40,7 @@
     "incorrect_password": "Incorrect password. Please try again.",
     "chosen": "/4 players chosen",
     "data_fail": "User data fetch failed, returning to main menu!",
-    "weapon_fail": "Weapon data savw failed, returning to main menu!",
+    "weapon_fail": "Weapon data save failed, returning to main menu!",
     "damage": "DAMAGE:",
     "cooldown": "COOLDOWN:",
     "data_fetch": "Fetching user data, please wait.",
@@ -54,5 +54,6 @@
     "computers_rule": "Computers will rule the world... yikes!!",
     "humans_rock": "Great job, humans ROCK!!",
     "new_rank_of": "The new rank of",
-    "is": "is"
+    "is": "is",
+    "saving_failed": "User data saving failed!"
 }

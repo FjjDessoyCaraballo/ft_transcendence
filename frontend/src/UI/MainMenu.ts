@@ -188,7 +188,7 @@ export class MainMenu implements IGameState
 			}
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("MAIN MENU: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.loggedInUserData = null;

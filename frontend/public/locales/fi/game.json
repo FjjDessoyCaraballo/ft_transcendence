@@ -54,5 +54,6 @@
     "computers_rule": "Tietokoneet tulevat hallitsemaan maailmaa... apua!!",
     "humans_rock": "Hienoa työtä, ihmiset ROCKAA!!",
     "new_rank_of": "Uusi sijoitus pelaajalle",
-    "is": "on"
+    "is": "on",
+    "saving_failed": "Käyttäjätietojen tallennus epäonnistui!"
 }

@@ -112,7 +112,7 @@ export class Tournament implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed! ${error}`);
+			alert(`${this.t('data_fail')} ${error}`);
 			console.log("TOURNAMENT: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -207,7 +207,7 @@ export class Tournament implements IGameState
 
 		} catch (error) {
 
-			alert(`User data fetch failed, returning to Start Screen! ${error}`);
+			alert(`${this.t('data_fail')} ${error}`);
 			console.log("TOURNAMENT: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -235,7 +235,7 @@ export class Tournament implements IGameState
 
 		} catch (error) {
 
-			alert(`User data fetch failed, returning to Start Screen! ${error}`);
+			alert(`${this.t('data_fail')} ${error}`);
 			console.log("TOURNAMENT: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;

@@ -179,7 +179,7 @@ export class BlockBattle implements IGameState
 		this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("BLOCK BATTLE: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -235,7 +235,7 @@ export class BlockBattle implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("BLOCK BATTLE: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -378,7 +378,7 @@ export class BlockBattle implements IGameState
 			await UserManager.updateUserStats(this.player1.userData, this.player2.userData, this.gameStats);
 		} catch (error) {
 
-			alert(`User data saving failed! ${error}`);
+			alert(`${this.t('saving_failed')} ${error}`);
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;
@@ -402,7 +402,7 @@ export class BlockBattle implements IGameState
 
 		} catch (error) {
 
-			alert(`User data saving failed, returning to Start Screen! ${error}`);
+			alert(`${this.t("saving_failed")} ${error}`);
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;

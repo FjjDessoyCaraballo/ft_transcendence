@@ -184,7 +184,6 @@ export class UserHUB implements IGameState
 
 			alert(`Error while removing player from tournament: ${error}`);
 			// Do I need other error handling...?
-
 		}
 
 		
