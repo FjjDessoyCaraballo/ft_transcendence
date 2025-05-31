@@ -2,10 +2,15 @@ import { BAZOOKA_BULLET_SPEED, BAZOOKA_COOLDOWN, BAZOOKA_DMG, MINE_BULLET_SPEED,
 import { Platform } from "./Platform";
 import { Player } from "./Player";
 import { Projectile } from "./Projectiles";
+import { TFunction } from 'i18next';
 
 
 export abstract class Weapon
 {
+	constructor(t: TFunction) {
+		this.t = t;
+	}
+	t: TFunction;
 	abstract name: string;
 	abstract description: string;
 	abstract cooldown: number;
@@ -80,7 +85,7 @@ export abstract class Weapon
 export class Pistol extends Weapon
 {
 	name: string = 'Pistol';
-	description: string = 'A handy basic weapon';
+	description: string = this.t('pistol');
 	cooldown: number = PISTOL_COOLDOWN;
 	damage: number = PISTOL_DMG;
 	projSpeed: number = PISTOL_BULLET_SPEED;
@@ -90,7 +95,7 @@ export class Pistol extends Weapon
 
 	clone(): Pistol
 	{
-		return new Pistol();
+		return new Pistol(this.t);
 	}
 
 }
@@ -99,7 +104,7 @@ export class Pistol extends Weapon
 export class Bazooka extends Weapon
 {
 	name: string = 'Bazooka';
-	description: string = 'Very powerful, but kinda slow';
+	description: string = this.t('bazooka');
 	cooldown: number = BAZOOKA_COOLDOWN;
 	damage: number = BAZOOKA_DMG;
 	projSpeed: number = BAZOOKA_BULLET_SPEED;
@@ -109,7 +114,7 @@ export class Bazooka extends Weapon
 
 	clone(): Bazooka
 	{
-		return new Bazooka();
+		return new Bazooka(this.t);
 	}
 
 }
@@ -117,7 +122,7 @@ export class Bazooka extends Weapon
 export class LandMine extends Weapon
 {
 	name: string = 'Land Mine';
-	description: string = 'Will detonate if you step on it!';
+	description: string = this.t('land_mine');
 	cooldown: number = MINE_COOLDOWN;
 	damage: number = MINE_DMG;
 	projSpeed: number = MINE_BULLET_SPEED;
@@ -127,7 +132,7 @@ export class LandMine extends Weapon
 
 	clone(): LandMine
 	{
-		return new LandMine();
+		return new LandMine(this.t);
 	}
 
 }

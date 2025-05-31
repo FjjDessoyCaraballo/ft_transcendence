@@ -1,0 +1,10 @@
+{
+    "avatar_change": "Alterar avatar",
+    "file_limit": "Os arquivos devem estar no formato JPG ou PNG e ter no máximo 2MB",
+    "avatar": "Avatar",
+    "cancel": "Cancelar",
+    "update": "Atualizar",
+    "load_fail": "Falha ao carregar a imagem!",
+    "select_file": "Por favor, selecione um arquivo de imagem"
+}
+  

@@ -7,6 +7,7 @@ import { GameType } from "../../UI/Types";
 import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "../Constants";
 import { Player, Paddle} from "./Paddle";
 import { Ball } from "./Ball";
+import { TFunction } from 'i18next';
 import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, recordTournamentMatchResult } from "../../services/userService";
 import { drawCenteredText } from "../StartScreen";
 import { UserManager } from "../../UI/UserManager";
@@ -72,8 +73,9 @@ export class Pong implements IGameState {
   savingDataToDB: boolean;
   saveReady: boolean;
   isLoggedIn: boolean = false;
+  t: TFunction;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, AIData: User | null, state: 'ai' | 'playing', isTournament: boolean) {
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, AIData: User | null, state: 'ai' | 'playing', isTournament: boolean, t: TFunction) {
 
 	  this.canvas = canvas;
 	  this.ctx = ctx;
@@ -89,6 +91,7 @@ export class Pong implements IGameState {
 	this.showLoadingText = false;
 	this.savingDataToDB = false;
 	this.saveReady = false;
+  this.t = t;
     this.state = state;
 	this.gameStats = null;
     this.tournamentData1 = null;
@@ -147,9 +150,9 @@ export class Pong implements IGameState {
 		this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to Start Screen! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("PONG: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -199,9 +202,9 @@ export class Pong implements IGameState {
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("PONG: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -356,8 +359,8 @@ export class Pong implements IGameState {
 			await UserManager.updateUserStats(this.player1.user, this.player2.user, this.gameStats);
 		} catch (error){
 
-			alert(`User data saving failed! ${error}`);
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			alert(`${this.t('saving_failed')} ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;
 		}
@@ -380,8 +383,8 @@ export class Pong implements IGameState {
 
 		} catch (error) {
 
-			alert(`User data saving failed, returning to Start Screen! ${error}`);
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			alert(`${this.t('saving_failed')} ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;
 		}
@@ -401,9 +404,9 @@ export class Pong implements IGameState {
 	if (!this.twoPlayerMode)
 	{
 		if (this.winner === this.player1)
-			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG_AI, false, this.AIData));
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG_AI, false, this.AIData, this.t));
 		else if (this.winner === this.player2)
-			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG_AI, false, this.AIData));
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG_AI, false, this.AIData, this.t));
 
 		return ;
 	}
@@ -442,9 +445,9 @@ export class Pong implements IGameState {
     if (this.saveReady)
     {
       if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG, false, null));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG, false, null, this.t));
       else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG, false, null));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG, false, null, this.t));
     }
 
   }

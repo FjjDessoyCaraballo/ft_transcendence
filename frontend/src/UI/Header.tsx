@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RegistrationPopup } from './Registration';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { LoginPopup } from './Login'
 import { SettingsPopup } from './Settings'
 import { getLoggedInUserData, checkIsLoggedIn, getMatchHistoryByID } from '../services/userService';
@@ -26,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
   const [windowOpen, setWindowOpen] = useState(false);
   const [loggedInUserData, setLoggedInUserData] = useState<User | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation('header');
 
 
  useEffect(() => {
@@ -132,18 +135,35 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 			</h4>
 			</div>
 			<div className="buttonsDiv flex flex-wrap gap-1 justify-end overflow-x-auto">
+        {/* Language switcher */}
+            <div className="flex gap-2 items-center text-sm">
+              <label htmlFor="language" className="text-[#4B0082] font-bold">🌐</label>
+              <select
+                id="language"
+                onChange={(e) => {
+                  i18n.changeLanguage(e.target.value);
+                  localStorage.setItem('preferredLanguage', e.target.value);
+                }}
+                className="border border-gray-300 rounded px-2 py-1"
+                value={i18n.language}
+              >
+                <option value="en">EN</option>
+                <option value="fi">FI</option>
+                <option value="pt">PT</option>
+              </select>
+            </div>
 			{isLoggedIn ? (
 				<>
-				<button className="buttonsStyle" onClick={() => navigate('/')}>Game</button>
-				<button className="buttonsStyle" onClick={() => navigate('/instructions')}>Instructions</button>
-				<button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>Dashboard</button>
-				<button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
-				<button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
+				<button className="buttonsStyle" onClick={() => navigate('/')}>{t('game')}</button>
+				<button className="buttonsStyle" onClick={() => navigate('/instructions')}>{t('instructions')}</button>
+				<button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>{t('dashboard')}</button>
+				<button className="buttonsStyle" onClick={() => navigate('/playerlist')}>{t('players')}</button>
+				<button className="buttonsStyle" onClick={HandleSettingsClick}>{t('settings')}</button>
 				</>
 			) : (
 				<>
-				<button className="buttonsStyle" onClick={HandleLoginClick}>Login</button>
-				<button className="buttonsStyle px-1" onClick={HandleRegistrationClick}>Registration</button>
+				<button className="buttonsStyle" onClick={HandleLoginClick}>{t('login')}</button>
+				<button className="buttonsStyle px-1" onClick={HandleRegistrationClick}>{t('registration')}</button>
 				</>
 			)}
 			</div>
