@@ -124,7 +124,7 @@ export class EndScreen implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("END SCREEN: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -182,9 +182,9 @@ export class EndScreen implements IGameState
 			if (!this.showLoadingText)
 				return ;
 
-			const loadingHeader = 'Fetching user data, please wait.';
+			const loadingHeader = this.t('data_fetch');
 			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
-			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			const loadingInfo = this.t('info_loading');
 			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
 			return ;
 		}
@@ -192,23 +192,23 @@ export class EndScreen implements IGameState
 		if (!this.winner || !this.loser)
 			return ;
 
-		const text = this.winner.username + ' wins the game!';
+		const text = this.winner.username + this.t('wins_the_game');
 		drawCenteredText(this.canvas, this.ctx, text, '40px arial', '#1cc706', 200);
 
 		if (this.gameType === GameType.PONG_AI)
 		{
 			if (this.winner.username === 'Computer')
-				drawCenteredText(this.canvas, this.ctx, 'Computers will rule the world... yikes!!', '30px arial', 'white', 300);
+				drawCenteredText(this.canvas, this.ctx, this.t('computers_rule'), '30px arial', 'white', 300);
 			else
-				drawCenteredText(this.canvas, this.ctx, 'Great job, humans ROCK!!', '30px arial', 'white', 300);
+				drawCenteredText(this.canvas, this.ctx, this.t('humans_rock'), '30px arial', 'white', 300);
 
 		}
 		else if (!this.isTournament)
 		{
-			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.ranking_points.toFixed(2)}.`;
+			const winnerRankText = `${this.t('new_rank_of')} ${this.winner.username} ${this.t('is')} ${this.winner.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, winnerRankText, '30px arial', 'white', 300);
 			
-			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.ranking_points.toFixed(2)}.`;
+			const loserRankText = `${this.t('new_rank_of')} ${this.loser.username} ${this.t('is')} ${this.loser.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 

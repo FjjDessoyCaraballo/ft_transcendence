@@ -49,5 +49,10 @@
     "shoot": "Use SHOOT key to equip/unequip weapons",
     "pistol": "A handy basic weapon",
     "bazooka": "Very powerful, but kinda slow",
-    "land_mine": "Will detonate if you step on it!"
+    "land_mine": "Will detonate if you step on it!",
+    "wins_the_game": " wins the game!",
+    "computers_rule": "Computers will rule the world... yikes!!",
+    "humans_rock": "Great job, humans ROCK!!",
+    "new_rank_of": "The new rank of",
+    "is": "is"
 }

@@ -49,5 +49,10 @@
     "shoot": "Käytä AMMUNTA-näppäintä ottaaksesi aseen käyttöön tai pois käytöstä",
     "pistol": "Kätevä perusase",
     "bazooka": "Erittäin voimakas, mutta melko hidas",
-    "land_mine": "Räjähtää, jos astut sen päälle!"
+    "land_mine": "Räjähtää, jos astut sen päälle!",
+    "wins_the_game": " voittaa pelin!",
+    "computers_rule": "Tietokoneet tulevat hallitsemaan maailmaa... apua!!",
+    "humans_rock": "Hienoa työtä, ihmiset ROCKAA!!",
+    "new_rank_of": "Uusi sijoitus pelaajalle",
+    "is": "on"
 }

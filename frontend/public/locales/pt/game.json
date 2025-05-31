@@ -49,6 +49,11 @@
     "shoot": "Use a tecla DISPARAR para equipar/desequipar armas",
     "pistol": "Uma arma básica e prática",
     "bazooka": "Muito poderosa, mas um pouco lenta",
-    "land_mine": "Vai explodir se você pisar nela!"
+    "land_mine": "Vai explodir se você pisar nela!",
+    "wins_the_game": " vence o jogo!",
+    "computers_rule": "Os computadores vão dominar o mundo... socorro!!",
+    "humans_rock": "Mandaram bem, os humanos ARRASAM!!",
+    "new_rank_of": "A nova classificação de",
+    "is": "é"
 }
   
