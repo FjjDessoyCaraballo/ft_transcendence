@@ -15,5 +15,6 @@
     "welcome": "Welcome to the Player Hub!",
     "pong_played": "Pong games played:",
     "block_battle_played": "Block Battle games played:",
-    "more_stats": "More Stats"
+    "more_stats": "More Stats",
+    "issues": "This might be because of connection issues, so please log out and try to log in again!"
 }

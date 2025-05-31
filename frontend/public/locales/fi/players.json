@@ -15,5 +15,6 @@
   "welcome": "Tervetuloa pelaajakeskukseen!",
   "pong_played": "Pelatut Pong-pelit:",
   "block_battle_played": "Pelatut Block Battle -pelit:",
-  "more_stats": "Lisää tilastoja"
+  "more_stats": "Lisää tilastoja",
+  "issues": "Tämä saattaa johtua yhteysongelmista, joten kirjaudu ulos ja yritä uudelleen!"
 }

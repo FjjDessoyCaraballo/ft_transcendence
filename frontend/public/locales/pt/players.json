@@ -15,5 +15,6 @@
   "welcome": "Bem-vindo ao Centro de Jogadores!",
   "pong_played": "Jogos de Pong jogados:",
   "block_battle_played": "Jogos de Block Battle jogados:",
-  "more_stats": "Mais estatísticas"
+  "more_stats": "Mais estatísticas",
+  "issues": "Isso pode ser por causa de problemas de conexão, então saia e tente entrar novamente!"
 }

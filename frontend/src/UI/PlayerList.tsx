@@ -229,7 +229,7 @@ export const PlayerList: React.FC<PlayerListProp> = ( {isLoggedIn} ) => {
   if (error) {
     return (
 		<div className="max-w-screen-xl mx-auto my-6 p-4 bg-[#F3E8FF] border border-[#6B21A8] rounded-lg shadow-md text-[#6B21A8] font-mono font-bold text-center text-lg">
-			{error} <br/> This might be because of connection issues, so please log out and try to log in again!
+			{error} <br/> {t('issues')}
 		</div>
 	)
   }
@@ -273,7 +273,7 @@ export const PlayerList: React.FC<PlayerListProp> = ( {isLoggedIn} ) => {
       {/* Display all players (excluding pending requests) */}
       <div className="p-6 w-full flex flex-col items-center">
         <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
-          <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 Hi {loggedInUserData?.username}! {t('welcome')}</h2>
+          <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 {t('hi')} {loggedInUserData?.username}! {t('welcome')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...nonPendingPlayers]
