@@ -17,11 +17,12 @@ interface ExtendedUser extends User {
   friendshipStatus: 'none' | 'friend' | 'pending_sent' | 'pending_received';
 }
 
-interface PlayerListProps {
-  onShowDashboard: () => void;
+interface PlayerListProp {
+  isLoggedIn: boolean;
 }
 
-export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
+
+export const PlayerList: React.FC<PlayerListProp> = ( {isLoggedIn} ) => {
   // State to store the list of players, loading state, and error messages
   const [players, setPlayers] = useState<ExtendedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,7 +79,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
         setPlayers(extendedUsers); // Update state
       } catch (error) {
         console.error('Failed to fetch data:', error);
-        setError('Failed to load players. Please try again later.');
+        setError('Failed to load players.');
 		setLoggedInUser(null);
       } finally {
         setIsLoading(false);
@@ -86,7 +87,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     };
 
     fetchData();
-  }, []);
+  }, [isLoggedIn]);
 
   // Handle sending a friend request
   const handleSendFriendRequest = async (userId: number) => {
@@ -101,7 +102,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to send friend request:', error);
-      setError('Failed to send friend request. Please try again.');
+      setError('Failed to send friend request.');
     }
   };
 
@@ -118,7 +119,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to accept friend request:', error);
-      setError('Failed to accept friend request. Please try again.');
+      setError('Failed to accept friend request.');
     }
   };
 
@@ -135,7 +136,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to reject friend request:', error);
-      setError('Failed to reject friend request. Please try again.');
+      setError('Failed to reject friend request.');
     }
   };
 
@@ -152,7 +153,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       );
     } catch (error) {
       console.error('Failed to remove friend:', error);
-      setError('Failed to remove friend. Please try again.');
+      setError('Failed to remove friend.');
     }
   };
 
@@ -216,12 +217,19 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
 
   // Show loading state
   if (isLoading) {
-    return <div className="p-6 w-full flex justify-center">Loading players...</div>;
+    return (
+		<div className="max-w-screen-xl mx-auto my-6 p-4 bg-[#F3E8FF] border border-[#6B21A8] rounded-lg shadow-md text-[#6B21A8] font-mono font-bold text-center text-lg">
+			Loading players...
+		</div>	) 
   }
 
   // Show error if any occurred
   if (error) {
-    return <div className="p-6 w-full flex justify-center text-red-500">{error}</div>;
+    return (
+		<div className="max-w-screen-xl mx-auto my-6 p-4 bg-[#F3E8FF] border border-[#6B21A8] rounded-lg shadow-md text-[#6B21A8] font-mono font-bold text-center text-lg">
+			{error} <br/> This might be because of connection issues, so please log out and try to log in again!
+		</div>
+	)
   }
 
   // Main component return
@@ -229,7 +237,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
     <>
       {/* Display pending friend requests if any */}
       {pendingRequests.length > 0 && (
-        <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 p-6 rounded-xl border border-yellow-300 bg-yellow-50 shadow-md">
+        <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 mt-8 p-6 rounded-xl border border-yellow-300 bg-yellow-50 shadow-md">
           <h2 className="titles text-yellow-700 mb-4 text-xl">📬 Friend Requests</h2>
           <div className="flex flex-wrap gap-4">
             {pendingRequests.map((player) => (

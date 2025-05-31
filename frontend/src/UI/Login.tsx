@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { WindowManager } from './Header';
 import { setToken, getToken } from '../services/TokenService';
 import { loginUser } from '../services/userService'
+import { useNavigate } from 'react-router-dom';
+
 
 export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
   // State for form inputs
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+  
 
   const HandleCancel = () => {
     // Clear form data and close the popup
@@ -47,6 +51,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
 	        
       window.dispatchEvent(new Event('loginStatusChanged'));
       onAccept();
+	  navigate('/')
     } catch (error) {
       setErrorMessage('Login failed.');
       console.error('Login failed.');

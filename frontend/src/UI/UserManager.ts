@@ -1,4 +1,4 @@
-import { DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
+import { DEEP_PURPLE, LIGHT_PURPLE, PURPLE} from "../game/Constants";
 import { drawCenteredText } from "../game/StartScreen";
 import { Button } from "./Button";
 import { UserHubState, GameType } from "./Types";
@@ -118,7 +118,8 @@ export class TournamentButton extends Button
 
 export class UserManager {
 
-   
+	static avatarCache: Record<string, HTMLImageElement> = {};
+
 	static async updateUserStats(player1: User, player2: User, stats: bbMatchData | pongMatchData)
 	{
 		
@@ -137,15 +138,33 @@ export class UserManager {
 
 	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
 	{
-		// Draw avatar box & text (JUST A TEST)
 		const avatarW = 200;
 		const avatarH = 180;
-		ctx.fillStyle = DEEP_PURPLE; // GLOBAL USE of ctx
-		ctx.fillRect(x, y, avatarW, avatarH);
 
-		ctx.font = '20px arial';
-		ctx.fillStyle = 'black';
-		ctx.fillText('Avatar here', x + 40, y + 30);
+		if (!this.avatarCache[user.username])
+		{
+			const img = new Image();
+			img.src = `https://localhost:3443${user.avatar_url}`;
+
+			img.onload = () => {
+			this.avatarCache[user.username] = img;
+		    };
+
+			// Draw avatar placeholder
+			ctx.fillStyle = DEEP_PURPLE;
+			ctx.fillRect(x, y, avatarW, avatarH);
+
+			ctx.font = '20px arial';
+			ctx.fillStyle = 'black';
+			ctx.fillText('Loading avatar', x + 40, y + 30);
+		}
+		else
+		{
+			ctx.fillStyle = '#96799B';
+			ctx.fillRect(x, y, avatarW, avatarH);
+			ctx.drawImage(this.avatarCache[user.username], x, y, avatarW, avatarH);
+		}
+		
 
 		// Draw info box
 		const boxPadding = 40;
