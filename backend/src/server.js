@@ -35,6 +35,21 @@ fastify.register(require('./plugins/db'), {
   dbPath: config.dbPath 
 });
 
+// Register response serializer plugin to prevent XSS in responses
+fastify.register(require('./plugins/responseSerializer'));
+
+// Add security headers
+fastify.addHook('onRequest', (request, reply, done) => {
+  // Security headers
+  reply.header('X-Content-Type-Options', 'nosniff');
+  reply.header('X-XSS-Protection', '1; mode=block');
+  reply.header('X-Frame-Options', 'DENY');
+  reply.header('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'");
+  reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  reply.header('Referrer-Policy', 'no-referrer-when-downgrade');
+  done();
+});
+
 // Initialize repositories after DB is ready
 fastify.addHook('onReady', async () => {
   friendRepo = new FriendRepository(fastify.db);
@@ -132,9 +147,11 @@ fastify.ready().then(() => {
     });
   });
 });
-
+// register ratelimit
+fastify.register(require('./plugins/rateLimit'))
 // Register routes
 fastify.register(require('./routes'));
+
 
 // Start the server
 const start = async () => {
