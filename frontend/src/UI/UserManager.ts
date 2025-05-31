@@ -1,24 +1,13 @@
-import { global_curUser } from "./GameCanvas"
 import { DEEP_PURPLE, LIGHT_PURPLE} from "../game/Constants";
 import { drawCenteredText } from "../game/StartScreen";
 import { Button } from "./Button";
 import { UserHubState, GameType } from "./Types";
-import { RankingHandler } from "../game/RankingPoints";
-import { updateUserStatsAPI } from "../services/userService";
 import { TFunction } from 'i18next';
+import { Weapon } from "../game/Weapons";
+import { bbMatchData } from "../game/BlockBattle";
+import { recordMatchResult } from "../services/userService";
+import { pongMatchData } from "../game/pong/Pong";
 
-/*
-OLD VERSION
-
-export interface User {
-    username: string;
-	password: string;
-    wins: number;
-    losses: number;
-	rankingPoint: number;
-	// Add match history here...? Or somewhere else?
-}
-	*/
 
 export interface PongData {
 	id: number;
@@ -51,9 +40,11 @@ export interface MatchData {
 	id: number;
 	date: Date;
 	player1_id: number;
-	player1_rank: number;
+	player1_name: string;
+	p1_ranking_points: number;
 	player2_id: number;
-	player2_rank: number;
+	player2_name: string;
+	p2_ranking_points: number;
 	winner_id: number;
 	game_duration: number;
 	game_type: string; // pong / blockbattle
@@ -64,7 +55,6 @@ export interface MatchData {
 export interface User {
 	id: number;
 	username: string;
-//	password: string; --> Not needed in the frontend, right?
 	ranking_points: number;
 	avatar_url: string;
 	games_played_pong: number;
@@ -79,6 +69,7 @@ export interface User {
 	created_at: Date;
 	updated_at: Date;
 	deleted_at: Date | null;
+	bbWeapons: Weapon [];
 	match_history: MatchData[];
 }
 
@@ -127,138 +118,22 @@ export class TournamentButton extends Button
 }
 
 export class UserManager {
-   /* static saveUserData(user: User): void 
+
+   
+	static async updateUserStats(player1: User, player2: User, stats: bbMatchData | pongMatchData)
 	{
-        try 
-		{
-			// NOTE! If key already existed, it will be OVERWRITTEN!
-			// So when we call this function, we need to already know that a duplicate does not exist
-			localStorage.setItem(user.username, JSON.stringify(user));     
-		} 
-		catch (e) 
-		{
-            if (e instanceof DOMException) 
-				console.error("Storage limit exceeded, could not save user data", e);
-			else 
-                console.error("An error occurred while saving user data", e);
-        }
-    } */
-
-
-	static async updateUserStats(winner: User, loser: User, type: GameType) 
-	{
-
-		if (type === GameType.BLOCK_BATTLE)
-		{
-			winner.games_played_blockbattle++;
-			winner.wins_blockbattle++;
-			loser.games_played_blockbattle++;
-			loser.losses_blockbattle++;
-		}
-		else if (type === GameType.PONG)
-		{
-			winner.games_played_pong++;
-			winner.wins_pong++;
-			loser.games_played_pong++;
-			loser.losses_pong++;
-		}
 		
-		RankingHandler.updateRanking(winner, loser);
-
 		try {
 
-			await updateUserStatsAPI(winner, loser, type);
+			await recordMatchResult(player1, player2, stats);
 
-		} catch {
+		} catch (error) {
 
-			throw new Error('Failed to update user statistics'); // is this necessary...?
-
+			console.error(error);
+			throw (error);
 		}
 
 	} 
-
-	// This could be more simple now that I have the whole User object in updateUserStats...?
-/*	static updateUserData(username: string, updatedData: Partial<User>): void 
-	{
-		try 
-		{
-			const oldData = this.getUserData(username);
-			if (oldData) 
-			{
-				const updatedUser = { ...oldData, ...updatedData };
-				this.saveUserData(updatedUser);
-			} 
-			else
-				console.error(`No user found with username: ${username}`);
-		} 
-		catch (e) {
-			console.error("An error occurred while updating user data", e);
-		}
-	} */
-
-/*	static cloneUser(user: User): User
-	{
-		let newUser: User = {
-			id: user.id,
-			username: user.username,
-		//	password: string; --> Not needed in the frontend, right?
-			ranking_points: user.ranking_points,
-			avatar_url: user.avatar_url,
-			games_played_pong: user.games_played_pong,
-			wins_pong: user.wins_pong,
-			losses_pong: user.losses_pong,
-			games_played_blockbattle: user.games_played_blockbattle,
-			wins_blockbattle: user.wins_blockbattle,
-			losses_blockbattle: user.losses_blockbattle,
-			tournaments_played: user.tournaments_played,
-			tournaments_won: user.tournaments_won,
-			tournament_points: user.tournament_points,
-			created_at: user.created_at,
-			updated_at: user.updated_at,
-			deleted_at: user.deleted_at
-		//	match_history: MatchData[]; --> Needs to be added at some point maybe...?
-		};
-
-		return newUser;
-	} */
-
-
-
- /*   static getAllUserData(): User[] {
-
-        const usersArr: User[] = [];
-		const usernames = localStorage.getItem(USER_ARR_KEY);
-		let usernameArr;
-
-		if (!usernames)
-			return usersArr;
-		else
-			usernameArr = JSON.parse(usernames);
-        
-        for (let i = 0; i < usernameArr.length; i++) 
-		{
-            const userData = localStorage.getItem(usernameArr[i]);
-
-			if (!userData)
-				continue ;
-			else
-			{
-				try 
-				{
-					const user: User = JSON.parse(userData);
-					usersArr.push(user);
-				} 
-				catch (e) 
-				{
-					console.error(`Error parsing user data for ${userData}:`, e);
-				}
-			}
-
-
-        }
-
-        return usersArr;
-    } */
 
 
 	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean, t: TFunction): ChallengeButton | TournamentButton
@@ -340,12 +215,12 @@ export class UserManager {
 	}
 
 
-	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, t: TFunction)
+	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, curUser: User | null, t:TFunction)
 	{
-		if (global_curUser)
+		if (curUser)
 		{
 			drawCenteredText(canvas, ctx, t('currently_logged_in'), '22px arial', 'white', 30);
-			drawCenteredText(canvas, ctx, global_curUser, '28px arial', 'red', 60);
+			drawCenteredText(canvas, ctx, curUser.username, '28px arial', 'red', 60);
 		}
 	}
 }

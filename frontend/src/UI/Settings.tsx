@@ -3,7 +3,6 @@ import { getUserDataForDownload, deleteUserAccount } from '../services/userServi
 import { PasswordChangePopup } from './PasswordChange'
 import { AvatarChangePopup } from './AvatarChange'
 import { clearToken } from '../services/TokenService'
-import { updateCurUser } from './GameCanvas';
 import { useTranslation } from 'react-i18next';
 
 interface SettingsProps {
@@ -91,10 +90,12 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 	}
 
 	const HandleLogout = async () => {
+
+		console.log('LOG OUT clicked');
+
 		try {
 			await clearToken();
 			sessionStorage.setItem('logged-in', 'false');
-			updateCurUser(null);
 			console.log(`Action: user logged off. Status of logged-in: ${sessionStorage.getItem('logged-in')}`);
 			window.dispatchEvent(new Event('loginStatusChanged'));
 			onLogout(); // Reset Header state

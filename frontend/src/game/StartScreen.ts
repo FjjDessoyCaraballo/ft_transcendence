@@ -1,10 +1,11 @@
 import { Button } from "../UI/Button";
-import { global_stateManager, global_curUser } from "../UI/GameCanvas";
+import { global_stateManager } from "../UI/GameCanvas";
 import { MainMenu } from "../UI/MainMenu";
 import { GameStates, IGameState, } from "./GameStates";
 import { DEEP_PURPLE, PURPLE, TEXT_PADDING } from "./Constants";
-import { UserManager } from "../UI/UserManager";
+import { UserManager, User } from "../UI/UserManager";
 import { GameType } from "../UI/Types";
+import { getLoggedInUserData } from "../services/userService";
 import { TFunction } from 'i18next';
 
 
@@ -73,6 +74,10 @@ export class StartScreen implements IGameState
 	blockBattleBtn: BlockBattleBtn;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	loggedInUserData: User | null;
+	isDataReady: boolean;
+	showLoggedOutText: boolean;
+	isLoggedIn: boolean = true;
 	t: TFunction;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
@@ -82,6 +87,9 @@ export class StartScreen implements IGameState
 		this.name = GameStates.START_SCREEN;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.isDataReady = false;
+		this.loggedInUserData = null;
+		this.showLoggedOutText = false;
 		this.t = t;
 
 		const pongText = 'PONG';
@@ -95,8 +103,34 @@ export class StartScreen implements IGameState
 		const bbY = 570;
 		this.blockBattleBtn = new BlockBattleBtn(this.canvas, this.ctx, bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial', this.t);
 
+		setTimeout(() => {
+			this.showLoggedOutText = true;
+		}, 50); 
+		this.fetchLoggedInUserData();
+
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
+	}
+
+	async fetchLoggedInUserData()
+	{
+		try
+		{
+			this.loggedInUserData = await getLoggedInUserData();
+			if (!this.loggedInUserData)
+				console.log("START SCREEN: No user is logged in, so the game cannot be played");
+			else
+			{
+				this.isDataReady = true;
+				this.isLoggedIn = true;
+			}
+		}
+		catch {
+			console.log("START SCREEN: No user is logged in, so the game cannot be played");
+			this.loggedInUserData = null;
+			this.isDataReady = false;
+			this.isLoggedIn = false;
+		}
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -140,13 +174,13 @@ export class StartScreen implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		UserManager.drawCurUser(this.canvas, ctx, this.t);
+		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData, this.t);
 		
 		drawCenteredText(this.canvas, this.ctx, this.t('welcome_gamer'), '140px Impact', DEEP_PURPLE, 240);
 
-		if (!global_curUser)
+		if (!this.isDataReady && this.showLoggedOutText)
 			drawCenteredText(this.canvas, this.ctx, this.t('please_login'), '50px arial', 'white', this.canvas.height / 2 + 100);
-		else
+		else if (this.isDataReady)
 		{
 			drawCenteredText(this.canvas, this.ctx, this.t('please_choose'), '40px arial', 'white', 390);
 

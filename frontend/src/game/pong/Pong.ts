@@ -1,6 +1,6 @@
 import { GameStates, IGameState } from "../GameStates";
 import { User } from "../../UI/UserManager";
-import { global_allUserDataArr, global_stateManager } from "../../UI/GameCanvas";
+import { global_stateManager } from "../../UI/GameCanvas";
 import { EndScreen } from "../EndScreen";
 import { TournamentPlayer } from "../Tournament";
 import { GameType } from "../../UI/Types";
@@ -8,6 +8,27 @@ import { PONG_DOWN_1, PONG_DOWN_2, PONG_UP_1, PONG_UP_2 } from "../Constants";
 import { Player, Paddle} from "./Paddle";
 import { Ball } from "./Ball";
 import { TFunction } from 'i18next';
+import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, recordTournamentMatchResult } from "../../services/userService";
+import { drawCenteredText } from "../StartScreen";
+import { UserManager } from "../../UI/UserManager";
+import { StartScreen } from "../StartScreen";
+
+export interface pongMatchData {
+	date: Date;
+	game_type: string;
+	startTime: number;
+	player1_id: number;
+	player1_rank: number;
+	player2_id: number;
+	player2_rank: number;
+	game_duration: number; // in seconds
+	winner_id: number;
+	longest_rally: number;
+	avg_rally: number;
+	player1_points: number;
+	player2_points: number;
+}
+
 
 // Game Constants
 export const PADDLE_WIDTH = 15; 
@@ -24,7 +45,8 @@ export const INITIAL_BALLSPEED_Y = 25;
 
 export class Pong implements IGameState {
   name: GameStates = GameStates.PONG; //STAT
-  gameState: 'playing' | 'result' | 'ai';
+  state: 'playing' | 'result' | 'ai';
+  gameStats: pongMatchData | null;
   startTime: number = 0;
   duration: number = 0; // In milliseconds, can convert later //STAT
   averageRally: number = 0;
@@ -33,11 +55,11 @@ export class Pong implements IGameState {
   aiTargetY: number; // AI's current target
 
   twoPlayerMode: boolean = false;
-  player1: Player;
-  player2: Player;
+  player1: Player | null;
+  player2: Player | null;
+  AIData: User | null;
   tournamentData1: TournamentPlayer | null;
   tournamentData2: TournamentPlayer | null;
-  storedOpponentName: string;
   ball: Ball;
   keysPressed: { [key: string]: boolean } = {};
   winner: Player | null = null; //STAT
@@ -46,40 +68,146 @@ export class Pong implements IGameState {
   canvasHeight: number;
   ctx: CanvasRenderingContext2D;
   isStateReady: boolean;
+  isDataReady: boolean;
+  showLoadingText: boolean;
+  savingDataToDB: boolean;
+  saveReady: boolean;
+  isLoggedIn: boolean = false;
   t: TFunction;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, user1: User, user2: User, tData1: TournamentPlayer | null, tData2: TournamentPlayer | null, state: 'ai' | 'playing', t: TFunction) {
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, AIData: User | null, state: 'ai' | 'playing', isTournament: boolean, t: TFunction) {
 
 	  this.canvas = canvas;
 	  this.ctx = ctx;
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
-    this.storedOpponentName = user2.username;
     this.aiTargetY = (this.canvasHeight - PADDLE_HEIGHT) / 2; // AI's current target
-    this.player1 = new Player(user1, new Paddle(BUFFER, this.canvasHeight)); //STAT
-    this.player2 = new Player(user2, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+    this.player1 = null;
+    this.player2 = null;
+	this.AIData = AIData;
     this.ball = new Ball(this.canvasWidth, this.canvasHeight);
     this.isStateReady = false;
-    this.gameState = state;
-    this.tournamentData1 = tData1;
-	  this.tournamentData2 = tData2;
-    this.t = t;
-    if (this.gameState === 'playing')
+	this.isDataReady = false;
+	this.showLoadingText = false;
+	this.savingDataToDB = false;
+	this.saveReady = false;
+  this.t = t;
+    this.state = state;
+	this.gameStats = null;
+    this.tournamentData1 = null;
+	  this.tournamentData2 = null;
+    if (this.state === 'playing')
     {
       this.twoPlayerMode = true; // Two-player mode
-      this.player2.user.username = this.storedOpponentName;
     }
-    else if (this.gameState === 'ai')
+    else if (this.state === 'ai')
     {
       this.twoPlayerMode = false; // One player mode (AI plays as Player 2)
-      this.player2.user.username = "Computer";
-      this.gameState = 'playing';
+      this.state = 'playing';
     }
+
+	setTimeout(() => {
+		this.showLoadingText = true;
+	}, 500); 
+
+	if (!isTournament)
+		this.fetchUserData();
+	else
+		this.fetchNextTournamentData();
 
     // Listen for key events
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
     document.addEventListener('keyup', this.handleKeyUp.bind(this));
   }
+
+	async fetchNextTournamentData()
+	{
+		try {
+		const response = await getNextTournamentGameData();
+  
+		this.tournamentData1 = response[0];
+		this.tournamentData2 = response[1];
+  
+		this.player1 = new Player(this.tournamentData1.user, new Paddle(BUFFER, this.canvasHeight)); //STAT
+    	this.player2 = new Player(this.tournamentData2.user, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+  
+		this.gameStats = {
+			date: new Date(),
+			game_type: 'pong',
+			startTime: Date.now(),
+			player1_id: this.tournamentData1.user.id,
+			player1_rank: this.tournamentData1.user.ranking_points,
+			player2_id: this.tournamentData2.user.id,
+			player2_rank: this.tournamentData2.user.ranking_points,
+			game_duration: -1,
+			winner_id: -1,
+			longest_rally: 0,
+			avg_rally: 0,
+			player1_points: 0,
+			player2_points: 0
+		}
+  
+		this.isDataReady = true;
+		}
+		catch (error) {
+			alert(`User data fetch failed, returning to Start Screen! ${error}`)
+			console.log("PONG: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
+			this.isDataReady = false;
+		}
+	}
+
+	async fetchUserData()
+	{
+		try
+		{
+			const player1UserData = await getLoggedInUserData();
+			if (!player1UserData)
+			{
+				console.log("PONG: User data fetch failed.");
+				return ;
+			}
+  
+			let player2UserData = null;
+			if (this.twoPlayerMode)
+				player2UserData = await getOpponentData();
+			else
+				player2UserData = this.AIData;
+  
+			if (!player2UserData)
+			{
+				console.log("PONG: User data fetch failed.");
+				return ;
+			}
+			
+			this.player1 = new Player(player1UserData, new Paddle(BUFFER, this.canvasHeight)); //STAT
+    		this.player2 = new Player(player2UserData, new Paddle(this.canvasWidth - PADDLE_WIDTH - BUFFER, this.canvasHeight)); //STAT
+
+			this.gameStats = {
+				date: new Date(),
+				game_type: 'pong',
+				startTime: Date.now(),
+				player1_id: player1UserData.id,
+				player1_rank: player1UserData.ranking_points,
+				player2_id: player2UserData.id,
+				player2_rank: player2UserData.ranking_points,
+				game_duration: -1,
+				winner_id: -1,
+				longest_rally: 0,
+				avg_rally: 0,
+				player1_points: 0,
+				player2_points: 0
+			}
+
+			this.isDataReady = true;
+		}
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
+			console.log("PONG: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
+			this.isDataReady = false;
+		}
+	}
 
   handleKeyDown(e: KeyboardEvent) {
       this.keysPressed[e.key] = true;
@@ -118,12 +246,14 @@ export class Pong implements IGameState {
 
   updatePlayerPositions(deltaTime: number) {
     // Player 1 movement
+	if (!this.player1)
+		return ;
     if (this.keysPressed[PONG_UP_1]) 
       this.player1.paddle.moveUp(deltaTime);
     if (this.keysPressed[PONG_DOWN_1]) 
       this.player1.paddle.moveDown(deltaTime);
 
-    if (this.twoPlayerMode) {
+    if (this.twoPlayerMode && this.player2) {
       // Player 2 movement
       if (this.keysPressed[PONG_UP_2]) 
         this.player2.paddle.moveUp(deltaTime);
@@ -131,6 +261,10 @@ export class Pong implements IGameState {
         this.player2.paddle.moveDown(deltaTime);
     } 
     else {
+
+		if (!this.player2)
+			return ;
+
       if (this.ball.speedX < 0) {
         this.player1.paddle.stayInBounds(this.canvasHeight);
         this.player2.paddle.stayInBounds(this.canvasHeight);
@@ -174,6 +308,10 @@ export class Pong implements IGameState {
 	}
 
   updateGame(deltaTime: number) {
+
+	if (!this.player1 || !this.player2)
+		return ;
+
     this.updatePlayerPositions(deltaTime);
     this.ball.move(deltaTime);
     this.ball.checkCollisions(this.player1.paddle, this.player2.paddle, this.canvasHeight, this.canvasWidth);
@@ -182,7 +320,7 @@ export class Pong implements IGameState {
     if (this.ball.x < 0) {
       this.player2.score++;
       if (this.player2.score === WINNING_SCORE) {
-        this.gameState = 'result';
+        this.state = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player2;
         this.duration = performance.now() - this.startTime;
@@ -193,7 +331,7 @@ export class Pong implements IGameState {
     if (this.ball.x > this.canvasWidth) {
       this.player1.score++;
       if (this.player1.score === WINNING_SCORE) {
-        this.gameState = 'result';
+        this.state = 'result';
         this.averageRally = this.ball.totalHits / this.ball.pointsPlayed;
         this.winner = this.player1;
         this.duration = performance.now() - this.startTime;
@@ -203,80 +341,122 @@ export class Pong implements IGameState {
   }
 
   update(deltaTime: number) {
-		if (this.gameState === 'playing')
+		if (this.state === 'playing')
 			this.updateGame(deltaTime);
   }
 
-// STATS
-// BOTH GAMES
-// - Player1 (in TP)
-// - Player2 (in TP)
-// - Winner (in TP)
-// - Game duration 
-// - Game type
-// PONG
-// - Longest ball rally
-// - Avg ball rally
-// - Points scored by Player1 (in TP)
-// - Points scored by Player2 (in TP)
 
-// Wins and Losses for each user?
+	async saveUserDataToDB(winner: User)
+	{
+		if (!this.gameStats || !this.player1 || !this.player2 || !this.player1.user || !this.player2.user)
+			return ;
+
+		this.gameStats.winner_id = winner.id;
+
+		this.savingDataToDB = true;
+
+		try {
+			await UserManager.updateUserStats(this.player1.user, this.player2.user, this.gameStats);
+		} catch (error){
+
+			alert(`User data saving failed! ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
+			this.savingDataToDB = false;
+			return ;
+		}
+
+		this.saveReady = true;
+	}
+
+	async saveTournamentGameDataToDB(winner: User)
+	{
+		if (!this.gameStats || !this.player1 || !this.player2 || !this.player1.user || !this.player2.user)
+			return ;
+
+		this.gameStats.winner_id = winner.id;
+		this.savingDataToDB = true;
+
+		try {
+
+			await recordTournamentMatchResult(this.player1.user, this.player2.user, this.gameStats);
+			this.isStateReady = true;
+
+		} catch (error) {
+
+			alert(`User data saving failed, returning to Start Screen! ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
+			this.savingDataToDB = false;
+			return ;
+		}
+
+		this.saveReady = true;
+	}
 
   drawResult() {
+
+	if (!this.player1 || !this.player2 || !this.gameStats)
+			return ;
+
+	const p1 = this.player1.user;
+	const p2 = this.player2.user;
+
+	// AI ending
+	if (!this.twoPlayerMode)
+	{
+		if (this.winner === this.player1)
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG_AI, false, this.AIData, this.t));
+		else if (this.winner === this.player2)
+			global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG_AI, false, this.AIData, this.t));
+
+		return ;
+	}
+
+	this.gameStats.game_duration = (Date.now() - this.gameStats.startTime) / 1000; // in seconds
+	this.gameStats.avg_rally = this.averageRally;
+	this.gameStats.longest_rally = this.ball.longestRally;
+	this.gameStats.player1_points = this.player1.score;
+	this.gameStats.player2_points = this.player2.score;
+
     // Tournament ending
     if (this.tournamentData1 && this.tournamentData2)
     {
-      if (this.winner === this.player1)
-      {
-        this.tournamentData1.tournamentPoints++;
-        this.tournamentData1.pongPointsScored += this.player1.score;
-        this.tournamentData2.pongPointsScored += this.player2.score;
-        this.tournamentData1.isWinner = true;
-      }	
-      else if (this.winner === this.player2)
-      {
-        this.tournamentData2.tournamentPoints++;
-        this.tournamentData1.pongPointsScored += this.player1.score;
-        this.tournamentData2.pongPointsScored += this.player2.score;
-        this.tournamentData2.isWinner = true;
-      }
-              
-      this.isStateReady = true;
-      return ;
-    }
+		if (!this.savingDataToDB)
+		{
+			if (this.winner === this.player1)
+			{
+				this.saveTournamentGameDataToDB(this.tournamentData1.user);
+			}
+			else if (this.winner === this.player2)
+			{
+				this.saveTournamentGameDataToDB(this.tournamentData2.user);
+			}
+		}
 
-    // GAME STATS FOR CURRENT GAME - NOT USING YET
-    // const player1Username = this.player1.user.username;
-    // const player2Username = this.player2.user.username;
-    // const winnerUsername = this.winner?.user.username || '';
-    // const gameType = this.twoPlayerMode ? 'PONG' : 'PONG_AI';
-    // const durationMs = this.duration;
-    // const averageRally = this.averageRally;
-    // const longestRally = this.ball.longestRally;
-    // const player1Score = this.player1.score;
-    // const player2Score = this.player2.score;
+		return ;
+    }
 
     // Regular ending
-    const p1 = this.player1.user;
-	const p2 = this.player2.user;
+	if (!this.savingDataToDB && this.winner)
+	{
+		this.saveUserDataToDB(this.winner.user);
+		return ;
+	}
 
-    if (this.twoPlayerMode)
+    if (this.saveReady)
     {
       if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG, this.t));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1.id, p2.id, GameType.PONG, false, null, this.t));
       else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG, this.t));
+        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2.id, p1.id, GameType.PONG, false, null, this.t));
     }
-    else
-    {
-      if (this.winner === this.player1)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p1, p2, null, null, GameType.PONG_AI, this.t));
-      else if (this.winner === this.player2)
-        global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, p2, p1, null, null, GameType.PONG_AI, this.t));
-	  }
+
   }
   drawGame()
   {
+
+	if (!this.player1 || !this.player2)
+		return ;
+
     // Clear canvas
     this.ctx.fillStyle = 'black';
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -306,10 +486,19 @@ export class Pong implements IGameState {
 
   render(ctx: CanvasRenderingContext2D) {
 
-	  // if (this.gameState === 'menu') {
-		//   this.drawMenu(ctx);
-	  // } 
-    if (this.gameState === 'result') {
+	if (!this.isDataReady)
+	{
+		if (!this.showLoadingText)
+			return ;
+
+		const loadingHeader = 'Fetching user data, please wait.';
+		drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+		const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+		drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+		return ;
+	}	 
+
+    if (this.state === 'result') {
 		  this.drawResult();
 	  } 
     else {
@@ -318,6 +507,10 @@ export class Pong implements IGameState {
   }
 
   resetGame() {
+
+	if (!this.player1 || !this.player2)
+		return ;
+
     this.player1.paddle.y = (this.canvasHeight - PADDLE_HEIGHT) / 2;
     this.player2.paddle.y = (this.canvasHeight - PADDLE_HEIGHT) / 2;
     this.ball.reset(this.twoPlayerMode, this.canvasWidth, this.canvasHeight);

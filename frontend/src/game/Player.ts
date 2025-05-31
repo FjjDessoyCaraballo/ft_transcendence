@@ -1,10 +1,11 @@
-import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, BULLET_SPEED, FIRE_COOLDOWN, HEALTH_WIDTH, HEALT_HEIGHT, BB_LEFT_1, BB_RIGHT_1, BB_UP_1, BB_DOWN_1, BB_SHOOT_1} from "./Constants";
-import { Projectile } from "./Projectiles";
+import { PLAYER_SIZE, PLAYER_SPEED, GRAVITY, JUMP_POWER, HEALTH_WIDTH, HEALT_HEIGHT, BB_LEFT_1, BB_RIGHT_1, BB_UP_1, BB_SHOOT_1, BB_CHANGE_WEAPON_1} from "./Constants";
 import { CollisionShape, collType } from "./CollisionShape";
 import { Platform, PlatformDir } from "./Platform";
 import { Health } from "./Health";
 import { User } from "../UI/UserManager";
 import { global_gameArea } from "../UI/GameCanvas";
+import { Weapon } from "./Weapons";
+import { bbMatchData } from "./BlockBattle";
 
 export class Player {
     x: number;
@@ -15,21 +16,21 @@ export class Player {
 	velocity: { x: number, y: number };
 	direction: string;
 	isOnGround: boolean;
-	projectiles: Projectile[];
+	weapons: [Weapon, Weapon];
+	curWeapon: Weapon;
 	lastFired: number;
-    cooldownTime: number;
 	cShape: CollisionShape;
 	cShapeSize : number;
 	cShapeOffset : number;
 	health: Health;
 	isDead: boolean;
 	hasWon: boolean;
+	weaponIsChanging: boolean;
 	coinCount: number;
 	userData: User | null;
+	onPlatform: Platform | null;
 
-	onPlatform?: Platform;
-
-    constructor(x: number, y: number, color: string, user: User) {
+    constructor(x: number, y: number, color: string, user: User, weapon1: Weapon, weapon2: Weapon) {
         this.x = x;
         this.y = y;
 		this.color = color;
@@ -38,9 +39,10 @@ export class Player {
 		this.velocity = { x: 0, y: 0 };
 		this.direction = 'right';
 		this.isOnGround = true;
-		this.projectiles = [];
+		this.weaponIsChanging = false;
+		this.weapons = [weapon1, weapon2];
+		this.curWeapon = weapon1;
 		this.lastFired = 0;
-		this.cooldownTime = FIRE_COOLDOWN;
 
 		this.cShapeSize = PLAYER_SIZE - 4;
 		this.cShapeOffset = 2;
@@ -50,6 +52,7 @@ export class Player {
 		this.coinCount = 0;
 		this.hasWon = false;
 		this.userData = user;
+		this.onPlatform = null;
     }
 
     move(keys: { [key: string]: boolean }, deltaTime: number) {
@@ -119,7 +122,7 @@ export class Player {
 		)
 		{
 			this.isOnGround = false;
-			this.onPlatform = undefined;
+			this.onPlatform = null;
 		}
 	}
 
@@ -163,13 +166,13 @@ export class Player {
 		this.cShape.move(this.x + this.cShapeOffset, this.y + this.cShapeOffset);
 	}
 
-	checkKeyEvents(keys: { [key: string]: boolean }) {
+	checkKeyEvents(keys: { [key: string]: boolean }, statsObj: bbMatchData) {
 		this.velocity.x = 0;
 
         if (keys[BB_UP_1] && this.isOnGround) {
             this.velocity.y = JUMP_POWER;
 			this.isOnGround = false;
-			this.onPlatform = undefined;
+			this.onPlatform = null;
         }
         if (keys[BB_LEFT_1]) {
             this.velocity.x = -PLAYER_SPEED;
@@ -179,27 +182,30 @@ export class Player {
             this.velocity.x = PLAYER_SPEED;
 			this.direction = 'right';
         }
-		if (keys[BB_SHOOT_1] && this.canFire()) {
-            this.fireProjectile();
+
+		if (keys[BB_SHOOT_1]) {
+			if (this.curWeapon.shoot(this.x, this.y, this.direction, this.isOnGround, this.onPlatform))
+				statsObj.player1_shots_fired++;
         }
+		
+		if (keys[BB_CHANGE_WEAPON_1] && !this.weaponIsChanging){
+			if (this.curWeapon.name === this.weapons[0].name)
+				this.curWeapon = this.weapons[1];
+			else
+				this.curWeapon = this.weapons[0];
+
+			this.weaponIsChanging = true;
+		}
+		if (!keys[BB_CHANGE_WEAPON_1] && this.weaponIsChanging)
+			this.weaponIsChanging = false;
+
 	}
 
-	canFire(): boolean {
-        const currentTime = Date.now();
-        return currentTime - this.lastFired >= this.cooldownTime;
-    }
-
-	fireProjectile() {
-		let bulletSpeed = BULLET_SPEED;
-
-		if (this.direction === 'left')
-			bulletSpeed *= -1;
-
-        const projectileVelocity = { x: bulletSpeed, y: 0 };
-        const projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, projectileVelocity);
-        this.projectiles.push(projectile);
-		this.lastFired = Date.now();
-    }
+	updateWeapons(canvas: HTMLCanvasElement, deltaTime: number, enemy: Player)
+	{
+		this.weapons[0].update(canvas, deltaTime, enemy);
+		this.weapons[1].update(canvas, deltaTime, enemy);
+	}
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = this.color;
@@ -209,9 +215,16 @@ export class Player {
 		let offsetY = this.y - HEALT_HEIGHT - 10; // random 10 :D
 		this.health.draw(ctx, offsetX, offsetY);
 
-        for (const projectile of this.projectiles) {
-            projectile.draw(ctx);
-        }
+		if (this.weapons[0].name === 'Land Mine')
+        	this.weapons[0].draw(ctx, this.color);
+		else
+        	this.weapons[0].draw(ctx, null);
+
+		if (this.weapons[1].name === 'Land Mine')
+        	this.weapons[1].draw(ctx, this.color);
+		else
+        	this.weapons[1].draw(ctx, null);
+
 
 
 //		this.cShape.draw(ctx); // --> For debug

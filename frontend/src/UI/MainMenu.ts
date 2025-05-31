@@ -1,14 +1,14 @@
 import { GameStates, IGameState } from "../game/GameStates";
 import { Button } from "./Button";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR, LIGHT_PURPLE } from "../game/Constants";
-import { global_stateManager, global_curUser, global_allUserDataArr } from "./GameCanvas";
+import { global_stateManager } from "./GameCanvas";
 import { UserHUB } from "./UserHUB";
 import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
 import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { MatchIntro } from "../game/MatchIntro";
 import { TFunction } from 'i18next';
-
+import { getLoggedInUserData } from "../services/userService";
 
 // BUTTONS
 
@@ -78,23 +78,28 @@ export class PongAiBtn extends Button
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	t: TFunction;
+	loggedInUserData: User | null;
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
 		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.loggedInUserData = null;
 		this.t = t;
+	}
+
+	addUserData(user: User)
+	{
+		this.loggedInUserData = user;
 	}
 
 	clickAction(): void {
 
-		if (global_curUser && global_allUserDataArr)
-		{
-			const curUserData = global_allUserDataArr.find(user => user.username === global_curUser);
-			if (curUserData)
-				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserData, null, null, null, GameType.PONG_AI, this.t));
-		}
+		if (this.loggedInUserData)
+			global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, GameType.PONG_AI, false, this.t));
+		else
+			alert('User data error, please try again or log out and in again');
 
 	}
 }
@@ -114,6 +119,10 @@ export class MainMenu implements IGameState
 	opponent: User | null;
 	gameType: GameType;
 	t: TFunction;
+	loggedInUserData: User | null;
+	isDataReady: boolean;
+	showLoadingText: boolean;
+	isLoggedIn: boolean = false;
 	mouseMoveBound: (event: MouseEvent) => void;
 	mouseClickBound: () => void;
 
@@ -125,6 +134,9 @@ export class MainMenu implements IGameState
 		this.opponent = null;
 		this.gameType = gameType;
 		this.t = t;
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		this.loggedInUserData = null;
 
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
 
@@ -152,8 +164,36 @@ export class MainMenu implements IGameState
 		this.pongAiBtn = new PongAiBtn(this.canvas, this.ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '40px', 'arial', this.t);
 		this.changeGameBtn = new ChangeGameBtn(this.canvas, this.ctx, instructX, instructY, '#b0332a', '#780202', instructText, 'white', '30px', 'arial', this.t);
 
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		this.fetchLoggedInUserData();
+
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
 		this.mouseClickBound = () => this.mouseClickCallback();
+	}
+
+	async fetchLoggedInUserData()
+	{
+		try
+		{
+			this.loggedInUserData = await getLoggedInUserData();
+			if (!this.loggedInUserData)
+				console.log("MAIN MENU: User data fetch failed.");
+			else
+			{
+				this.isDataReady = true;
+				this.pongAiBtn.addUserData(this.loggedInUserData);
+			}
+		}
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
+			console.log("MAIN MENU: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
+			this.loggedInUserData = null;
+			this.isDataReady = false;
+		}
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -205,7 +245,20 @@ export class MainMenu implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		UserManager.drawCurUser(this.canvas, ctx, this.t);
+
+		if (!this.isDataReady)
+		{
+			if (!this.showLoadingText)
+				return ;
+
+			const loadingHeader = 'Fetching user data, please wait.';
+			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+			return ;
+		}
+
+		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData, this.t);
 
 		drawCenteredText(this.canvas, this.ctx, this.t('you_are_playing'), '40px arial', 'white', 200);
 

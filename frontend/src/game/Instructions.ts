@@ -1,3 +1,5 @@
+/*
+
 import { GameStates, IGameState } from "./GameStates";
 import { ReturnMainMenuButton } from "./EndScreen";
 import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./Constants";
@@ -104,7 +106,7 @@ export class Instructions implements IGameState
 			lineCount++;
 		}*/
 
-		this.returnMenuButton.draw(ctx, this.t);
+		/*this.returnMenuButton.draw(ctx, this.t);
 	}
 
 	getInstructionText(): string []
@@ -118,3 +120,5 @@ export class Instructions implements IGameState
 	}
 
 }
+
+*/

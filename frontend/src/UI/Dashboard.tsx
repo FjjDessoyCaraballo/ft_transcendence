@@ -13,10 +13,10 @@ import {
   Legend,
 } from 'chart.js';
 import { Pie, Line, Bar } from 'react-chartjs-2';
-import { panuMatchHistory } from './PANU_TEST_DATA';
 import { User, MatchData } from './UserManager';
 import MatchStatsPopup from './MatchStatsPopup';
 import 'chart.js/auto';
+import { getMatchByID } from '../services/userService';
 import { useTranslation } from 'react-i18next';
 
 
@@ -55,11 +55,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   const { t } = useTranslation('dashboard');
   const [selectedMatch, setSelectedMatch] = useState<MatchData | null>(null);
 
-  // A test for now, because the match history API is not ready!!
-  userData.match_history = panuMatchHistory;
-
   const user = userData;
   const matchHistory = user.match_history;
+
+  const handleSelectMatch = async (id: number) => {
+  
+	try {
+		const userMatchData = await getMatchByID(id);
+		
+		setSelectedMatch(userMatchData);
+		
+	} catch {
+		alert("Error while fetching user data for MatchStatsPopUp.");
+		console.log("Error while fetching user data for MatchStatsPopUp");
+	}
+	};
 
   // --- Win/Loss Pie Chart ---
   const winLossPie = {
@@ -75,23 +85,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   };
 
   // --- Ranking Progression Line Chart ---
+
+	const matchRankData = matchHistory.map((match) =>
+			match.player1_id === user.id ? match.p1_ranking_points : match.p2_ranking_points
+		);
+	const finalRankData = [...matchRankData, user.ranking_points];
+
+
   const rankingLine = {
-    labels: matchHistory.map((match) =>
-      match.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-    ),
-    datasets: [
-      {
-        label: t('ranking_points'),
-        data: matchHistory.map((match) =>
-          match.player1_id === 0 ? match.player1_rank : match.player2_rank
-        ),
-        borderColor: '#BA55D3',
-        backgroundColor: '#BA55D3',
-        pointBackgroundColor: '#fff',
-        tension: 0.4,
-      },
-    ],
-  };
+	labels: [...matchHistory.map((_, index) => `${index + 1}`), 'Current'],
+	datasets: [
+		{
+		label: t('ranking_points'),
+		data: finalRankData,
+		borderColor: '#BA55D3',
+		backgroundColor: '#BA55D3',
+		pointBackgroundColor: '#fff',
+		tension: 0.4,
+		},
+	],
+};
 
   const lineOptions = {
     responsive: true,
@@ -145,10 +158,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   };
 
   // ==== Match History Cards ====
-  const matchCards = user.match_history.map((match) => {
+  const reversedMatchHistory = [...user.match_history].reverse();
+
+  const matchCards = reversedMatchHistory.map((match) => {
     const isWinner = match.winner_id === user.id;
-    const opponentId =
-      match.player1_id === user.id ? match.player2_id : match.player1_id;
     const matchDate = new Date(match.date).toLocaleDateString();
 
     return (
@@ -163,11 +176,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 			<strong className="inline-block">{match.game_type.toUpperCase()}</strong> — {matchDate}
 			<span className="inline-block ml-2">{match.game_type === 'pong' ? '🏓' : '⚔️'}</span>
 		</p>
-        <p className="font-mono text-lg"><strong>{t('opponent')}</strong> {t('player')} #{opponentId}</p>
-        <p className="font-mono text-lg"><strong>{t('duration')}</strong> {match.game_duration}s</p>
+        <p className="font-mono text-lg"><strong>{t('opponent')}</strong> {match.player1_id === user.id ? match.player2_name : match.player1_name}</p>
+        <p className="font-mono text-lg"><strong>{t('duration')}</strong> {match.game_duration.toFixed(2)}s</p>
         <p className="font-mono text-lg">{isWinner ? '✅ Win' : '❌ Loss'}</p>
         <button
-          onClick={() => setSelectedMatch(match)}
+          onClick={() => handleSelectMatch(match.id)}
           className="mt-4 bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-700"
         >
           {t('view_details')}
@@ -193,14 +206,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   const avgGamesPerDay = (matchesPlayed / daysSinceJoined).toFixed(2);
 
   // Determine Favorite Game
-  const favoriteGame = user.games_played_pong > user.games_played_blockbattle ? 'Pong' : 'Blockbattle';
+  let favoriteGame = '';
+  if (user.games_played_pong === user.games_played_blockbattle)
+		favoriteGame = 'You like them both equally';
+  else
+ 		favoriteGame = user.games_played_pong > user.games_played_blockbattle ? 'Pong' : 'Blockbattle';
 
   return (
     <div className="p-6 flex flex-col w-full">
     {/* Player Info Panel */}
       <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-purple-100 via-white to-purple-100 p-6 rounded-xl border border-purple-300 shadow-lg">
         <h2 className="titles text-[#6B21A8] mb-4">
-          {t('welcome')} <span className="font-semibold">{user.username}</span> 👋
+          Game statistics of <span className="font-semibold">{user.username}</span> 👋
         </h2>
         <div className="flex flex-wrap justify-center gap-12">
           <div className="texts">🎖️ {t('current_ranking')} <strong>{user.ranking_points.toFixed(2)}</strong></div>

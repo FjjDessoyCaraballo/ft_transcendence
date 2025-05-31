@@ -3,6 +3,18 @@ import React from 'react';
 import { MatchData } from './UserManager';
 import { useTranslation } from 'react-i18next';
 
+// Dynamic emoji assignment
+const weaponEmojiMap: Record<string, string> = {
+  Pistol: '🔫',
+  Bazooka: '🚀',
+  'Land Mine': '💣'
+};
+
+function getWeaponEmoji(weapon: string): string {
+  return weaponEmojiMap[weapon] || '❓';
+}
+
+// React prop info
 interface MatchStatsPopupProps {
   match: MatchData;
   onClose: () => void;
@@ -10,15 +22,14 @@ interface MatchStatsPopupProps {
 
 const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => {
   const { t } = useTranslation('dashboard');
-  const isWinner = match.winner_id === 0;  // Assuming user ID is 0 for the test user
 
   // For Pong match
   const pongStats = match.game_data && 'longest_rally' in match.game_data ? (
 	<div className="bg-purple-100 p-4 rounded-lg shadow-sm">      
-		<p><strong>{t('longest_rally')}</strong> {match.game_data.longest_rally}s 🏓</p>
-		<p><strong>{t('average_rally')}</strong>  {match.game_data.avg_rally}s 🏓</p>
-		<p><strong>{t('player')} 1 {t('points')}:</strong>  {match.game_data.player1_points} 🏓</p>
-		<p><strong>{t('player')} 2 {t('points')}:</strong>  {match.game_data.player2_points} 🏓</p>
+		<p><strong>Longest Rally:</strong> {match.game_data.longest_rally}s 🏓</p>
+		<p><strong>Average Rally:</strong>  {match.game_data.avg_rally.toFixed(2)}s 🏓</p>
+		<p><strong>Player 1 Points:</strong>  {match.game_data.player1_points} 🏓</p>
+		<p><strong>Player 2 Points:</strong>  {match.game_data.player2_points} 🏓</p>
     </div>
   ) : null;
 
@@ -28,9 +39,9 @@ const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => 
       {/* Player 1 Column */}
       <div className="flex flex-col w-1/2 space-y-4">
         <div className="bg-purple-100 p-4 rounded-lg shadow-sm">
-          <h4 className="font-bold text-lg text-purple-700">{t('player')} 1 {t('info')}</h4>
-          <p><strong>{t('weapon')} 1:</strong> {match.game_data.player1_weapon1} ⚔️</p>
-          <p><strong>{t('weapon')} 2:</strong> {match.game_data.player1_weapon2} 🛡️</p>
+          <h4 className="font-bold text-lg text-purple-700">{match.player1_name}</h4>
+          <p><strong>{t('weapon')} 1:</strong> {match.game_data.player1_weapon1} {getWeaponEmoji(match.game_data.player1_weapon1)}</p>
+          <p><strong>{t('weapon')} 2:</strong> {match.game_data.player1_weapon2} {getWeaponEmoji(match.game_data.player1_weapon2)}</p>
           <p><strong>{t('damage_done')}</strong> {match.game_data.player1_damage_done} 💥</p>
           <p><strong>{t('damage_taken')}</strong> {match.game_data.player1_damage_taken} ⚡</p>
           <p><strong>{t('coins_collected')}</strong> {match.game_data.player1_coins_collected} 🪙</p>
@@ -40,9 +51,9 @@ const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => 
       {/* Player 2 Column */}
       <div className="flex flex-col w-1/2 space-y-4">
         <div className="bg-purple-100 p-4 rounded-lg shadow-sm">
-          <h4 className="font-bold text-lg text-purple-700">{t('player')} 2 {t('info')}</h4>
-          <p><strong>{t('weapon')} 1:</strong> {match.game_data.player2_weapon1} ⚔️</p>
-          <p><strong>{t('weapon')} 2:</strong> {match.game_data.player2_weapon2} 🛡️</p>
+          <h4 className="font-bold text-lg text-purple-700">{match.player2_name}</h4>
+          <p><strong>{t('weapon')} 1:</strong> {match.game_data.player2_weapon1} {getWeaponEmoji(match.game_data.player2_weapon1)}</p>
+          <p><strong>{t('weapon')} 2:</strong> {match.game_data.player2_weapon2} {getWeaponEmoji(match.game_data.player2_weapon2)}</p>
           <p><strong>{t('damage_done')}</strong> {match.game_data.player2_damage_done} 💥</p>
           <p><strong>{t('damage_taken')}</strong> {match.game_data.player2_damage_taken} ⚡</p>
           <p><strong>{t('coins_collected')}</strong> {match.game_data.player2_coins_collected} 🪙</p>
@@ -61,7 +72,7 @@ const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => 
 				<div className="flex justify-center space-x-6 text-black">
 				<p><strong>{t('game_type')}</strong><br/> {match.game_type.toUpperCase()} 🎮</p>
 				<p><strong>{t('match_date')}</strong><br/> {new Date(match.date).toLocaleDateString()} 📅</p>
-				<p><strong>{t('duration')}</strong><br/> {match.game_duration}s ⏱</p>
+				<p><strong>{t('duration')}</strong><br/> {match.game_duration.toFixed(2)}s ⏱</p>
 				{'win_method' in match.game_data && (
 					<p><strong>{t('win_method')}</strong><br/> {match.game_data.win_method} 🏆</p>
 				)}           

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from "./UserManager";
-import { getAllUsers } from '../services/userService';
-import { global_curUser } from './GameCanvas';
+import { getAllUsers, getLoggedInUserData } from '../services/userService';
 import {
   getFriends,
   getPendingRequests,
@@ -28,6 +27,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
   const [players, setPlayers] = useState<ExtendedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loggedInUserData, setLoggedInUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const { t } = useTranslation('players');
 
@@ -48,6 +48,11 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
           getPendingRequests().catch(() => []),      // Get friend requests received
           getSentRequests().catch(() => [])          // Get friend requests sent
         ]);
+
+		// Get loggedInUser
+
+		const newLoggedInUserData = await getLoggedInUserData();
+		setLoggedInUser(newLoggedInUserData);
 
         // Create sets of user IDs for fast lookup
         const friendIds = new Set(friendsList.map(friend => friend.id));
@@ -76,6 +81,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       } catch (error) {
         console.error('Failed to fetch data:', error);
         setError(t('player_fail'));
+		setLoggedInUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -154,7 +160,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
 
   // Renders the appropriate button based on the friendship status
   const getFriendActionButton = (player: ExtendedUser) => {
-    const isLoggedInUser = player.username === global_curUser;
+    const isLoggedInUser = player.username === loggedInUserData?.username;
 
     if (isLoggedInUser) return null;
 
@@ -259,13 +265,13 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
       {/* Display all players (excluding pending requests) */}
       <div className="p-6 w-full flex flex-col items-center">
         <div className="w-full max-w-6xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-pink-200 shadow-md">
-          <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 {t('hi')} {global_curUser}! {t('welcome')}</h2>
+          <h2 className="titles text-[#6B21A8] mb-6 text-2xl">🧑‍🤝‍🧑 Hi {loggedInUserData?.username}! {t('welcome')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...nonPendingPlayers]
-              .sort((a, b) => (a.username === global_curUser ? -1 : b.username === global_curUser ? 1 : 0))
+              .sort((a, b) => (a.username === loggedInUserData?.username ? -1 : b.username === loggedInUserData?.username ? 1 : 0))
               .map((player) => {
-                const isLoggedInUser = player.username === global_curUser;
+                const isLoggedInUser = player.username === loggedInUserData?.username;
 
                 return (
                   <div
@@ -294,8 +300,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ onShowDashboard }) => {
                       {getFriendActionButton(player)}
                       {(isLoggedInUser || player.friendshipStatus === 'friend') && (
                         <button
-                          onClick={() => navigate('/dashboard')}
-                          className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
+                          onClick={() => navigate(`/dashboard/${player.username}`)}
+                          className="px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-700 text-white"
                         >
                           {t('more_stats')}
                         </button>

@@ -1,15 +1,16 @@
 import { GameStates, IGameState } from "../game/GameStates";
 import { ReturnMainMenuButton } from "../game/EndScreen";
-import { global_allUserDataArr, global_curUser, global_stateManager } from "./GameCanvas";
+import { global_stateManager } from "./GameCanvas";
 import { TEXT_PADDING, BUTTON_COLOR, BUTTON_HOVER_COLOR } from "../game/Constants";
 import { ChallengeButton, TournamentButton, User, UserManager } from "./UserManager";
 import { Button } from "./Button";
 import { GameType, UserHubState } from "./Types";
 import { MatchIntro } from "../game/MatchIntro";
-import { Tournament } from "../game/Tournament";
+import { Tournament, TournamentPlayer } from "../game/Tournament";
 import { drawCenteredText } from "../game/StartScreen";
-import { loginUser } from "../services/userService";
 import { TFunction } from 'i18next';
+import { checkTournamentStatus, getAllUsers, getLoggedInUserData, loginUser, removeTournamentPlayer, startNewTournament, verifyOpponent, verifyTournamentPlayer } from "../services/userService";
+import { StartScreen } from "../game/StartScreen";
 
 export class NextPageButton extends Button
 {
@@ -51,10 +52,15 @@ export class UserHUB implements IGameState
 	isCheckingPassword: boolean;
 	needNewChallengeButtons: boolean;
 	opponentName: string | null;
-	tournamentArr: User [];
+	tournamentArr: TournamentPlayer [];
 	gameType: GameType;
 	state: UserHubState;
 	t: TFunction;
+	loggedInUserData: User | null;
+	userDataArr: User [];
+	isDataReady: boolean;
+	showLoadingText: boolean;
+	isLoggedIn: boolean = false;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 	submitPasswordBound: () => void;
@@ -75,24 +81,11 @@ export class UserHUB implements IGameState
 		this.state = state;
 		this.tournamentArr = [];
 		this.gameType = gameType;
+		this.isDataReady = false;
+		this.showLoadingText = false;
+		this.loggedInUserData = null;
+		this.userDataArr = [];
 		this.t = t;
-
-		if (global_curUser)
-		{
-			const curUserData = global_allUserDataArr.find(user => user.username === global_curUser)
-			if (curUserData)
-			{
-				this.tournamentArr.push(curUserData);
-
-				// Sort userArr based on player ranking
-				const curUserRank = curUserData.ranking_points;
-				global_allUserDataArr.sort((a, b) => {
-					const diffA = Math.abs(a.ranking_points - curUserRank);
-					const diffB = Math.abs(b.ranking_points - curUserRank);
-					return diffA - diffB;
-				});
-			}
-		}
 
 		let text1 = 'return_to_menu';
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
@@ -111,11 +104,90 @@ export class UserHUB implements IGameState
 		this.nextPageButton = new NextPageButton(ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial', t);
 		this.prevPageButton = new PrevPageButton(ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial', t);
 		this.challengeBtnArr = [];
+		
+		setTimeout(() => {
+			this.showLoadingText = true;
+		}, 500); 
+
+		this.fetchUserDataArr();
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
 		this.submitPasswordBound = () => this.submitPasswordCallback();
 		this.cancelPasswordBound = () => this.cancelPasswordCallback();
+	}
+
+	async fetchUserDataArr()
+	{
+		try
+		{
+			this.userDataArr = await getAllUsers();
+			if (this.userDataArr.length === 0)
+			{
+				console.log("USER HUB: User data fetch failed.");
+				return ;
+			}
+
+			this.loggedInUserData = await getLoggedInUserData();
+			if (!this.loggedInUserData)
+			{
+				console.log("USER HUB: User data fetch failed.");
+				return ;
+			}
+
+			if (this.state === UserHubState.TOURNAMENT)
+			{
+				await startNewTournament();
+				
+				const loggedInPlayer: TournamentPlayer = {
+					tournamentId: 0,
+					user: this.loggedInUserData,
+					tournamentPoints: 0,
+					place: 0,
+					coinsCollected: 0,
+					pongPointsScored: 0,
+					isWinner: false,
+					bbWeapons: []
+				}
+
+				this.tournamentArr.push(loggedInPlayer);
+			}
+
+			// Sort userArr based on player ranking
+			const curUserRank = this.loggedInUserData.ranking_points;
+			this.userDataArr.sort((a, b) => {
+				const diffA = Math.abs(a.ranking_points - curUserRank);
+				const diffB = Math.abs(b.ranking_points - curUserRank);
+				return diffA - diffB;
+			});
+
+			this.isDataReady = true;
+		
+	
+		}
+		catch (error) {
+			alert(`User data fetch failed, returning to main menu! ${error}`)
+			console.log("USER HUB: User data fetch failed.");
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
+			this.isDataReady = false;
+		}
+	}
+
+	async removeTournamenPlayer(playerToRemove: TournamentPlayer)
+	{
+
+		try {
+
+			this.tournamentArr = await removeTournamentPlayer(playerToRemove.user.id);
+		
+		} catch (error) {
+
+			alert(`Error while removing player from tournament: ${error}`);
+			// Do I need other error handling...?
+
+		}
+
+		
 	}
 
 	mouseMoveCallback(event: MouseEvent)
@@ -152,14 +224,13 @@ export class UserHUB implements IGameState
 			if (btn.checkClick())
 			{
 				// Logic for "Remove from tournament" -button
-				const tournamentPlayer = this.tournamentArr.find(player => player.username === btn.user.username);
+				const tournamentPlayer = this.tournamentArr.find(player => player.user.username === btn.user.username);
 
 				if (tournamentPlayer && btn.textKey === this.t('remove'))
 				{
-					const idx = this.tournamentArr.indexOf(tournamentPlayer);
-					this.tournamentArr.splice(idx, 1);
+					this.removeTournamenPlayer(tournamentPlayer);
 				}
-				else if (global_curUser) 
+				else if (this.loggedInUserData)
 				{
 					this.opponentName = btn.user.username;
 
@@ -201,10 +272,21 @@ export class UserHUB implements IGameState
 			if (!this.opponentName)
 				return ;
 
-			await loginUser({
-					username: this.opponentName,
-					password: enteredPassword
-				  });
+			if (this.state === UserHubState.SINGLE_GAME)
+			{
+				await verifyOpponent({
+						username: this.opponentName,
+						password: enteredPassword
+					  });
+			}
+			else if (this.state === UserHubState.TOURNAMENT)
+			{
+				this.tournamentArr = await verifyTournamentPlayer({
+						username: this.opponentName,
+						password: enteredPassword
+					  });
+
+			}
 
 			const passwordModal = document.getElementById("passwordModal") as HTMLElement;
 			if (passwordModal) {
@@ -212,22 +294,9 @@ export class UserHUB implements IGameState
 			}
 			passwordInput.value = "";
 			this.isCheckingPassword = false;
-			const curUserData = global_allUserDataArr.find(user => user.username === global_curUser);
-			const opponentData = global_allUserDataArr.find(user => user.username === this.opponentName);
 
-			if (this.state === UserHubState.SINGLE_GAME && curUserData && opponentData)
-			{
-				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, curUserData, opponentData, null, null, this.gameType, this.t));
-			}
-			else
-			{
-				if (opponentData)
-					this.tournamentArr.push(opponentData);
-
-				if (this.tournamentArr.length === 4)
-					global_stateManager.changeState(new Tournament(this.canvas, this.ctx, this.tournamentArr, this.gameType, this.t));
-			}
-
+			if (this.state === UserHubState.SINGLE_GAME)
+				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, this.gameType, false, this.t));
 			
 		} catch {
 			this.isCheckingPassword = false;
@@ -235,11 +304,21 @@ export class UserHUB implements IGameState
 			passwordInput.value = ""; // Clear the input field
 		}
 
+		if (this.state === UserHubState.TOURNAMENT)
+		{
+			try {
+				await checkTournamentStatus();
+				global_stateManager.changeState(new Tournament(this.canvas, this.ctx, this.gameType, this.t));
+			} catch {
+				console.log('Tournament not ready yet');
+			}
+		}
+
 	}
 
 	submitPasswordCallback(): void
 	{
-		if (!this.opponentName || !global_curUser || this.isCheckingPassword)
+		if (!this.opponentName || !this.loggedInUserData || this.isCheckingPassword)
 			return ;
 
 		this.handleOpponentLogin();
@@ -286,6 +365,19 @@ export class UserHUB implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
+
+		if (!this.isDataReady)
+		{
+			if (!this.showLoadingText)
+				return ;
+			const loadingHeader = 'Fetching user data, please wait.';
+			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
+			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
+			return ;
+		}
+
+
 		if (this.prevUserStartIdx !== this.userStartIdx)
 		{
 			this.needNewChallengeButtons = true;
@@ -293,7 +385,7 @@ export class UserHUB implements IGameState
 			this.challengeBtnArr.length = 0;
 		}
 
-		UserManager.drawCurUser(this.canvas, ctx, this.t);
+		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData, this.t);
 
 		if (this.state === UserHubState.TOURNAMENT)
 		{
@@ -306,21 +398,21 @@ export class UserHUB implements IGameState
 
 		for (let i = this.userStartIdx; i < this.userStartIdx + 3; ++i)
 		{
-			if (i >= global_allUserDataArr.length)
+			if (i >= this.userDataArr.length)
 				break ;
 
-			const isInTournament = this.tournamentArr.some(player => player.username === global_allUserDataArr[i].username);
+			const isInTournament = this.tournamentArr.some(player => player.user.username === this.userDataArr[i].username);
 
-			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(ctx, global_allUserDataArr[i], x, y, this.state, isInTournament, this.t);
+			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(ctx, this.userDataArr[i], x, y, this.state, isInTournament, this.t);
 
-			if (this.needNewChallengeButtons && btn.user.username !== global_curUser
+			if (this.needNewChallengeButtons && btn.user.username !== this.loggedInUserData?.username
 				&& this.state !== UserHubState.INFO)
 			{
 				this.challengeBtnArr.push(btn);
 			}
 
 			// Check if we need to update the tournament button
-			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === global_allUserDataArr[i].username);
+			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === this.userDataArr[i].username);
 
 			if ((isInTournament && tournamentBtn && tournamentBtn.textKey === this.t('add_to_tournament'))
 				|| (!isInTournament && tournamentBtn && tournamentBtn.textKey === this.t('remove'))
@@ -339,7 +431,7 @@ export class UserHUB implements IGameState
 
 		this.returnMenuButton.draw(ctx, this.t);
 
-		if (this.userStartIdx < global_allUserDataArr.length - 3)
+		if (this.userStartIdx < this.userDataArr.length - 3)
 		{
 			this.nextPageButton.draw(ctx, this.t);
 			this.isNextActive = true;
