@@ -166,7 +166,7 @@ export class UserHUB implements IGameState
 	
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("USER HUB: User data fetch failed.");
 			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
@@ -370,9 +370,9 @@ export class UserHUB implements IGameState
 		{
 			if (!this.showLoadingText)
 				return ;
-			const loadingHeader = 'Fetching user data, please wait.';
+			const loadingHeader = this.t('data_fetch');
 			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
-			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			const loadingInfo = this.t('info_loading');
 			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
 			return ;
 		}
