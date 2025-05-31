@@ -14,6 +14,7 @@ async function userRoutes(fastify, options) {
   
     // Valid language options
   const validLanguages = ['English', 'Finnish', 'Portuguese'];
+  const validWeapons = ['Pistol', 'Bazooka', 'Land Mine'];
   
   const authenticate = async (request, reply) => {
     try {
@@ -175,7 +176,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   });
 
   // GET user by USERNAME
-  fastify.get('/by-username/:username', async (request, reply) => {
+  fastify.get('/by-username/:username', { preHandler: authenticate }, async (request, reply) => {
 
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
@@ -554,7 +555,12 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       return { error: 'Tournament array empty' };
     }
 
-	// Verify that weapons are valid...?
+	if (!validWeapons.includes(p1Weapons[0]) || !validWeapons.includes(p1Weapons[1])
+	 || !validWeapons.includes(p2Weapons[0]) || !validWeapons.includes(p2Weapons[1])) {
+      reply.code(400);
+      return { error: 'Bad weapon data; weapon name is nod valid' };
+    }
+
     
 	const p1Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][0];
 	const p2Idx = globalTournamentObj.gameOrder[globalTournamentObj.matchCounter][1];
@@ -911,79 +917,6 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     return { friends };
   });
 
-  /*
-  // Update rankings after a match (for internal use)
-  fastify.post('/update-stats', { preHandler: authenticate }, async (request, reply) => {
-    const { winner, loser, gameTypeString } = request.body;
-    
-    if (!winner || !loser || !gameTypeString) {
-      reply.code(400);
-      return { error: 'Missing required parameters' };
-    }
-    
-    const transaction = fastify.db.transaction(() => {
-      // Update game stats
-      if (gameTypeString === 'pong') {
-
-        fastify.db.prepare(`
-          UPDATE users 
-          SET games_played_pong = ?,
-              wins_pong = ?,
-              losses_pong = ?,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE id = ?
-        `).run(winner.games_played_pong, winner.wins_pong, winner.losses_pong, winner.id);
-
-		fastify.db.prepare(`
-          UPDATE users 
-          SET games_played_pong = ?,
-              wins_pong = ?,
-              losses_pong = ?,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE id = ?
-        `).run(loser.games_played_pong, loser.wins_pong, loser.losses_pong, loser.id);
-
-      } else if (gameTypeString === 'blockbattle') {
-
-        fastify.db.prepare(`
-          UPDATE users 
-          SET games_played_blockbattle = ?,
-              wins_blockbattle = ?,
-              losses_blockbattle = ?,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE id = ?
-        `).run(winner.games_played_blockbattle, winner.wins_blockbattle, winner.losses_blockbattle, winner.id);
-
-		fastify.db.prepare(`
-          UPDATE users 
-          SET games_played_blockbattle = ?,
-              wins_blockbattle = ?,
-              losses_blockbattle = ?,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE id = ?
-        `).run(loser.games_played_blockbattle, loser.wins_blockbattle, loser.losses_blockbattle, loser.id);
-
-      }
-      
-      // Update ranking points
-      fastify.db.prepare(`
-        UPDATE users 
-        SET ranking_points = ?
-        WHERE id = ?
-      `).run(winner.ranking_points, winner.id);
-
-	  fastify.db.prepare(`
-        UPDATE users 
-        SET ranking_points = ?
-        WHERE id = ?
-      `).run(loser.ranking_points, loser.id);
-
-    });
-    
-    transaction();
-    
-    return { success: true };
-  }); */
 
   // GDPR - Export user data
   fastify.get('/export-data', { 

@@ -438,14 +438,6 @@ async function gameRoutes(fastify, options) {
 			player1TournamentObj.isWinner = true;
 		}
 
-	/*	const sortedPlayerArr = [...globalTournamentObj.tournamentArr].sort((a, b) => {
-			if (b.tournamentPoints !== a.tournamentPoints)
-				return b.tournamentPoints - a.tournamentPoints;
-			return b.coinsCollected - a.coinsCollected;
-		});
-
-		for (let i = 0; i < sortedPlayerArr.length; i++)
-			sortedPlayerArr[i].place = i + 1; */
 	}
 	else if (matchData.game_type === 'pong')
 	{
@@ -465,14 +457,6 @@ async function gameRoutes(fastify, options) {
 			player1TournamentObj.isWinner = true;
 		}
 
-	/*	const sortedPlayerArr = [...globalTournamentObj.tournamentArr].sort((a, b) => {
-			if (b.tournamentPoints !== a.tournamentPoints)
-				return b.tournamentPoints - a.tournamentPoints;
-			return b.pongPointsScored - a.pongPointsScored;
-		});
-
-		for (let i = 0; i < sortedPlayerArr.length; i++)
-			sortedPlayerArr[i].place = i + 1; */
 	}
       
     return {status: 'OK'};

@@ -37,10 +37,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 			setIsLoggedIn(true);
 		} catch (err) {
 			setIsLoggedIn(false);
-	//		setIsGameVisible(true);
-	//		setIsDashboardVisible(false);
-	//		setDashboardUserData(null);
-	//		setButtonText('Dashboard');
 		}
   };
 
@@ -81,43 +77,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
     setShowSettings(true);
   }
 
-  /*
-  // Dashboard state change functions
-  const handleDashboardClick = async () => {
-
-	try {
-		const userData = await getLoggedInUserData();
-
-		if (userData)
-		{
-			userData.match_history = await getMatchHistoryByID(userData.id);
-		}
-
-		setDashboardUserData(userData);
-		setIsGameVisible(false);
-		setIsDashboardVisible(true);
-		setButtonText('To Game');
-	} catch {
-		alert("Error while fetching user data for Dashboard; are you sure you're logged in...?");
-		console.log("Error while fetching user data for Dashboard");
-	}
-  };
-
-  const handleBackToGameClick = () => {
-	setDashboardUserData(null);
-    setIsGameVisible(true);
-    setIsDashboardVisible(false);
-    setButtonText('Dashboard');
-  }; */
-
-  const onStartScreenLoginFail = () => {
-	setIsLoggedIn(false);
-//	setIsGameVisible(true);
-//	setIsDashboardVisible(false);
-//	setDashboardUserData(null);
-//	setButtonText('Dashboard');
-  }
-
   return (
     <>
 	<header className="w-full bg-[url('../assets/header.png')] bg-cover bg-no-repeat bg-center shadow-md z-[200]">
@@ -135,7 +94,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 			{isLoggedIn ? (
 				<>
 				<button className="buttonsStyle" onClick={() => navigate('/')}>Game</button>
-				<button className="buttonsStyle" onClick={() => navigate('/instructions')}>Instructions</button>
 				<button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>Dashboard</button>
 				<button className="buttonsStyle" onClick={() => navigate('/playerlist')}>Players</button>
 				<button className="buttonsStyle" onClick={HandleSettingsClick}>Settings</button>
