@@ -1,4 +1,5 @@
 const { hashPassword, comparePassword } = require('../utils/passwords');
+const { validateUsername, escapeHtml } = require('../utils/inputSanitizer');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
@@ -144,6 +145,12 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       reply.code(400);
       return { error: 'Username and password are required' };
     }
+    
+    const validationResult = validateUsername(username);
+    if (!validationResult.isValid) {
+      reply.code(400);
+      return { error: validationResult.message };
+    }
 
     if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
       reply.code(400);
@@ -154,17 +161,19 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       const hashedPassword = await hashPassword(password);
       
       const avatarUrl = '/public/avatars/bee.png';
+
+      const sanitizedUsername = validationResult.sanitized;
       
       const result = fastify.db.prepare(`
         INSERT INTO users (
           username, password, avatar_url
         ) VALUES (?, ?, ?)
-      `).run(username, hashedPassword, avatarUrl);
+      `).run(sanitizedUsername, hashedPassword, avatarUrl);
       
       reply.code(201);
       return { 
         id: result.lastInsertRowid, 
-        username, 
+        username: sanitizedUsername, 
         avatar_url: avatarUrl,
         ranking_points: 1000,
         games_played_pong: 0,
@@ -590,11 +599,19 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
         return { error: 'Username is required' };
       }
       
+      const validationResult = validateUsername(username);
+      if (!validationResult.isValid) {
+        reply.code(400);
+        return { error: validationResult.message };
+      }
+      
+      const sanitizedUsername = validationResult.sanitized;
+      
       const result = fastify.db.prepare(`
         UPDATE users 
         SET username = ?, updated_at = CURRENT_TIMESTAMP 
         WHERE id = ? AND deleted_at IS NULL
-      `).run(username, userId);
+      `).run(sanitizedUsername, userId);
       
       if (result.changes === 0) {
         reply.code(404);
