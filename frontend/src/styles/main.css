@@ -20,7 +20,7 @@
   		@apply px-4 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082];
     }
     .buttonsDiv {
-        @apply flex p-3 justify-center space-x-8;
+        @apply flex p-3 justify-center space-x-3;
     }
 }
 
@@ -35,7 +35,6 @@ body {
     font-family: 'mono', sans-serif;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
     overflow-y: auto; 
@@ -55,7 +54,7 @@ h1 {
 .button-container {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
@@ -79,14 +78,6 @@ button:hover {
 	display: none;
 }
 
-/* Canvas styling */
-canvas {
-    border: 2px solid #FFFFF0;
-    margin-top: 20px;
-    max-width: 100%;
-    max-height: 80vh;
-    background-color: #000000;
-}
 
 /* Form container */
 .form-container {

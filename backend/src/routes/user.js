@@ -1,4 +1,5 @@
 const { hashPassword, comparePassword } = require('../utils/passwords');
+const { validateUsername, escapeHtml } = require('../utils/inputSanitizer');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
@@ -202,6 +203,12 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       reply.code(400);
       return { error: 'Username and password are required' };
     }
+    
+    const validationResult = validateUsername(username);
+    if (!validationResult.isValid) {
+      reply.code(400);
+      return { error: validationResult.message };
+    }
 
     if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/)) {
       reply.code(400);
@@ -222,6 +229,8 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       const hashedPassword = await hashPassword(password);
       
       const avatarUrl = '/public/avatars/bee.png';
+
+      const sanitizedUsername = validationResult.sanitized;
       
       const result = fastify.db.prepare(`
         INSERT INTO users (
@@ -232,7 +241,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
       reply.code(201);
       return { 
         id: result.lastInsertRowid, 
-        username, 
+        username: sanitizedUsername, 
         avatar_url: avatarUrl,
         ranking_points: 1000,
         games_played_pong: 0,
@@ -259,7 +268,15 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   });
 
   // Verify opponent
-  fastify.post('/verify-opponent', { preHandler: authenticate }, async (request, reply) => {
+  fastify.post('/verify-opponent', { 
+    preHandler: authenticate,
+    config: {
+      rateLimit: {
+        max: 10,
+        timeWindow: '1 minute'
+      }
+    }
+  }, async (request, reply) => {
     const { username, password } = request.body;
     
     // Validate input
@@ -595,7 +612,14 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 });
 
   // Login
-  fastify.post('/login', async (request, reply) => {
+  fastify.post('/login', {
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: '1 minute'
+      }
+    }
+  }, async (request, reply) => {
     const { username, password } = request.body;
     
     if (!username || !password) {
@@ -662,11 +686,19 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
         return { error: 'Username is required' };
       }
       
+      const validationResult = validateUsername(username);
+      if (!validationResult.isValid) {
+        reply.code(400);
+        return { error: validationResult.message };
+      }
+      
+      const sanitizedUsername = validationResult.sanitized;
+      
       const result = fastify.db.prepare(`
         UPDATE users 
         SET username = ?, updated_at = CURRENT_TIMESTAMP 
         WHERE id = ? AND deleted_at IS NULL
-      `).run(username, userId);
+      `).run(sanitizedUsername, userId);
       
       if (result.changes === 0) {
         reply.code(404);
@@ -696,7 +728,15 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   });
 
   // Change password
-  fastify.put('/password', { preHandler: authenticate }, async (request, reply) => {
+  fastify.put('/password', { 
+    preHandler: authenticate,
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: '1 minute'
+      }
+    }
+  }, async (request, reply) => {
     const userId = request.user.id;
     const { currentPassword, newPassword } = request.body;
     
@@ -740,7 +780,15 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   });
 
   // Upload avatar
-  fastify.post('/avatar', { preHandler: authenticate }, async (request, reply) => {
+  fastify.post('/avatar', { 
+    preHandler: authenticate,
+    config: {
+      rateLimit: {
+        max: 2,
+        timeWindow: '1 minute'
+      }
+    }
+  }, async (request, reply) => {
     const userId = request.user.id;
 	const now = Date.now();
 	const lastUpload = uploadTracker.get(userId);
@@ -938,7 +986,15 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   }); */
 
   // GDPR - Export user data
-  fastify.get('/export-data', { preHandler: authenticate }, async (request, reply) => {
+  fastify.get('/export-data', { 
+    preHandler: authenticate,
+    config: {
+      rateLimit: {
+        max: 3,
+        timeWindow: '5 minutes'
+      }
+    }
+  }, async (request, reply) => {
     const userId = request.user.id;
     
     // Get user data
@@ -984,7 +1040,15 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   });
 
   // GDPR - Delete account (soft delete)
-  fastify.delete('/account', { preHandler: authenticate }, async (request, reply) => {
+  fastify.delete('/account', { 
+    preHandler: authenticate,
+    config: {
+      rateLimit: {
+        max: 3,
+        timeWindow: '1 minute'
+      }
+    }
+  }, async (request, reply) => {
     const userId = request.user.id;
     
     // Perform soft delete
