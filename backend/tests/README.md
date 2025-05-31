@@ -1,0 +1,1 @@
+move the scripts to root before running or modify paths.
