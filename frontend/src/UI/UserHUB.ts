@@ -414,8 +414,8 @@ export class UserHUB implements IGameState
 			// Check if we need to update the tournament button
 			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === this.userDataArr[i].username);
 
-			if ((isInTournament && tournamentBtn && tournamentBtn.textKey === this.t('add_to_tournament'))
-				|| (!isInTournament && tournamentBtn && tournamentBtn.textKey === this.t('remove'))
+			if ((isInTournament && tournamentBtn && tournamentBtn.textKey === 'add_to_tournament')
+				|| (!isInTournament && tournamentBtn && tournamentBtn.textKey === 'remove')
 			)
 			{
 				const idx = this.challengeBtnArr.indexOf(tournamentBtn);
