@@ -307,7 +307,7 @@ export class MatchIntro implements IGameState
 		}
 	}
 
-	drawWeaponMenu(ctx: CanvasRenderingContext2D)
+	drawWeaponMenu(ctx: CanvasRenderingContext2D, t: TFunction)
 	{
 
 		const infoBoxW = 500;
@@ -364,7 +364,15 @@ export class MatchIntro implements IGameState
 		ctx.fillText(name, nameX, nameY);
 
 		ctx.font = '24px arial';
-		const descript = curWeapon.description;
+		let descript = '';
+		// Set the description based on the weapon name - Allows dynamic translation
+		if (name === 'Pistol') {
+			descript = this.t('pistol');
+		} else if (name === 'Bazooka') {
+			descript = this.t('bazooka');
+		} else if (name === 'Land Mine') {
+			descript = this.t('land_mine');
+		}
 		const descriptX = infoBox1X + infoBoxW / 2 - ctx.measureText(descript).width / 2;
 		const descriptY = nameY + 40;
 		ctx.fillText(descript, descriptX, descriptY);
@@ -427,7 +435,15 @@ export class MatchIntro implements IGameState
 		ctx.fillText(name2, nameX2, nameY);
 
 		ctx.font = '24px arial';
-		const descript2 = curWeapon2.description;
+		let descript2 = '';
+		// Set the description based on the weapon name - Allows dynamic translation
+		if (name2 === 'Pistol') {
+			descript2 = this.t('pistol');
+		} else if (name2 === 'Bazooka') {
+			descript2 = this.t('bazooka');
+		} else if (name2 === 'Land Mine') {
+			descript2 = this.t('land_mine');
+		}
 		const descript2X = infoBox2X + infoBoxW / 2 - ctx.measureText(descript2).width / 2;
 		ctx.fillText(descript2, descript2X, descriptY);
 
@@ -540,7 +556,7 @@ export class MatchIntro implements IGameState
 		ctx.fillText(p2Rank, rank2X, rankingPointsY);
 
 		if (this.gameType === GameType.BLOCK_BATTLE)
-			this.drawWeaponMenu(ctx);
+			this.drawWeaponMenu(ctx, this.t);
 
 	}
 
