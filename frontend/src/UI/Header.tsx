@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onHeaderLogOut: () => void;
-  onHeaderLogIn: () => void
+  onHeaderLogIn: () => void;
+  AppLogStatus: boolean;
 }
 
 export interface WindowManager {
@@ -17,7 +18,7 @@ export interface WindowManager {
   onDecline: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn} ) => {
+export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, AppLogStatus} ) => {
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -26,7 +27,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn} )
   const [loggedInUserData, setLoggedInUserData] = useState<User | null>(null);
   const navigate = useNavigate();
 
-  console.log('Header isLoggedIn state:', isLoggedIn);
 
  useEffect(() => {
   	const checkLoginStatus = async () => {
@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn} )
   return () => {
     window.removeEventListener('loginStatusChanged', checkLoginStatus);
   };
-}, []);
+}, [AppLogStatus]);
 
   const handleLogout = () => {
 

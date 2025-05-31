@@ -8,25 +8,30 @@ import { Instructions } from '../UI/Instructions';
 
 export default function App() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const onLogOut = () =>
-  {
-	setIsLoggedIn(false);
-  }
+	const onLogOut = () =>
+	{
+		setIsLoggedIn(false);
+	}
 
-  const onLogIn = () =>
-  {
-	setIsLoggedIn(true);
-  }
+	const onLogIn = () =>
+	{
+		setIsLoggedIn(true);
+	}
+
+	const gameCanvasLogOut = () =>
+	{
+		setIsLoggedIn(false);
+	}
 
 
   return (
 	<>
-		<Header onHeaderLogOut={onLogOut} onHeaderLogIn={onLogIn} />
+		<Header onHeaderLogOut={onLogOut} onHeaderLogIn={onLogIn} AppLogStatus={isLoggedIn} />
 		<main className="pt-0">
 		<Routes>
-			<Route path="/" element={<GameCanvas isLoggedIn={isLoggedIn} />} />
+			<Route path="/" element={<GameCanvas isLoggedIn={isLoggedIn} onCanvasLogOut={gameCanvasLogOut} />} />
 			<Route path="/dashboard/:username" element={<DashboardWrapper isLoggedIn={isLoggedIn} />} />
 			<Route path="/playerlist" element={<PlayerList isLoggedIn={isLoggedIn} />} />
 			<Route path="/instructions" element={<Instructions />} />
