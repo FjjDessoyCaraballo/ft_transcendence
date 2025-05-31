@@ -26,10 +26,10 @@ const MatchStatsPopup: React.FC<MatchStatsPopupProps> = ({ match, onClose }) => 
   // For Pong match
   const pongStats = match.game_data && 'longest_rally' in match.game_data ? (
 	<div className="bg-purple-100 p-4 rounded-lg shadow-sm">      
-		<p><strong>Longest Rally:</strong> {match.game_data.longest_rally}s 🏓</p>
-		<p><strong>Average Rally:</strong>  {match.game_data.avg_rally.toFixed(2)}s 🏓</p>
-		<p><strong>Player 1 Points:</strong>  {match.game_data.player1_points} 🏓</p>
-		<p><strong>Player 2 Points:</strong>  {match.game_data.player2_points} 🏓</p>
+		<p><strong>{t('longest_rally')}</strong> {match.game_data.longest_rally}s 🏓</p>
+		<p><strong>{t('average_rally')}</strong>  {match.game_data.avg_rally.toFixed(2)}s 🏓</p>
+		<p><strong>{t('player')} 1 {t('points')}:</strong>  {match.game_data.player1_points} 🏓</p>
+		<p><strong>{t('player')} 2 {t('points')}:</strong>  {match.game_data.player2_points} 🏓</p>
     </div>
   ) : null;
 

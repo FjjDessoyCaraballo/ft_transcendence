@@ -28,5 +28,9 @@
   "match_date": "Ottelupäivämäärä:",
   "win_method": "Voittotapa:",
   "close": "Sulje",
-  "match_details": "Ottelun tiedot"
+  "match_details": "Ottelun tiedot",
+  "game_statistics_of": "Pelitilastot pelaajalta",
+  "like_both": "Pidät heistä molemmista yhtä paljon",
+  "win": "Voitto",
+  "loss": "Tappio"
 }

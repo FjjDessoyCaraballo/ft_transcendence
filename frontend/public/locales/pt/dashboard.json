@@ -28,5 +28,9 @@
   "match_date": "Data da partida:",
   "win_method": "Forma de vitória:",
   "close": "Fechar",
-  "match_details": "Detalhes da partida"
+  "match_details": "Detalhes da partida",
+  "game_statistics_of": "Estatísticas do jogo de",
+  "like_both": "Você gosta dos dois igualmente",
+  "win": "Vitória",
+  "loss": "Derrota"
 }

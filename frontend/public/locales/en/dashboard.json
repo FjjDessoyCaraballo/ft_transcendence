@@ -28,5 +28,9 @@
     "match_date": "Match Date:",
     "win_method": "Win Method:",
     "close": "Close",
-    "match_details": "Match Details"
+    "match_details": "Match Details",
+    "game_statistics_of": "Game statistics of",
+    "like_both": "You like them both equally",
+    "win": "Win",
+    "loss": "Loss"
 }

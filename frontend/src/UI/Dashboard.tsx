@@ -178,7 +178,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 		</p>
         <p className="font-mono text-lg"><strong>{t('opponent')}</strong> {match.player1_id === user.id ? match.player2_name : match.player1_name}</p>
         <p className="font-mono text-lg"><strong>{t('duration')}</strong> {match.game_duration.toFixed(2)}s</p>
-        <p className="font-mono text-lg">{isWinner ? '✅ Win' : '❌ Loss'}</p>
+        <p className="font-mono text-lg">
+          {isWinner ? `✅ ${t('win')}` : `❌ ${t('loss')}`}
+        </p>
         <button
           onClick={() => handleSelectMatch(match.id)}
           className="mt-4 bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-700"
@@ -208,7 +210,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   // Determine Favorite Game
   let favoriteGame = '';
   if (user.games_played_pong === user.games_played_blockbattle)
-		favoriteGame = 'You like them both equally';
+		favoriteGame = t('like_both');
   else
  		favoriteGame = user.games_played_pong > user.games_played_blockbattle ? 'Pong' : 'Blockbattle';
 
@@ -217,7 +219,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
     {/* Player Info Panel */}
       <div className="w-full max-w-4xl min-w-[800px] mx-auto mb-8 bg-gradient-to-r from-purple-100 via-white to-purple-100 p-6 rounded-xl border border-purple-300 shadow-lg">
         <h2 className="titles text-[#6B21A8] mb-4">
-          Game statistics of <span className="font-semibold">{user.username}</span> 👋
+          {t('game_statistics_of')} <span className="font-semibold">{user.username}</span> 👋
         </h2>
         <div className="flex flex-wrap justify-center gap-12">
           <div className="texts">🎖️ {t('current_ranking')} <strong>{user.ranking_points.toFixed(2)}</strong></div>
@@ -242,7 +244,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
 				<div className="flex flex-col justify-center w-full md:w-2/5 p-6 bg-white rounded-md border border-[#4B0082] shadow-sm">
 					<div className="texts mb-2">📊 {t('matches_played')} <strong>{matchesPlayed}</strong></div>
 					<div className="texts mb-2">📅 {t('avg_games_per_day')} <strong>{avgGamesPerDay}</strong></div>
-					<div className="texts mb-2">🎮 {t('faavorite_game')} <strong>{favoriteGame}</strong></div>
+					<div className="texts mb-2">🎮 {t('favorite_game')} <strong>{favoriteGame}</strong></div>
 				</div>
 
 				{/* Win/Loss Pie Chart */}
