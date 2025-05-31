@@ -63,7 +63,7 @@ export abstract class Button
 	}
 
 
-	draw(ctx: CanvasRenderingContext2D, t: TFunction, x: number) // may have to pass canvas into here too... dont need y
+	draw(ctx: CanvasRenderingContext2D, t: TFunction, x: number) // may have to pass canvas into here too...
 	{
 		const avatarW = 200;
 		const boxPadding = 40;
@@ -79,7 +79,7 @@ export abstract class Button
 			this.x = boxX + boxPadding * 2 + infoWidth * 2;
 		}
 		else if (this.textKey === 'add_to_tournament') {
-			this.x = boxX + boxPadding * 2 + infoWidth * 2 - 20;
+			this.x = boxX + boxPadding * 2 + infoWidth * 2 - 30;
 		}
 		else if (this.textKey === 'remove') {
 			this.x = boxX + boxPadding * 2 + infoWidth * 2 + 40;

@@ -188,7 +188,7 @@ export class UserManager {
 		const lineHeight = 30;
 		const buttonOffset = 20;
 
-		ctx.font = '20px arial';
+		ctx.font = '17px arial';
 		ctx.fillStyle = '#1111d6';
 		ctx.fillText(t('wins_losses'), boxX + boxPadding, infoHeight);
 		const winLoseData = `${user.wins_blockbattle + user.wins_pong} / ${user.losses_blockbattle + user.losses_pong}`; // CHECK THIS: Should we separate these?
