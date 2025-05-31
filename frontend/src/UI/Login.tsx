@@ -13,7 +13,6 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
   const [errorMessage, setErrorMessage] = useState('');
   const { t } = useTranslation('login');
   const navigate = useNavigate();
-  
 
   const HandleCancel = () => {
     // Clear form data and close the popup

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { WindowManager } from './Header';
 import { registerUser } from '../services/userService'
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	// State management
@@ -13,6 +14,14 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	const [errorMessage, setErrorMessage] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const { t } = useTranslation('registration');
+	const [language, setLanguage] = useState(i18n.language || 'en');
+
+	const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const selectedLang = e.target.value;
+		setLanguage(selectedLang);
+		i18n.changeLanguage(selectedLang);
+		localStorage.setItem('i18nextLng', selectedLang); // Persist the choice CHANGE THIS!!!
+	};
   
 	const HandleCancel = () => {
 	  setUsername('');
@@ -100,7 +109,21 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  maxLength={20}
             />
           </div>
-          
+          <div className="mb-4">
+            <label htmlFor="language" className="block text-gray-700 font-mono mb-1">
+              {t('preferred_language')}
+            </label>
+            <select
+              id="language"
+              value={language}
+              onChange={handleLanguageChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
+            >
+              <option value="en">English</option>
+              <option value="fi">Suomi</option>
+              <option value="pt">Português</option>
+            </select>
+          </div>
           <div className="mb-4">
             <label 
               htmlFor="password" 
@@ -140,7 +163,6 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  minLength={8}
             />
           </div>
-          
           <div className="flex justify-end gap-3">
             <button 
               type="button"
