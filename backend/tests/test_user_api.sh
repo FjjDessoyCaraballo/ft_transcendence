@@ -19,11 +19,11 @@ NC='\033[0m' # No Color
 # Test user credentials
 USER1_USERNAME="usertest1"
 USER1_PASSWORD="Password123"  # Must have uppercase, lowercase, and digit
-USER1_LANGUAGE="English"      # Default language option
+USER1_LANGUAGE="en"      # Default language option
 
 USER2_USERNAME="usertest2"
 USER2_PASSWORD="Password123"  # Must have uppercase, lowercase, and digit
-USER2_LANGUAGE="Finnish"      # Alternative language option
+USER2_LANGUAGE="fi"      # Alternative language option
 
 # Stored tokens and IDs
 USER1_TOKEN=""
@@ -273,7 +273,7 @@ test_get_language() {
 test_update_language() {
   print_message "Testing updating user's preferred language..."
   
-  local new_language="Portuguese"  # Different from both initial languages
+  local new_language="pt"  # Different from both initial languages
   
   local response=$(curl $CURL_OPTS -X PUT -H "Content-Type: application/json" \
     -H "Authorization: Bearer $USER1_TOKEN" \

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getPreferredLanguage, updatePreferredLanguage } from '../services/userService';
+import i18n from '../i18n';
 
 interface LanguageSelectPopupProps {
   onClose: () => void;
@@ -8,14 +9,14 @@ interface LanguageSelectPopupProps {
 
 export const LanguageSelectPopup: React.FC<LanguageSelectPopupProps> = ({ onClose }) => {
   const { t } = useTranslation('settings');
-  const [selectedLang, setSelectedLang] = useState('English');
+  const [selectedLang, setSelectedLang] = useState('en');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const languages = [
-    { code: 'English', label: 'English' },
-    { code: 'Finnish', label: 'Finnish' },
-    { code: 'Portuguese', label: 'Portuguese' },
+    { code: 'en', label: 'English' },
+    { code: 'fi', label: 'Finnish' },
+    { code: 'pt', label: 'Portuguese' },
   ];
 
   // Load current preferred language when popup opens
@@ -27,7 +28,7 @@ export const LanguageSelectPopup: React.FC<LanguageSelectPopupProps> = ({ onClos
           setSelectedLang(response.language);
         }
       } catch {
-        // ignore error or optionally set default language
+        // Optionally handle fetch error
       }
     })();
   }, []);
@@ -37,6 +38,8 @@ export const LanguageSelectPopup: React.FC<LanguageSelectPopupProps> = ({ onClos
     setError(null);
     try {
       await updatePreferredLanguage(selectedLang);
+      i18n.changeLanguage(selectedLang);
+      localStorage.setItem('preferredLanguage', selectedLang);
       alert(t('language_saved_success'));
       onClose();
     } catch (e) {
