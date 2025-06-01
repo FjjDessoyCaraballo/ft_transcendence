@@ -15,8 +15,8 @@ export const LanguageSelectPopup: React.FC<LanguageSelectPopupProps> = ({ onClos
 
   const languages = [
     { code: 'en', label: 'English' },
-    { code: 'fi', label: 'Finnish' },
-    { code: 'pt', label: 'Portuguese' },
+    { code: 'fi', label: 'Suomi' },
+    { code: 'pt', label: 'Português' },
   ];
 
   // Load current preferred language when popup opens
@@ -63,28 +63,30 @@ export const LanguageSelectPopup: React.FC<LanguageSelectPopupProps> = ({ onClos
                 value={code}
                 checked={selectedLang === code}
                 onChange={() => setSelectedLang(code)}
+                className="accent-purple-800"
               />
               <span>{label}</span>
             </label>
           ))}
         </div>
         {error && <p className="text-red-600 mb-4">{error}</p>}
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 mt-4">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded bg-gray-200 hover:bg-gray-300"
+            className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300"
             disabled={loading}
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleSave}
-            className="px-5 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700"
+            className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]"
             disabled={loading}
           >
             {loading ? t('saving') : t('save')}
           </button>
         </div>
+
       </div>
     </div>
   );
