@@ -1,7 +1,22 @@
 {
   "pong": " Pong-ohjeet",
-  "controls": " Käytä Q / A (Pelaaja 1) tai O / K (Pelaaja 2) liikuttaaksesi mailaa ylös ja alas.",
+  "controls_pong": " Käytä Q / S (Pelaaja 1) tai O / K (Pelaaja 2) liikuttaaksesi mailaa ylös ja alas.",
   "hit_ball": " Lyö pallo ohi vastustajan mailasta saadaksesi pisteen.",
   "how_to_win": " Ensimmäinen 5 pisteeseen voittaa pelin!",
-  "block_battle": " Block Battle -ohjeet"
+  "block_battle": " Block Battle -ohjeet",
+  "block_battle_desc": "Block Battle on 1v1 tasohyppelytaistelupeli, jossa on kaksi tapaa voittaa:",
+  "collect_5_coins": "Kerää 5 kolikkoa",
+  "before_opponent": "ennen vastustajaasi.",
+  "reduce_health": "Vähennä vastustajasi terveys nollaan",
+  "at_start": "Jokaisen ottelun alussa valitse",
+  "2_weapons": "2 asetta",
+  "to_use": "käytettäväksi taistelussa.",
+  "use_movement": "Käytä liikettä, hyppimistä, ampumista ja aseen vaihtoa päihittääksesi vastustajasi.",
+  "controls": "Näppäimet",
+  "player_1": "Pelaaja 1:",
+  "controls_1": "W (Hyppy), A (Vasen), D (Oikea), E (Ampu), S (Vaihda asetta)",
+  "player_2": "Pelaaja 2:",
+  "controls_2": "I (Hyppy), J (Vasen), L (Oikea), U (Ampu), K (Vaihda asetta)",
+  "close_instructions": "Sulje ohjeet",
+  "game_instructions": "Pelin ohjeet"
 }

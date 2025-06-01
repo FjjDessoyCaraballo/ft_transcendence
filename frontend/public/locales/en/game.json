@@ -55,5 +55,7 @@
     "humans_rock": "Great job, humans ROCK!!",
     "new_rank_of": "The new rank of",
     "is": "is",
-    "saving_failed": "User data saving failed!"
+    "saving_failed": "User data saving failed!",
+    "close_instructions": "Close Instructions",
+    "game_instructions": "Game Instructions"
 }

@@ -1,7 +1,20 @@
 {
     "pong": " Pong Instructions",
-    "controls": " Use Q / A (Player 1) or O / K (Player 2) to move your paddle up and down.",
+    "controls_pong": " Use Q / S (Player 1) or O / K (Player 2) to move your paddle up and down.",
     "hit_ball": " Hit the ball past your opponent’s paddle to earn a point.",
     "how_to_win": " First to 5 points wins the game!",
-    "block_battle": " Block Battle Instructions"
+    "block_battle": " Block Battle Instructions",
+    "block_battle_desc": " Block Battle is a 1v1 platform combat game with two paths to victory:",
+    "collect_5_coins": "Collect 5 coins",
+    "before_opponent": "before your opponent.",
+    "reduce_health": "Reduce your opponent's health to 0",
+    "at_start": "At the start of each match, choose",
+    "2_weapons": "2 weapons",
+    "to_use": "to use in battle.",
+    "use_movement": "Use movement, jumping, shooting, and weapon switching to outplay your opponent.",
+    "controls": "Controls",
+    "player_1": "Player 1:",
+    "controls_1": "W (Jump), A (Left), D (Right), E (Fire), S (Switch Weapon)",
+    "player_2": "Player 2:",
+    "controls_2": "I (Jump), J (Left), L (Right), U (Fire), K (Switch Weapon)"
 }
