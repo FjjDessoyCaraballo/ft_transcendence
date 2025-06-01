@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { getUserDataForDownload, deleteUserAccount } from '../services/userService'; 
 import { PasswordChangePopup } from './PasswordChange'
 import { AvatarChangePopup } from './AvatarChange'
+import { LanguageSelectPopup } from './LanguageSelect'
 import { clearToken } from '../services/TokenService'
+import { useTranslation } from 'react-i18next';
 
 interface SettingsProps {
 	onClick: () => void;
@@ -11,6 +13,7 @@ interface SettingsProps {
 
 const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void }> = ({onClose, onConfirm}) => {
 	const [] = useState(false);
+	const { t } = useTranslation('delete');
 
 	const handleClose = () => {
 		onClose();
@@ -20,7 +23,7 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 		try {
 			await deleteUserAccount()
 			.then(() => {
-				alert("Account successfully deleted");
+				alert(t('success'));
 				sessionStorage.setItem('logged-in', 'false');
 				window.dispatchEvent(new Event('loginStatusChanged'));
 				onConfirm();
@@ -36,24 +39,24 @@ const DeleteAccountPopup: React.FC<{ onClose: () => void, onConfirm: () => void 
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 		<div className="bg-white rounded-lg shadow-lg w-[500px] max-w-[90%] overflow-hidden mx-auto">
 		  <div className="p-6 bg-red-600 text-white">
-			<h2 className="text-2xl font-bold font-mono">Delete Account</h2>
+			<h2 className="text-2xl font-bold font-mono">{t('delete_account')}</h2>
 		  </div>
 		  <div className="p-6">
 			<p className="mb-6 text-gray-700">
-			  Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.
+			{t('delete_message')}
 			</p>
 			<div className="flex justify-end gap-3">
 			  <button 
 				onClick={handleClose}
 				className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300"
 			  >
-				Cancel
+				{t('cancel')}
 			  </button>
 			  <button 
 				onClick={handleConfirm}
 				className="px-5 py-2 rounded bg-red-600 text-white font-mono transition-colors hover:bg-red-700"
 			  >
-				Delete My Account
+				{t('delete_my_account')}
 			  </button>
 			</div>
 		  </div>
@@ -66,6 +69,8 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 	const [showChangePassword, setShowChangePassword] = useState(false);
 	const [showAvatarChange, setShowAvatarChange] = useState(false);
+	const [showLanguageSelect, setShowLanguageSelect] = useState(false);
+	const { t } = useTranslation('settings');
 
 	const HandleDownloadData = async () => {
 		try {
@@ -143,7 +148,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 			<div className="bg-white rounded-lg shadow-lg w-[400px] max-w-[90%] max-h-[80vh] overflow-y-auto mx-auto">
 			<div className="p-6 bg-[#4B0082] text-white">
-			  <h2 className="text-2xl font-bold font-mono">Settings</h2>
+			  <h2 className="text-2xl font-bold font-mono">{t('settings')}</h2>
 			</div>
 
 			{/* DOWNLOAD DATA BUTTON */}
@@ -153,7 +158,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleDownloadData}
 			>
-      		Download Data
+      		{t('download_data')}
           	</button>
 		  	</div>
 
@@ -164,7 +169,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleChangePasswordClick}
 			>
-      		Change Password
+      		{t('change_password')}
           	</button>
 		  	</div>
 
@@ -175,9 +180,19 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleAvatarChange}
 			>
-      		Change Avatar
+      		{t('change_avatar')}
           	</button>
 		  	</div>
+
+			<div className="buttonsDiv">
+			<button
+				type="button"
+				className="buttonsStyle"
+				onClick={() => setShowLanguageSelect(true)}
+			>
+				{t('select_language')}
+			</button>
+			</div>
 
 			{/* ACCOUNT DELETION */}
 			<div className="buttonsDiv">
@@ -186,7 +201,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle text-red-600 hover:bg-red-50"
 			  onClick={DeleteAccountClick}
 			>
-      		Delete Account
+      		{t('delete_account')}
           	</button>
 		  	</div>
 
@@ -197,7 +212,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleContribute}
 			>
-      		Contribute
+      		{t('contribute')}
           	</button>
 		  	</div>
 
@@ -208,7 +223,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle"
 			  onClick={HandleLogout}
 			>
-      		Logout
+      		{t('logout')}
           	</button>
 		  	</div>
 
@@ -219,7 +234,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
               className="buttonsStyle" 
               onClick={HandleClose}
             >
-              Close
+              {t('close')}
 			</button>
 			</div>
 		  </div>
@@ -245,6 +260,11 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
           onClick={() => setShowAvatarChange(false)}
         />
       )}
+
+	  {showLanguageSelect && (
+		<LanguageSelectPopup onClose={() => setShowLanguageSelect(false)} />
+		)}
+
     </>
   );
 };

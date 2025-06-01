@@ -2,6 +2,7 @@ import { DEEP_PURPLE, LIGHT_PURPLE, PURPLE} from "../game/Constants";
 import { drawCenteredText } from "../game/StartScreen";
 import { Button } from "./Button";
 import { UserHubState, GameType } from "./Types";
+import { TFunction } from 'i18next';
 import { Weapon } from "../game/Weapons";
 import { bbMatchData } from "../game/BlockBattle";
 import { recordMatchResult } from "../services/userService";
@@ -78,9 +79,9 @@ export class ChallengeButton extends Button
 {
 	user: User;
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.user = user;
 	}
 
@@ -92,9 +93,9 @@ export class PongButton extends Button
 {
 	user: User;
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.user = user;
 	}
 
@@ -106,9 +107,9 @@ export class TournamentButton extends Button
 {
 	user: User;
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, user: User, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.user = user;
 	}
 
@@ -136,7 +137,7 @@ export class UserManager {
 	} 
 
 
-	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean): ChallengeButton | TournamentButton
+	static drawUserInfo(ctx: CanvasRenderingContext2D, user: User, x: number, y: number, state: UserHubState, isInTournament: boolean, t: TFunction): ChallengeButton | TournamentButton
 	{
 		const avatarW = 200;
 		const avatarH = 180;
@@ -187,24 +188,24 @@ export class UserManager {
 		const lineHeight = 30;
 		const buttonOffset = 20;
 
-		ctx.font = '20px arial';
+		ctx.font = '17px arial';
 		ctx.fillStyle = '#1111d6';
-		ctx.fillText('WINS / LOSSES:  ', boxX + boxPadding, infoHeight);
+		ctx.fillText(t('wins_losses'), boxX + boxPadding, infoHeight);
 		const winLoseData = `${user.wins_blockbattle + user.wins_pong} / ${user.losses_blockbattle + user.losses_pong}`; // CHECK THIS: Should we separate these?
 		ctx.fillStyle = 'black';
 		ctx.fillText(winLoseData, boxX + boxPadding, infoHeight + lineHeight);
 		ctx.fillStyle = '#1111d6';
-		ctx.fillText('RANKING POINTS:  ', boxX + boxPadding + infoWidth, infoHeight);
+		ctx.fillText(t('ranking_points_caps'), boxX + boxPadding + infoWidth, infoHeight);
 		ctx.fillStyle = 'black';
 		ctx.fillText(user.ranking_points.toFixed(2), boxX + boxPadding + infoWidth, infoHeight + lineHeight);
 
 		// Create challenge button
 		if (state === UserHubState.SINGLE_GAME)
 		{
-			let text = 'CHALLENGE';
+			let text = 'challenge';
 			const buttonX = boxX + boxPadding * 2 + infoWidth * 2;
 			const buttonY = infoHeight - buttonOffset;
-			const challengeButton = new ChallengeButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user);
+			const challengeButton = new ChallengeButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', user, t);
 			return challengeButton;
 		}
 		else
@@ -213,17 +214,17 @@ export class UserManager {
 
 			if (!isInTournament)
 			{
-				let text = 'ADD TO TOURNAMENT';
+				let text = 'add_to_tournament';
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 - 20;
 				const buttonY = infoHeight - buttonOffset;
-				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user);
+				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'green', '#0e3801', text, 'white', '20px', 'arial', user, t);
 			}
 			else
 			{
-				let text = 'REMOVE';
+				let text = 'remove';
 				const buttonX = boxX + boxPadding * 2 + infoWidth * 2 + 40;
 				const buttonY = infoHeight - buttonOffset;
-				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user);
+				tournamentBtn = new TournamentButton(ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '20px', 'arial', user, t);
 			}
 
 			return tournamentBtn;
@@ -233,11 +234,11 @@ export class UserManager {
 	}
 
 
-	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, curUser: User | null)
+	static drawCurUser(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, curUser: User | null, t:TFunction)
 	{
 		if (curUser)
 		{
-			drawCenteredText(canvas, ctx, 'Currently logged in user: ', '22px arial', 'white', 30);
+			drawCenteredText(canvas, ctx, t('currently_logged_in'), '22px arial', 'white', 30);
 			drawCenteredText(canvas, ctx, curUser.username, '28px arial', 'red', 60);
 		}
 	}

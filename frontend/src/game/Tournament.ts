@@ -12,6 +12,7 @@ import { drawCenteredText, StartScreen } from "./StartScreen";
 import { Weapon } from "./Weapons";
 import { endTournamentAPI, getTournamentEndScreenData, getTournamentPlayers } from "../services/userService";
 import { global_stateManager } from "../UI/GameCanvas";
+import { TFunction } from 'i18next';
 
 export interface TournamentPlayer
 {
@@ -27,9 +28,9 @@ export interface TournamentPlayer
 
 export class NextGameBtn extends Button
 {
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void 
@@ -58,8 +59,9 @@ export class Tournament implements IGameState
 	gameOrder: [number, number][];
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: GameType, t: TFunction)
 	{
 		this.name = GameStates.TOURNAMENT;
 		this.canvas = canvas;
@@ -73,6 +75,7 @@ export class Tournament implements IGameState
 		this.isDataReady = false;
 		this.showLoadingText = false;
 		this.isSettingEndScreen = false;
+		this.t = t;
 
 		this.gameOrder = [
 			[0, 1],
@@ -83,17 +86,17 @@ export class Tournament implements IGameState
 			[2, 1]
 		];
 
-		let text1 = 'EXIT TOURNAMENT'; // Add a warning here that all tournament data will be lost
+		let text1 = 'exit_tournament'; // Add a warning here that all tournament data will be lost
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
 		const button1X = 20;
 		const button1Y = 20;
-		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
+		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType, this.t);
 
-		let text2 = 'NEXT GAME';
+		let text2 = 'next_game';
 		ctx.font = '35px arial' // GLOBAL USE OF CTX!!
-		const button2X = (canvas.width * 0.75) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
+		const button2X = (canvas.width * 0.75) - (ctx.measureText(t('next_game')).width / 2) - TEXT_PADDING;
 		const button2Y = (canvas.height / 2) - 20 - TEXT_PADDING + 200;
-		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial');
+		this.nextGameBtn = new NextGameBtn(this.ctx, button2X, button2Y, 'green', '#054d19', text2, 'white', '35px', 'arial', t);
 
 		setTimeout(() => {
 			this.showLoadingText = true;
@@ -119,9 +122,9 @@ export class Tournament implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed! ${error}`);
+			alert(`${this.t('data_fail')} ${error}`);
 			console.log("TOURNAMENT: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -150,7 +153,7 @@ export class Tournament implements IGameState
 		
 		if (!this.isFinished && this.nextGameBtn.checkClick())
 		{
-			this.curState = new MatchIntro(this.canvas, this.ctx, this.gameType, true);
+			this.curState = new MatchIntro(this.canvas, this.ctx, this.gameType, true, this.t);
 			this.curState.enter();
 		}
 	}
@@ -188,7 +191,7 @@ export class Tournament implements IGameState
 				this.isFinished = true;
 
 
-			this.curState = new EndScreen(this.canvas, this.ctx, winner.user.id, loser.user.id, this.gameType, true, null);
+			this.curState = new EndScreen(this.canvas, this.ctx, winner.user.id, loser.user.id, this.gameType, true, null, this.t);
 			this.curState.enter();
 
 			// Sort players based on points
@@ -214,9 +217,9 @@ export class Tournament implements IGameState
 
 		} catch (error) {
 
-			alert(`User data fetch failed, returning to Start Screen! ${error}`);
+			alert(`${this.t('data_fail')} ${error}`);
 			console.log("TOURNAMENT: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 
 		}
@@ -242,9 +245,9 @@ export class Tournament implements IGameState
 
 		} catch (error) {
 
-			alert(`User data fetch failed, returning to Start Screen! ${error}`);
+			alert(`${this.t('data_fail')} ${error}`);
 			console.log("TOURNAMENT: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 
 		}
@@ -263,16 +266,16 @@ export class Tournament implements IGameState
 				if (this.curState.name === GameStates.MATCH_INTRO)
 				{	
 					if (this.gameType === GameType.BLOCK_BATTLE)
-						this.curState = new BlockBattle(this.canvas, this.ctx, [], [], true);
+						this.curState = new BlockBattle(this.canvas, this.ctx, [], [], true, this.t);
 					else if (this.gameType === GameType.PONG)
-						this.curState = new Pong(this.canvas, this.ctx, null, 'playing', true);
+						this.curState = new Pong(this.canvas, this.ctx, null, 'playing', true, this.t);
 
 					this.curState.enter();
 				}
 				else if ((this.curState.name === GameStates.BLOCK_BATTLE || this.curState.name === GameStates.PONG))
 				{
 					if (!this.isSettingEndScreen)
-						this.setupEndScreen()
+						this.setupEndScreen() // need this.t here??
 				}
 				else
 				{
@@ -309,21 +312,21 @@ export class Tournament implements IGameState
 
 		ctx.font = '40px Impact';
 		ctx.fillStyle = 'white';
-		const usernameText = 'USERNAME';
+		const usernameText = this.t('username');
 		const usernameX = x + (colW / 2) - (ctx.measureText(usernameText).width / 2);
 		ctx.fillText(usernameText, usernameX, y + padding + 5);
 
 		ctx.strokeRect(x + colW, y, colW, colH);
-		const pointsText = 'POINTS';
+		const pointsText = this.t('points_caps');
 		const pointsX = x + colW + (colW / 2) - (ctx.measureText(pointsText).width / 2);
 		ctx.fillText(pointsText, pointsX, y + padding + 5);
 
 		ctx.strokeRect(x + colW * 2, y, colW, colH);
 		let coinText = '';
 		if (this.gameType === GameType.BLOCK_BATTLE)
-			coinText = 'COINS';
+			coinText = this.t('coins');
 		else if (this.gameType === GameType.PONG)
-			coinText = 'PONG SCORE';
+			coinText = this.t('pong_score');
 		const coinX = x + (colW * 2) + (colW / 2) - (ctx.measureText(coinText).width / 2);
 		ctx.fillText(coinText, coinX, y + padding + 5);
 
@@ -425,8 +428,8 @@ export class Tournament implements IGameState
 
 		if (!this.curState)
 		{
-			// Draw Header, Score Board and Match order
-			drawCenteredText(this.canvas, this.ctx, 'SCORE BOARD', '50px Impact', 'white', 100);
+			// Draw Header & Score Board
+			drawCenteredText(this.canvas, this.ctx, this.t('score_board'), '50px Impact', 'white', 150);
 			this.drawScoreBoard(ctx);
 
 			if (!this.isFinished)
@@ -434,12 +437,12 @@ export class Tournament implements IGameState
 			
 	
 			// Draw Return button
-			this.returnMenuButton.draw(ctx);
+			this.returnMenuButton.draw(ctx, this.t, 0);
 			let exitWarning;
 			if (!this.isFinished)
-				exitWarning = `(and lose all tournament progress)`;
+				exitWarning = this.t('lose_progress');
 			else
-				exitWarning = '(You can now safely exit the tournament)';
+				exitWarning = this.t('safe_exit')
 			ctx.font = '20px arial';
 			ctx.fillStyle = 'white';
 			const warningX = this.returnMenuButton.x;
@@ -449,13 +452,13 @@ export class Tournament implements IGameState
 			// Draw Next game button || Winner announcement
 			if (!this.isFinished)
 			{
-				this.nextGameBtn.draw(ctx);
+				this.nextGameBtn.draw(ctx, this.t, 0);
 			}
 			else
 			{
 				let y = (this.canvas.height / 2) - 20 - TEXT_PADDING + 220;
 
-				drawCenteredText(this.canvas, this.ctx, 'TOURNAMENT WINNER(s):', '50px Impact', 'green', y);
+				drawCenteredText(this.canvas, this.ctx, this.t('tournament_winner'), '50px Impact', 'green', y);
 				y += 40
 
 				for (const player of this.tournamentWinner)

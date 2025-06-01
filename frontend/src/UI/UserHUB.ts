@@ -8,15 +8,16 @@ import { GameType, UserHubState } from "./Types";
 import { MatchIntro } from "../game/MatchIntro";
 import { Tournament, TournamentPlayer } from "../game/Tournament";
 import { drawCenteredText } from "../game/StartScreen";
+import { TFunction } from 'i18next';
 import { checkTournamentStatus, getAllUsers, getLoggedInUserData, loginUser, removeTournamentPlayer, startNewTournament, verifyOpponent, verifyTournamentPlayer } from "../services/userService";
 import { StartScreen } from "../game/StartScreen";
 
 export class NextPageButton extends Button
 {
 
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void {
@@ -25,9 +26,9 @@ export class NextPageButton extends Button
 
 export class PrevPageButton extends Button
 {
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void {
@@ -54,6 +55,7 @@ export class UserHUB implements IGameState
 	tournamentArr: TournamentPlayer [];
 	gameType: GameType;
 	state: UserHubState;
+	t: TFunction;
 	loggedInUserData: User | null;
 	userDataArr: User [];
 	isDataReady: boolean;
@@ -64,7 +66,7 @@ export class UserHUB implements IGameState
 	submitPasswordBound: () => void;
 	cancelPasswordBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, state: UserHubState, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, state: UserHubState, gameType: GameType, t: TFunction)
 	{
 		this.name = GameStates.USER_HUB;
 		this.canvas = canvas;
@@ -83,23 +85,24 @@ export class UserHUB implements IGameState
 		this.showLoadingText = false;
 		this.loggedInUserData = null;
 		this.userDataArr = [];
+		this.t = t;
 
-		let text1 = 'RETURN TO MENU';
+		let text1 = 'return_to_menu';
 		ctx.font = '25px arial' // GLOBAL USE OF CTX!!
-		const button1X = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
+		const button1X = (canvas.width / 2) - (ctx.measureText(t('return_to_menu')).width / 2) - TEXT_PADDING;
 		const button1Y = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
 
-		let text2 = 'NEXT PAGE';
-		const button2X = canvas.width - ctx.measureText(text2).width - TEXT_PADDING;
+		let text2 = 'next_page';
+		const button2X = canvas.width - ctx.measureText(t('next_page')).width - TEXT_PADDING;
 		const button2Y = 80 + TEXT_PADDING;
 
-		let text3 = 'PREVIOUS PAGE';
+		let text3 = 'previous_page';
 		const button3X = 0 + TEXT_PADDING;
 		const button3Y = 80 + TEXT_PADDING;
 
-		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType);
-		this.nextPageButton = new NextPageButton(ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial');
-		this.prevPageButton = new PrevPageButton(ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(this.canvas, this.ctx, button1X, button1Y, 'red', '#780202', text1, 'white', '25px', 'arial', this.gameType, this.t);
+		this.nextPageButton = new NextPageButton(ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '25px', 'arial', t);
+		this.prevPageButton = new PrevPageButton(ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '25px', 'arial', t);
 		this.challengeBtnArr = [];
 		
 		setTimeout(() => {
@@ -163,9 +166,9 @@ export class UserHUB implements IGameState
 	
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("USER HUB: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -181,7 +184,6 @@ export class UserHUB implements IGameState
 
 			alert(`Error while removing player from tournament: ${error}`);
 			// Do I need other error handling...?
-
 		}
 
 		
@@ -223,7 +225,7 @@ export class UserHUB implements IGameState
 				// Logic for "Remove from tournament" -button
 				const tournamentPlayer = this.tournamentArr.find(player => player.user.username === btn.user.username);
 
-				if (tournamentPlayer && btn.text === 'REMOVE')
+				if (tournamentPlayer && btn.textKey === 'remove')
 				{
 					this.removeTournamenPlayer(tournamentPlayer);
 				}
@@ -234,9 +236,9 @@ export class UserHUB implements IGameState
 					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
 					if (passwordHeader)
 					{
-						passwordHeader.textContent = `Hello ${this.opponentName}!`;
+						passwordHeader.textContent = `${this.t('hello')}${this.opponentName}!`;
 						passwordHeader.appendChild(document.createElement('br'));
-						passwordHeader.appendChild(document.createTextNode('Please type in your password to start the game'));
+						passwordHeader.appendChild(document.createTextNode(this.t('type_password')));
 					}
 
 					const passwordModal = document.getElementById("passwordModal") as HTMLElement;
@@ -293,11 +295,11 @@ export class UserHUB implements IGameState
 			this.isCheckingPassword = false;
 
 			if (this.state === UserHubState.SINGLE_GAME)
-				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, this.gameType, false));
+				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, this.gameType, false, this.t));
 			
 		} catch {
 			this.isCheckingPassword = false;
-			alert("Incorrect password. Please try again.");
+			alert(this.t('incorrect_password'));
 			passwordInput.value = ""; // Clear the input field
 		}
 
@@ -305,7 +307,7 @@ export class UserHUB implements IGameState
 		{
 			try {
 				await checkTournamentStatus();
-				global_stateManager.changeState(new Tournament(this.canvas, this.ctx, this.gameType));
+				global_stateManager.changeState(new Tournament(this.canvas, this.ctx, this.gameType, this.t));
 			} catch {
 				console.log('Tournament not ready yet');
 			}
@@ -367,9 +369,9 @@ export class UserHUB implements IGameState
 		{
 			if (!this.showLoadingText)
 				return ;
-			const loadingHeader = 'Fetching user data, please wait.';
+			const loadingHeader = this.t('data_fetch');
 			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
-			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			const loadingInfo = this.t('info_loading');
 			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
 			return ;
 		}
@@ -382,11 +384,11 @@ export class UserHUB implements IGameState
 			this.challengeBtnArr.length = 0;
 		}
 
-		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData);
+		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData, this.t);
 
 		if (this.state === UserHubState.TOURNAMENT)
 		{
-			let playerCountText = `${this.tournamentArr.length}/4 players chosen`;
+			let playerCountText = `${this.tournamentArr.length}${this.t('chosen')}`;
 			drawCenteredText(this.canvas, this.ctx, playerCountText, '40px impact', 'white', 120)
 		}
 
@@ -400,7 +402,7 @@ export class UserHUB implements IGameState
 
 			const isInTournament = this.tournamentArr.some(player => player.user.username === this.userDataArr[i].username);
 
-			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(ctx, this.userDataArr[i], x, y, this.state, isInTournament);
+			const btn: ChallengeButton | TournamentButton = UserManager.drawUserInfo(ctx, this.userDataArr[i], x, y, this.state, isInTournament, this.t);
 
 			if (this.needNewChallengeButtons && btn.user.username !== this.loggedInUserData?.username
 				&& this.state !== UserHubState.INFO)
@@ -411,8 +413,8 @@ export class UserHUB implements IGameState
 			// Check if we need to update the tournament button
 			const tournamentBtn = this.challengeBtnArr.find(btn => btn.user.username === this.userDataArr[i].username);
 
-			if ((isInTournament && tournamentBtn && tournamentBtn.text === 'ADD TO TOURNAMENT')
-				|| (!isInTournament && tournamentBtn && tournamentBtn.text === 'REMOVE')
+			if ((isInTournament && tournamentBtn && tournamentBtn.textKey === 'add_to_tournament')
+				|| (!isInTournament && tournamentBtn && tournamentBtn.textKey === 'remove')
 			)
 			{
 				const idx = this.challengeBtnArr.indexOf(tournamentBtn);
@@ -426,11 +428,11 @@ export class UserHUB implements IGameState
 		if (this.needNewChallengeButtons)
 			this.needNewChallengeButtons = false;
 
-		this.returnMenuButton.draw(ctx);
+		this.returnMenuButton.draw(ctx, this.t, 0);
 
 		if (this.userStartIdx < this.userDataArr.length - 3)
 		{
-			this.nextPageButton.draw(ctx);
+			this.nextPageButton.draw(ctx, this.t, 0);
 			this.isNextActive = true;
 		}
 		else
@@ -438,14 +440,16 @@ export class UserHUB implements IGameState
 
 		if (this.userStartIdx != 0)
 		{
-			this.prevPageButton.draw(ctx);
+			this.prevPageButton.draw(ctx, this.t, 0);
 			this.isPrevActive = true;
 		}
 		else
 			this.isPrevActive = false;
 
-		for (const btn of this.challengeBtnArr)
-			btn.draw(ctx);
+		for (const btn of this.challengeBtnArr) {
+			btn.draw(ctx, this.t, x);
+			y += 185;
+		}
 		
 	}
 }

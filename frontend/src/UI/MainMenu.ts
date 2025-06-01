@@ -7,6 +7,7 @@ import { UserManager, User } from "./UserManager";
 import { GameType, UserHubState } from "./Types";
 import { drawCenteredText, StartScreen } from "../game/StartScreen";
 import { MatchIntro } from "../game/MatchIntro";
+import { TFunction } from 'i18next';
 import { getLoggedInUserData } from "../services/userService";
 
 // BUTTONS
@@ -16,17 +17,19 @@ export class SingleGameButton extends Button
 	private gameType: GameType;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.SINGLE_GAME, this.gameType));
+		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.SINGLE_GAME, this.gameType, this.t));
 	}
 }
 
@@ -35,17 +38,19 @@ export class StartTournamentButton extends Button
 	private gameType: GameType;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.TOURNAMENT, this.gameType));
+		global_stateManager.changeState(new UserHUB(this.canvas, this.ctx, UserHubState.TOURNAMENT, this.gameType, this.t));
 	}
 }
 
@@ -53,16 +58,18 @@ export class ChangeGameBtn extends Button
 {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+		global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 	}
 }
 
@@ -70,14 +77,16 @@ export class PongAiBtn extends Button
 {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 	loggedInUserData: User | null;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.loggedInUserData = null;
+		this.t = t;
 	}
 
 	addUserData(user: User)
@@ -88,7 +97,7 @@ export class PongAiBtn extends Button
 	clickAction(): void {
 
 		if (this.loggedInUserData)
-			global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, GameType.PONG_AI, false));
+			global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, GameType.PONG_AI, false, this.t));
 		else
 			alert('User data error, please try again or log out and in again');
 
@@ -109,6 +118,7 @@ export class MainMenu implements IGameState
 	ctx: CanvasRenderingContext2D;
 	opponent: User | null;
 	gameType: GameType;
+	t: TFunction;
 	loggedInUserData: User | null;
 	isDataReady: boolean;
 	showLoadingText: boolean;
@@ -116,13 +126,14 @@ export class MainMenu implements IGameState
 	mouseMoveBound: (event: MouseEvent) => void;
 	mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, gameType: GameType, t: TFunction)
 	{		
 		this.name = GameStates.MAIN_MENU;
 		this.canvas = canvas;
 		this.ctx = ctx;
 		this.opponent = null;
 		this.gameType = gameType;
+		this.t = t;
 		this.isDataReady = false;
 		this.showLoadingText = false;
 		this.loggedInUserData = null;
@@ -130,12 +141,12 @@ export class MainMenu implements IGameState
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
 
 		// Define buttons
-		let text1 = 'PLAY SINGLE GAME';
-		const button1X = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
-		let text2 = 'START TOURNAMENT';
-		const button2X = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
-		let text3 = 'PLAY PONG WITH AI';
-		const button3X = (canvas.width / 2) - (ctx.measureText(text3).width / 2) - TEXT_PADDING;
+		let text1 = 'play_single_game';
+		const button1X = (canvas.width / 2) - (ctx.measureText(t('play_single_game')).width / 2) - TEXT_PADDING;
+		let text2 = 'start_tournament';
+		const button2X = (canvas.width / 2) - (ctx.measureText(t('start_tournament')).width / 2) - TEXT_PADDING;
+		let text3 = 'play_ai';
+		const button3X = (canvas.width / 2) - (ctx.measureText(t('play_ai')).width / 2) - TEXT_PADDING;
 
 		const buttonYCenter = (canvas.height / 2) - 20 - TEXT_PADDING; // 20 == 40px / 2
 		const button1Y = buttonYCenter - 60;
@@ -144,14 +155,14 @@ export class MainMenu implements IGameState
 
 		// Define instruction button
 		ctx.font = '30px arial' // GLOBAL USE OF CTX!!
-		let instructText = 'CHANGE GAME';
-		const instructX = (canvas.width / 2) - (ctx.measureText(instructText).width / 2) - TEXT_PADDING;
+		let instructText = 'change_game';
+		const instructX = (canvas.width / 2) - (ctx.measureText(t('change_game')).width / 2) - TEXT_PADDING;
 		const instructY = canvas.height - 100;
 
-		this.singleGameButton = new SingleGameButton(this.canvas, this.ctx, button1X, button1Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text1, 'white', '40px', 'arial', this.gameType);
-		this.startTournamentButton = new StartTournamentButton(this.canvas, this.ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '40px', 'arial', this.gameType);
-		this.pongAiBtn = new PongAiBtn(this.canvas, this.ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '40px', 'arial');
-		this.changeGameBtn = new ChangeGameBtn(this.canvas, this.ctx, instructX, instructY, '#b0332a', '#780202', instructText, 'white', '30px', 'arial');
+		this.singleGameButton = new SingleGameButton(this.canvas, this.ctx, button1X, button1Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text1, 'white', '40px', 'arial', this.gameType, this.t);
+		this.startTournamentButton = new StartTournamentButton(this.canvas, this.ctx, button2X, button2Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text2, 'white', '40px', 'arial', this.gameType, this.t);
+		this.pongAiBtn = new PongAiBtn(this.canvas, this.ctx, button3X, button3Y, BUTTON_COLOR, BUTTON_HOVER_COLOR, text3, 'white', '40px', 'arial', this.t);
+		this.changeGameBtn = new ChangeGameBtn(this.canvas, this.ctx, instructX, instructY, '#b0332a', '#780202', instructText, 'white', '30px', 'arial', this.t);
 
 		setTimeout(() => {
 			this.showLoadingText = true;
@@ -177,9 +188,9 @@ export class MainMenu implements IGameState
 			}
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("MAIN MENU: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.loggedInUserData = null;
 			this.isDataReady = false;
 		}
@@ -247,9 +258,9 @@ export class MainMenu implements IGameState
 			return ;
 		}
 
-		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData);
+		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData, this.t);
 
-		drawCenteredText(this.canvas, this.ctx, 'You are playing:', '40px arial', 'white', 200);
+		drawCenteredText(this.canvas, this.ctx, this.t('you_are_playing'), '40px arial', 'white', 200);
 
 		if (this.gameType === GameType.BLOCK_BATTLE)
 			drawCenteredText(this.canvas, this.ctx, 'Block Battle', '40px impact', LIGHT_PURPLE, 250);
@@ -257,12 +268,12 @@ export class MainMenu implements IGameState
 			drawCenteredText(this.canvas, this.ctx, 'Pong', '40px impact', LIGHT_PURPLE, 250);
 
 
-		this.singleGameButton.draw(ctx);
-		this.startTournamentButton.draw(ctx);
-		this.changeGameBtn.draw(ctx);
+		this.singleGameButton.draw(ctx, this.t, 0);
+		this.startTournamentButton.draw(ctx, this.t, 0);
+		this.changeGameBtn.draw(ctx, this.t, 0);
 
 		if (this.gameType === GameType.PONG)
-			this.pongAiBtn.draw(ctx);
+			this.pongAiBtn.draw(ctx, this.t, 0);
 	}
 	
 }
