@@ -7,7 +7,9 @@ YELLOW = \033[33m
 RED = \033[31m
 BLUE = \033[34m
 
-.PHONY: all build start stop restart clean logs setup db help backend
+.PHONY: all build start stop restart clean logs setup db help backend transcendence
+
+transcendence: build start
 
 build:
 	@echo "$(BLUE)Building Docker images...$(RESET)"
