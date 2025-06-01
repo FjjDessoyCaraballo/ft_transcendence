@@ -52,6 +52,9 @@ type DashboardProps = {
 };
 
 export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
+
+	  console.log('here');
+
   const { t } = useTranslation('dashboard');
   const [selectedMatch, setSelectedMatch] = useState<MatchData | null>(null);
 
@@ -214,6 +217,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
   else
  		favoriteGame = user.games_played_pong > user.games_played_blockbattle ? 'Pong' : 'Blockbattle';
 
+  // Tournament stats
+
+  const tournamentStats = `Tournaments, played: ${user.tournaments_played} / Tournaments won: ${user.tournaments_won}`;
+  console.log('here');
+
   return (
     <div className="p-6 flex flex-col w-full">
     {/* Player Info Panel */}
@@ -223,6 +231,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData }) => {
         </h2>
         <div className="flex flex-wrap justify-center gap-12">
           <div className="texts">🎖️ {t('current_ranking')} <strong>{user.ranking_points.toFixed(2)}</strong></div>
+		  <div className="texts">📊 Tournament stats <strong>{tournamentStats}</strong></div>
           <div className="texts">📅 {t('joined')} {new Date(user.created_at).toLocaleDateString()}</div>
         </div>
       </div>
