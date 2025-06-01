@@ -24,6 +24,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
   const HandleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Basic validation
     if (!username || !password) {
       setErrorMessage('Please enter both username and password');
       return;

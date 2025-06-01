@@ -16,7 +16,6 @@ interface FriendRequestResponse {
  */
 export const getFriends = async (): Promise<User[]> => {
   try {
-    console.log('GET FRIENDS');
     const response = await apiRequest('/friends');
     return response.friends;
   } catch (error) {
@@ -29,7 +28,6 @@ export const getFriends = async (): Promise<User[]> => {
  */
 export const getPendingRequests = async (): Promise<User[]> => {
   try {
-    console.log('GET PENDING REQUESTS');
     const response = await apiRequest('/friends/requests');
     return response.requests;
   } catch (error) {
@@ -42,7 +40,6 @@ export const getPendingRequests = async (): Promise<User[]> => {
  */
 export const getSentRequests = async (): Promise<User[]> => {
   try {
-    console.log('GET SENT FRIEND REQUESTS');
     const response = await apiRequest('/friends/sent-requests');
     return response.sentRequests;
   } catch (error) {
@@ -58,7 +55,6 @@ export const getSentRequests = async (): Promise<User[]> => {
  */
 export const sendFriendRequest = async (friendId: number): Promise<FriendResponse> => {
   try {
-    console.log('SEND FRIEND REQUEST');
     return await apiRequest(`/friends/request/${friendId}`, {
       method: 'POST',
       body: JSON.stringify({ targetUserId: friendId })
@@ -75,7 +71,6 @@ export const sendFriendRequest = async (friendId: number): Promise<FriendRespons
  */
 export const acceptFriendRequest = async (friendId: number): Promise<FriendResponse> => {
   try {
-    console.log('ACCEPT FRIEND REQUEST');
     return await apiRequest(`/friends/accept/${friendId}`, {
       method: 'PUT',
       body: JSON.stringify({ targetUserId: friendId })
@@ -92,7 +87,6 @@ export const acceptFriendRequest = async (friendId: number): Promise<FriendRespo
  */
 export const rejectFriendRequest = async (friendId: number): Promise<FriendResponse> => {
   try {
-    console.log('REJECT FRIEND REQUEST');
     return await apiRequest(`/friends/reject/${friendId}`, {
       method: 'PUT',
       body: JSON.stringify({ targetUserId: friendId })
@@ -109,7 +103,6 @@ export const rejectFriendRequest = async (friendId: number): Promise<FriendRespo
  */
 export const removeFriend = async (friendId: number): Promise<FriendResponse> => {
   try {
-    console.log('REMOVE FRIEND');
     return await apiRequest(`/friends/${friendId}`, {
       method: 'DELETE'
     });

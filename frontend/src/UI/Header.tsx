@@ -40,10 +40,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 			setIsLoggedIn(true);
 		} catch (err) {
 			setIsLoggedIn(false);
-	//		setIsGameVisible(true);
-	//		setIsDashboardVisible(false);
-	//		setDashboardUserData(null);
-	//		setButtonText('Dashboard');
 		}
   };
 
@@ -57,8 +53,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 }, [AppLogStatus]);
 
   const handleLogout = () => {
-
-	console.log('HEADER: Executing OnLogOut');
 
 	onHeaderLogOut();
     setIsLoggedIn(false);
@@ -82,43 +76,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 
   const HandleSettingsClick = () => {
     setShowSettings(true);
-  }
-
-  /*
-  // Dashboard state change functions
-  const handleDashboardClick = async () => {
-
-	try {
-		const userData = await getLoggedInUserData();
-
-		if (userData)
-		{
-			userData.match_history = await getMatchHistoryByID(userData.id);
-		}
-
-		setDashboardUserData(userData);
-		setIsGameVisible(false);
-		setIsDashboardVisible(true);
-		setButtonText('To Game');
-	} catch {
-		alert("Error while fetching user data for Dashboard; are you sure you're logged in...?");
-		console.log("Error while fetching user data for Dashboard");
-	}
-  };
-
-  const handleBackToGameClick = () => {
-	setDashboardUserData(null);
-    setIsGameVisible(true);
-    setIsDashboardVisible(false);
-    setButtonText('Dashboard');
-  }; */
-
-  const onStartScreenLoginFail = () => {
-	setIsLoggedIn(false);
-//	setIsGameVisible(true);
-//	setIsDashboardVisible(false);
-//	setDashboardUserData(null);
-//	setButtonText('Dashboard');
   }
 
   return (
@@ -155,7 +112,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 			{isLoggedIn ? (
 				<>
 				<button className="buttonsStyle" onClick={() => navigate('/')}>{t('game')}</button>
-				<button className="buttonsStyle" onClick={() => navigate('/instructions')}>{t('instructions')}</button>
 				<button className="buttonsStyle" onClick={() => navigate(`/dashboard/${loggedInUserData?.username}`)}>{t('dashboard')}</button>
 				<button className="buttonsStyle" onClick={() => navigate('/playerlist')}>{t('players')}</button>
 				<button className="buttonsStyle" onClick={HandleSettingsClick}>{t('settings')}</button>

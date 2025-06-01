@@ -81,13 +81,6 @@ export const setToken = async (token: string): Promise<boolean> => {
 
 export const getToken = async (): Promise<string | null> => {
 
-//	console.log('getToken called');
-
-//	if (cachedToken)
-//	{
-//		console.log('Cached token');
-//		return cachedToken;
-//	} 
 	const token = await sendMessage('getToken');
 	cachedToken = token;
 	return token;
@@ -95,9 +88,6 @@ export const getToken = async (): Promise<string | null> => {
 
 export const clearToken = (): Promise<boolean> => {
 	
-//	console.log('clear Token called');
-
-
 	return sendMessage('clearToken');
 }
 

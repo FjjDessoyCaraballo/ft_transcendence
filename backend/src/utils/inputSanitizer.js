@@ -1,7 +1,26 @@
-function sanitizeInput(input) {
-  if (!input || typeof input !== 'string') {
-    return { isValid: false, sanitized: '' };
-  }
+function isIntegerString(str) {
+
+  return /^-?\d+$/.test(str);
+}
+
+function isDecimalString(str) {
+
+  return /^-?\d+(\.\d+)?$/.test(str);
+}
+
+function sanitizeInput(input, isString) {
+
+
+	if (isString && !input) {
+		return { isValid: false, sanitized: '' };
+	}
+
+	if (isString && typeof input !== 'string') {
+    	return { isValid: false, sanitized: '' };
+	}
+	if (!isString && typeof input !== 'number') {
+    	return { isValid: false, sanitized: '' };
+	}
 
   // Check for common SQL injection patterns
   const sqlInjectionPatterns = [
@@ -25,18 +44,54 @@ function sanitizeInput(input) {
 
   // Check if the input contains SQL injection patterns
   const hasSqlInjection = sqlInjectionPatterns.some(pattern => pattern.test(input));
+
   
   if (hasSqlInjection) {
     return { isValid: false, sanitized: '' };
   }
 
   // Additional sanitization - replace potentially dangerous characters
-  const sanitized = input
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/`/g, '&#96;');
+
+  let sanitized = '';
+
+  if (isString)
+  {
+	// Check for XSS patterns
+	const xssPatterns = [
+		/<script/i,
+		/javascript:/i,
+		/on\w+=/i,
+		/<img/i,
+		/<svg/i,
+		/<iframe/i,
+		/<embed/i,
+		/<object/i,
+		/<video/i,
+		/<audio/i,
+		/<link/i,
+		/alert\(/i,
+		/prompt\(/i,
+		/confirm\(/i,
+		/eval\(/i,
+		/document\./i,
+		/\.(get|set|remove)Item/i,
+	];
+	
+	const hasXssPattern = xssPatterns.some(pattern => pattern.test(input));
+	if (hasXssPattern) {
+    	return { isValid: false, sanitized: '' };
+	}
+
+	sanitized = input
+	.replace(/</g, '&lt;')
+	.replace(/>/g, '&gt;')
+	.replace(/"/g, '&quot;')
+	.replace(/'/g, '&#39;')
+	.replace(/`/g, '&#96;');
+
+  }
+
+
 
   return { isValid: true, sanitized };
 }
@@ -52,7 +107,7 @@ function validateUsername(username) {
   }
   
   // Check for SQL injection patterns
-  const result = sanitizeInput(username);
+  const result = sanitizeInput(username, true);
   if (!result.isValid) {
     return { isValid: false, message: 'Username contains invalid characters' };
   }
@@ -105,6 +160,8 @@ function escapeHtml(content) {
 }
 
 module.exports = {
+	isIntegerString,
+	isDecimalString,
   sanitizeInput,
   validateUsername,
   escapeHtml

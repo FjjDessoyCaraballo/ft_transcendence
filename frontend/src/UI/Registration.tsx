@@ -81,6 +81,7 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
             </div>
           )}
           
+
           <div className="mb-4">
             <label 
               htmlFor="username" 
@@ -99,6 +100,9 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  required
 			  maxLength={20}
             />
+			<p className="text-sm text-gray-500 mt-1">
+					3–20 characters: letters, numbers, _, -, and .
+				</p>
           </div>
           <div className="mb-4">
             <label 
@@ -118,12 +122,15 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  required
 			  minLength={8}
             />
+			<p className="text-sm text-gray-500 mt-1">
+					8+ characters, 1 uppercase, 1 lowercase, 1 number
+				</p>
           </div>
           
           <div className="mb-6">
             <label 
               htmlFor="confirmPassword" 
-              className="block text-gray-700 font-mono mb-2"
+              className="block text-[#4B0082] font-mono mb-2"
             >
               {t('confirm_password')}
             </label>

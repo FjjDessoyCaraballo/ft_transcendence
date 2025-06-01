@@ -284,7 +284,11 @@ export class MatchIntro implements IGameState
 			else
 			{
 				this.isSavingData = true;
-				this.saveWeaponData();
+				if (this.gameType === GameType.BLOCK_BATTLE)
+					this.saveWeaponData();
+				else
+					this.isStateReady = true;
+
 			}
 		}
 	}

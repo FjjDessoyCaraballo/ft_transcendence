@@ -34,7 +34,6 @@ export default function App() {
 			<Route path="/" element={<GameCanvas isLoggedIn={isLoggedIn} onCanvasLogOut={gameCanvasLogOut} />} />
 			<Route path="/dashboard/:username" element={<DashboardWrapper isLoggedIn={isLoggedIn} />} />
 			<Route path="/playerlist" element={<PlayerList isLoggedIn={isLoggedIn} />} />
-			<Route path="/instructions" element={<Instructions />} />
 			{/* Catch-all route: redirect unknown routes to landing page */}
 			<Route path="*" element={<Navigate to="/" replace />} />
 		</Routes>
