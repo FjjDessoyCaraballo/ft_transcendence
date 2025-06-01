@@ -1,0 +1,7 @@
+{
+    "pong": " Pong Instructions",
+    "controls": " Use Q / A (Player 1) or O / K (Player 2) to move your paddle up and down.",
+    "hit_ball": " Hit the ball past your opponent’s paddle to earn a point.",
+    "how_to_win": " First to 5 points wins the game!",
+    "block_battle": " Block Battle Instructions"
+}

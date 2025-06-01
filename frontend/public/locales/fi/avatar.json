@@ -1,0 +1,10 @@
+{
+    "avatar_change": "Avatarin vaihto",
+    "file_limit": "Tiedostojen on oltava JPG- tai PNG-muodossa ja enintään 2 Mt",
+    "avatar": "Avatar",
+    "cancel": "Peruuta",
+    "update": "Päivitä",
+    "load_fail": "Kuvan lataaminen epäonnistui!",
+    "select_file": "Valitse kuvatiedosto"
+}
+  

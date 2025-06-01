@@ -1,3 +1,4 @@
+import { TFunction } from 'i18next';
 
 export enum GameStates
 {

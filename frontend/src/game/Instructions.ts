@@ -5,6 +5,7 @@ import { ReturnMainMenuButton } from "./EndScreen";
 import { TEXT_PADDING, BUTTON_HOVER_COLOR } from "./Constants";
 import { UserManager } from "../UI/UserManager";
 import { GameType } from "../UI/Types";
+import { TFunction } from 'i18next';
 
 export class Instructions implements IGameState
 {
@@ -15,20 +16,22 @@ export class Instructions implements IGameState
 	ctx: CanvasRenderingContext2D;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, gameType: GameType, t: TFunction)
 	{
 		this.name = GameStates.INSTRUCTIONS;
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 		
-		let text = 'RETURN TO MENU';
+		let text = 'return_to_menu';
 		this.ctx.font = '25px arial';
-		const buttonX = (canvas.width / 2) - (this.ctx.measureText(text).width / 2) - TEXT_PADDING;
+		const buttonX = (canvas.width / 2) - (this.ctx.measureText(t('return_to_menu')).width / 2) - TEXT_PADDING;
 		const buttonY = (canvas.height / 2) - 20 - TEXT_PADDING + 370;
 
-		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', this.gameType);
+		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX, buttonY, 'red', '#780202', text, 'white', '25px', 'arial', this.gameType, this.t);
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
@@ -70,7 +73,7 @@ export class Instructions implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		UserManager.drawCurUser(this.canvas, ctx);
+		UserManager.drawCurUser(this.canvas, ctx, this.t);
 		
 		// Draw info box
 		const boxPadding = 70;
@@ -80,7 +83,7 @@ export class Instructions implements IGameState
 		ctx.fillRect(boxPadding, boxPadding, boxW, boxH);
 
 		// Draw header
-		const headerText = 'GAME INSTRUCTIONS';
+		/*const headerText = 'GAME INSTRUCTIONS';
 		ctx.font = '50px arial';
 		ctx.fillStyle = 'black';
 		const headerX = (this.canvas.width / 2) - (ctx.measureText(headerText).width / 2);
@@ -101,9 +104,9 @@ export class Instructions implements IGameState
 			infoY = headerY + 20 + lineHeight * lineCount; // 20 = font size
 			ctx.fillText(line, infoX, infoY);
 			lineCount++;
-		}
+		}*/
 
-		this.returnMenuButton.draw(ctx);
+		/*this.returnMenuButton.draw(ctx, this.t);
 	}
 
 	getInstructionText(): string []

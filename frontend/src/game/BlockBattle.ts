@@ -14,15 +14,16 @@ import { GameType } from '../UI/Types';
 import { Bazooka, LandMine, Pistol, Weapon } from './Weapons';
 import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, recordTournamentMatchResult } from '../services/userService';
 import { drawCenteredText, StartScreen } from './StartScreen';
+import { TFunction } from 'i18next';
 
-function createWeapon(name: string) : Weapon{
 
+function createWeapon(name: string, t: TFunction) : Weapon{
 	if (name === 'Pistol')
-		return new Pistol();
+		return new Pistol(t);
 	else if (name === 'Bazooka')
-		return new Bazooka();
+		return new Bazooka(t);
 	else
-		return new LandMine();
+		return new LandMine(t);
 }
 
 export interface bbMatchData {
@@ -74,8 +75,9 @@ export class BlockBattle implements IGameState
 	isLoggedIn: boolean = false;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, p1Weapons: Weapon[], p2Weapons: Weapon[], isTournament: boolean)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, p1Weapons: Weapon[], p2Weapons: Weapon[], isTournament: boolean, t: TFunction)
 	{
 		this.name = GameStates.BLOCK_BATTLE;
 		this.isStateReady = false;
@@ -91,6 +93,8 @@ export class BlockBattle implements IGameState
 		this.player1 = null;
 		this.player2 = null;
 		this.gameStats = null;
+
+		this.t = t;
 
 		this.keys = {}; // Maybe in enter() ?
 
@@ -139,10 +143,10 @@ export class BlockBattle implements IGameState
 		this.tournamentData1 = response[0];
 		this.tournamentData2 = response[1];
 
-		const p1w1 = createWeapon(this.tournamentData1.bbWeapons[0].name);
-		const p1w2 = createWeapon(this.tournamentData1.bbWeapons[1].name);
-		const p2w1 = createWeapon(this.tournamentData2.bbWeapons[0].name);
-		const p2w2 = createWeapon(this.tournamentData2.bbWeapons[1].name);
+		const p1w1 = createWeapon(this.tournamentData1.bbWeapons[0].name, this.t);
+		const p1w2 = createWeapon(this.tournamentData1.bbWeapons[1].name, this.t);
+		const p2w1 = createWeapon(this.tournamentData2.bbWeapons[0].name, this.t);
+		const p2w2 = createWeapon(this.tournamentData2.bbWeapons[1].name, this.t);
 
 		this.player1 = new Player(100, 745, 'green', this.tournamentData1.user, p1w1, p1w2);
 		this.player2 = new Player2(1100, 745, 'red', this.tournamentData2.user, p2w1, p2w2);
@@ -175,9 +179,9 @@ export class BlockBattle implements IGameState
 		this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("BLOCK BATTLE: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -231,9 +235,9 @@ export class BlockBattle implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("BLOCK BATTLE: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -374,8 +378,8 @@ export class BlockBattle implements IGameState
 			await UserManager.updateUserStats(this.player1.userData, this.player2.userData, this.gameStats);
 		} catch (error) {
 
-			alert(`User data saving failed! ${error}`);
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			alert(`${this.t('saving_failed')} ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;
 		}
@@ -398,8 +402,8 @@ export class BlockBattle implements IGameState
 
 		} catch (error) {
 
-			alert(`User data saving failed, returning to Start Screen! ${error}`);
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			alert(`${this.t("saving_failed")} ${error}`);
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.savingDataToDB = false;
 			return ;
 		}
@@ -547,9 +551,9 @@ export class BlockBattle implements IGameState
 				if (this.saveReady)
 				{
 					if (this.player1.health.amount === 0 || this.player2.hasWon)
-						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player2.userData.id, this.player1.userData.id, GameType.BLOCK_BATTLE, false, null));
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player2.userData.id, this.player1.userData.id, GameType.BLOCK_BATTLE, false, null, this.t));
 					else if (this.player2.health.amount === 0 || this.player1.hasWon)
-						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player1.userData.id, this.player2.userData.id, GameType.BLOCK_BATTLE, false, null));
+						global_stateManager.changeState(new EndScreen(this.canvas, this.ctx, this.player1.userData.id, this.player2.userData.id, GameType.BLOCK_BATTLE, false, null, this.t));
 				}
 
 			}

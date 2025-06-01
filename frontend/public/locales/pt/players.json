@@ -1,0 +1,20 @@
+{
+  "player_fail": "Falha ao carregar os jogadores. Tente novamente mais tarde.",
+  "request_fail": "Falha ao enviar solicitação de amizade. Tente novamente.",
+  "accept_fail": "Falha ao aceitar solicitação de amizade. Tente novamente.",
+  "reject_fail": "Falha ao rejeitar solicitação de amizade. Tente novamente.",
+  "remove_fail": "Falha ao remover amigo. Tente novamente.",
+  "unfriend": "Remover amigo",
+  "accept": "Aceitar",
+  "reject": "Rejeitar",
+  "request_sent": "Solicitação enviada",
+  "add_friend": "Adicionar amigo",
+  "loading_players": "Carregando jogadores...",
+  "friend_requests": "Solicitações de amizade",
+  "hi": "Oi",
+  "welcome": "Bem-vindo ao Centro de Jogadores!",
+  "pong_played": "Jogos de Pong jogados:",
+  "block_battle_played": "Jogos de Block Battle jogados:",
+  "more_stats": "Mais estatísticas",
+  "issues": "Isso pode ser por causa de problemas de conexão, então saia e tente entrar novamente!"
+}
