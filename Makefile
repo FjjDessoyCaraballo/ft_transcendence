@@ -31,12 +31,8 @@ restart: stop start
 clean:
 	@echo "$(RED)Cleaning up Docker resources...$(RESET)"
 	docker compose -f $(COMPOSE_FILE) down -v
-	@echo "$(RED)Removing data directory contents...$(RESET)"
-	rm -rf data/*
-	touch data/.gitkeep
-	rm -rf certs/
-	rm -rf backend/certs
-	rm -rf frontend/certs
+	@echo "$(RED)Removing named volumes...$(RESET)"
+	docker volume ls -q --filter name=$$(basename $$(pwd)) | xargs -r docker volume rm || true
 
 fclean: clean
 	@echo "$(RED)Removing all unused Docker volumes...$(RESET)"
@@ -84,3 +80,4 @@ help:
 	@echo "  make logs-frontend - View frontend logs"
 	@echo "  make db       - View database tables"
 	@echo "  make help     - Show this help message"
+	@echo " docker run --rm -v ft_transcendence_ssl_certs:/certs alpine ls -la /certs " - View Certs

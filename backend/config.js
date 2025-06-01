@@ -1,9 +1,5 @@
-// Load environment variables from .env file if not in production
-if (process.env.NODE_ENV !== 'production') {
 	require('dotenv').config({ path: '../.env' });
-  }
-  
-  // Default config with environment variable fallbacks
+
   const config = {
 	port: process.env.BACKEND_PORT || 3443,
 	
