@@ -53,8 +53,8 @@ export const getSentRequests = async (): Promise<User[]> => {
 
 /**
  * Send a friend request to another user.
- * 
- * @param friendId The ID of the user to send a request to.
+ *
+ * @param friendId
  */
 export const sendFriendRequest = async (friendId: number): Promise<FriendResponse> => {
   try {
@@ -70,7 +70,7 @@ export const sendFriendRequest = async (friendId: number): Promise<FriendRespons
 
 /**
  * Accept a pending friend request.
- * 
+ *
  * @param friendId The ID of the user whose request you are accepting.
  */
 export const acceptFriendRequest = async (friendId: number): Promise<FriendResponse> => {
@@ -87,7 +87,7 @@ export const acceptFriendRequest = async (friendId: number): Promise<FriendRespo
 
 /**
  * Reject a pending friend request.
- * 
+ *
  * @param friendId The ID of the user whose request you are rejecting.
  */
 export const rejectFriendRequest = async (friendId: number): Promise<FriendResponse> => {
@@ -104,7 +104,7 @@ export const rejectFriendRequest = async (friendId: number): Promise<FriendRespo
 
 /**
  * Remove a friend from the current user's friends list.
- * 
+ *
  * @param friendId The ID of the friend to remove.
  */
 export const removeFriend = async (friendId: number): Promise<FriendResponse> => {
@@ -118,34 +118,3 @@ export const removeFriend = async (friendId: number): Promise<FriendResponse> =>
   }
 };
 
-
-// //DO WE NEED THESE?
-// /**
-//  * Search for users to add as friends.
-//  * 
-//  * @param query The username search query.
-//  */
-// export const searchUsers = async (query: string): Promise<User[]> => {
-//   if (query.length < 3) {
-//     throw new Error('Search query must be at least 3 characters long.');
-//   }
-
-//   try {
-//     const response = await apiRequest(`/friends/search?q=${encodeURIComponent(query)}`);
-//     return response.users;
-//   } catch (error) {
-//     throw new Error('Failed to search for users.');
-//   }
-// };
-
-// /**
-//  * Get all online friends of the current user.
-//  */
-// export const getOnlineFriends = async (): Promise<User[]> => {
-//   try {
-//     const response = await apiRequest('/friends/online');
-//     return response.onlineFriends;
-//   } catch (error) {
-//     throw new Error('Failed to fetch online friends.');
-//   }
-// };
