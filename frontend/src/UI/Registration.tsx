@@ -150,7 +150,7 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 		</button>
 		<button 
               type="submit"
-              className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]"
+              className="flex items-center justify-center px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]"
 			  disabled={isLoading}
 			>
 			{isLoading ? (
