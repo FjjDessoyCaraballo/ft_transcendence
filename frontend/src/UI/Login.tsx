@@ -40,7 +40,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
         const stored = await getToken();
 
         // Fetch preferred language and update i18next language
-        /*try {
+        try {
           const langResp = await getPreferredLanguage();
           if (langResp.language) {
             localStorage.setItem('preferredLanguage', langResp.language);
@@ -49,7 +49,7 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
           }
         } catch (langErr) {
           console.warn('Failed to fetch preferred language:', langErr);
-        }*/
+        }
 
       } else {
         console.error('No token received from server.');
