@@ -15,7 +15,7 @@
     "terms4": "- Processamento de dados pela Dads and Coders Inc.",
     "terms5": "Os dados que a Dads and Coders Inc. coleta para fins de processamento são os seguintes:",
     "terms6": "- Id;",
-    "terms7": "- Nome de usuário;",
+    "terms7": "- Usuário (não utilize dados pessoais);",
     "terms8": "- Senha;",
     "terms9": "- Pontos de ranking;",
     "terms10": "- Avatar;",
@@ -34,6 +34,7 @@
     "terms23": "SOLICITAÇÕES DE DADOS PRÓPRIOS: usuários que desejam baixar todos os seus dados contidos nos servidores da Dads and Coders Inc. podem fazê-lo diretamente nas configurações pressionando o botão \"Baixar dados\".",
     "terms24": "Se o usuário encontrar dificuldades para excluir seus dados, pode entrar em contato com o encarregado de proteção de dados. Para dúvidas ou perguntas, entre em contato com o encarregado de proteção de dados:",
     "terms25": "Felipe Dessoy, fdessoy-@hive.student.fi",
+    "terms26": "Dads and Coders Inc. não coleta nenhum dado pessoal.",
     "decline": "Recusar",
     "accept": "Aceitar",
     "preferred_language": "Selecione o idioma preferido"

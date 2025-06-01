@@ -197,6 +197,7 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  <p className="gdpr"> {t('terms23')}</p>
 			  <p className="gdpr">{t('terms24')}</p>
 			  <p className="texts">{t('terms25')}</p>
+			  <p className="texts">{t('terms26')}</p>
 			</div>
 			<div className="flex justify-end p-5 border-t border-gray-200 gap-2">
 			  <button 

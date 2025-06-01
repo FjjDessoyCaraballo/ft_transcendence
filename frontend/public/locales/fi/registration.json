@@ -15,7 +15,7 @@
     "terms4": "- Tietojen käsittely Dads and Coders Inc.:n toimesta.",
     "terms5": "Dads and Coders Inc. kerää seuraavia tietoja käsittelytarkoituksiin:",
     "terms6": "- Id;",
-    "terms7": "- Käyttäjätunnus;",
+    "terms7": "- Käyttäjätunnus (älä syötä henkilötietoja);",
     "terms8": "- Salasana;",
     "terms9": "- Ranking-pisteet;",
     "terms10": "- Avatar;",
@@ -34,6 +34,7 @@
     "terms23": "OMIEN TIETOJEN PYYNTÖ: käyttäjät, jotka haluavat ladata kaiken Dads and Coders Inc.:n palvelimilla olevan tietonsa, voivat tehdä sen asetuksista painamalla \"Lataa tiedot\" -painiketta.",
     "terms24": "Jos käyttäjä kohtaa ongelmia tietojen poistamisessa, hän voi ottaa yhteyttä tietosuojavastaavaan. Kysymyksissä voit ottaa yhteyttä tietosuojavastaavaan:",
     "terms25": "Felipe Dessoy, fdessoy-@hive.student.fi",
+    "terms26": "Dads and Coders Inc. ei kerää mitään henkilötietoja.",
     "decline": "Hylkää",
     "accept": "Hyväksy",
     "preferred_language": "Valitse ensisijainen kieli"
