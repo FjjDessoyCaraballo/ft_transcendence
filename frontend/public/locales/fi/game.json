@@ -55,5 +55,7 @@
     "humans_rock": "Hienoa työtä, ihmiset ROCKAA!!",
     "new_rank_of": "Uusi sijoitus pelaajalle",
     "is": "on",
-    "saving_failed": "Käyttäjätietojen tallennus epäonnistui!"
+    "saving_failed": "Käyttäjätietojen tallennus epäonnistui!",
+    "close_instructions": "Sulje ohjeet",
+    "game_instructions": "Pelin ohjeet"
 }

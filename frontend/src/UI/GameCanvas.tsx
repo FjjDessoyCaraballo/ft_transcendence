@@ -20,40 +20,41 @@ interface GameCanvasProps {
 
 // Instructions popup component
 const Instructions: React.FC = () => {
+	const { t } = useTranslation('instructions');
   return (
     <div className="mt-8 w-full max-w-4xl min-w-[600px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-purple-300 shadow-lg">
       <div className="space-y-8">
 
         {/* Pong Instructions */}
         <div className="bg-white/80 p-6 rounded-lg shadow-md border border-purple-200">
-          <h2 className="text-[#6B21A8] text-2xl font-bold mb-4 text-center">🏓 Pong Instructions</h2>
+          <h2 className="text-[#6B21A8] text-2xl font-bold mb-4 text-center">🏓{t('pong')}</h2>
           <div className="space-y-4 text-[#4B0082] font-medium text-lg">
-            <p>🕹️ Use Q / A (Player 1) or O / K (Player 2) to move your paddle up and down.</p>
-            <p>⚽ Hit the ball past your opponent’s paddle to earn a point.</p>
-            <p>🏆 First to 5 points wins the game!</p>
+            <p>🕹️{t('controls_pong')}</p>
+            <p>⚽{t('hit_ball')}</p>
+            <p>🏆{t('how_to_win')}</p>
           </div>
         </div>
 
         {/* Block Battle Instructions */}
         <div className="bg-white/80 p-6 rounded-lg shadow-md border border-purple-200">
-          <h2 className="text-[#6B21A8] text-2xl font-bold mb-4 text-center">⚔️ Block Battle Instructions</h2>
+          <h2 className="text-[#6B21A8] text-2xl font-bold mb-4 text-center">⚔️{t('block_battle')}</h2>
           <div className="space-y-4 text-[#4B0082] font-medium text-lg">
-            <p>🧱 Block Battle is a 1v1 platform combat game with two paths to victory:</p>
+            <p>🧱 {t('block_battle_desc')}</p>
             <ul className="list-disc list-inside ml-4 space-y-2">
-              <li>💰 <strong>Collect 5 coins</strong> before your opponent.</li>
-              <li>💥 <strong>Reduce your opponent's health to 0</strong>.</li>
+              <li>💰 <strong>{t('collect_5_coins')}</strong> {t('before_opponent')}</li>
+              <li>💥 <strong>{t('reduce_health')}</strong>.</li>
             </ul>
-            <p>🔫 At the start of each match, choose <strong>2 weapons</strong> to use in battle.</p>
-            <p>🎮 Use movement, jumping, shooting, and weapon switching to outplay your opponent.</p>
+            <p>🔫 {t('at_start')} <strong>{t('2_weapons')}</strong> {t('to_use')}</p>
+            <p>🎮 {t('use_movement')}</p>
 
             <div className="mt-4">
-              <h3 className="text-xl font-semibold text-center">🎮 Controls</h3>
+              <h3 className="text-xl font-semibold text-center">🎮 {t('controls')}</h3>
               <div className="mt-2 space-y-2">
                 <div>
-                  <span className="font-semibold">Player 1:</span> W (Jump), A (Left), D (Right), E (Fire), S (Switch Weapon)
+                  <span className="font-semibold">{t('player_1')}</span> {t('controls_1')}
                 </div>
                 <div>
-                  <span className="font-semibold">Player 2:</span> I (Jump), J (Left), L (Right), U (Fire), K (Switch Weapon)
+                  <span className="font-semibold">{t('player_2')}</span> {t('controls_2')}
                 </div>
               </div>
             </div>
@@ -174,7 +175,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onCanvasLogO
 						onClick={() => setShowInstructions((prev) => !prev)}
 						className="buttonsStyle"
 					>
-						{showInstructions ? 'Close Instructions' : 'Game Instructions'}
+						{showInstructions ? t('close_instructions') : t('game_instructions')}
 					</button>
 				</div>
 			</div>
