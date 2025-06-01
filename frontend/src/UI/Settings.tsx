@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getUserDataForDownload, deleteUserAccount } from '../services/userService'; 
 import { PasswordChangePopup } from './PasswordChange'
 import { AvatarChangePopup } from './AvatarChange'
+import { LanguageSelectPopup } from './LanguageSelect'
 import { clearToken } from '../services/TokenService'
 import { useTranslation } from 'react-i18next';
 
@@ -68,6 +69,7 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 	const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 	const [showChangePassword, setShowChangePassword] = useState(false);
 	const [showAvatarChange, setShowAvatarChange] = useState(false);
+	const [showLanguageSelect, setShowLanguageSelect] = useState(false);
 	const { t } = useTranslation('settings');
 
 	const HandleDownloadData = async () => {
@@ -182,6 +184,16 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
           	</button>
 		  	</div>
 
+			<div className="buttonsDiv">
+			<button
+				type="button"
+				className="buttonsStyle"
+				onClick={() => setShowLanguageSelect(true)}
+			>
+				{t('select_language')}
+			</button>
+			</div>
+
 			{/* ACCOUNT DELETION */}
 			<div className="buttonsDiv">
 			<button 
@@ -248,6 +260,11 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
           onClick={() => setShowAvatarChange(false)}
         />
       )}
+
+	  {showLanguageSelect && (
+		<LanguageSelectPopup onClose={() => setShowLanguageSelect(false)} />
+		)}
+
     </>
   );
 };

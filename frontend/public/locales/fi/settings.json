@@ -7,5 +7,15 @@
     "close": "Sulje",
     "settings": "Asetukset",
     "logout": "Kirjaudu ulos",
-    "success": "Tili poistettu onnistuneesti"
+    "success": "Tili poistettu onnistuneesti",
+    "select_language": "Valitse kieli",
+    "preferred_language": "Ensisijainen kieli",
+    "set_preferred_language": "Aseta ensisijainen kieli",
+    "cancel": "Peruuta",
+    "save": "Tallenna",
+    "loading": "Ladataan...",
+    "load_failed": "Ensisijaisen kielen lataaminen epäonnistui.",
+    "update_failed": "Ensisijaisen kielen päivittäminen epäonnistui.",
+    "language_saved_success": "Kieli tallennettu onnistuneesti",
+    "language_save_error": "Virhe kieltä tallennettaessa"
 }

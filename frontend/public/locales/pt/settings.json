@@ -7,5 +7,15 @@
     "close": "Fechar",
     "settings": "Configurações",
     "logout": "Sair",
-    "success": "Conta excluída com sucesso"
+    "success": "Conta excluída com sucesso",
+    "select_language": "Selecionar idioma",
+    "preferred_language": "Idioma preferido",
+    "set_preferred_language": "Definir idioma preferido",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "loading": "Carregando...",
+    "load_failed": "Falha ao carregar o idioma preferido.",
+    "update_failed": "Falha ao atualizar o idioma preferido.",
+    "language_saved_success": "Idioma salvo com sucesso",
+    "language_save_error": "Erro ao salvar o idioma"
 }

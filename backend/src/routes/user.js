@@ -13,7 +13,7 @@ const uploadTracker = new Map();
 async function userRoutes(fastify, options) {
   
     // Valid language options
-  const validLanguages = ['English', 'Finnish', 'Portuguese'];
+  const validLanguages = ['en', 'fi', 'pt'];
   
   const authenticate = async (request, reply) => {
     try {
@@ -216,7 +216,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     }
     
 
-    let userLanguage = 'English';
+    let userLanguage = 'en';
     if (language) {
       if (!validLanguages.includes(language)) {
         reply.code(400);

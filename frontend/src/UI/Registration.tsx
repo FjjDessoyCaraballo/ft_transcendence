@@ -100,7 +100,6 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  maxLength={20}
             />
           </div>
-          
           <div className="mb-4">
             <label 
               htmlFor="password" 
@@ -140,7 +139,6 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  minLength={8}
             />
           </div>
-          
           <div className="flex justify-end gap-3">
             <button 
               type="button"
