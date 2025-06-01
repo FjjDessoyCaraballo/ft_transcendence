@@ -4,7 +4,6 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 
 const savedLanguage = localStorage.getItem('preferredLanguage') || 'en';
-console.log('AAAAAAAAAAAAAAAAAAA', savedLanguage);
 
 i18n
   .use(HttpBackend)
