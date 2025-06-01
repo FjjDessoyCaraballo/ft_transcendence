@@ -51,8 +51,6 @@ export const Header: React.FC<HeaderProps> = ( {onHeaderLogOut, onHeaderLogIn, A
 
   const handleLogout = () => {
 
-	console.log('HEADER: Executing OnLogOut');
-
 	onHeaderLogOut();
     setIsLoggedIn(false);
     sessionStorage.removeItem('logged-in');

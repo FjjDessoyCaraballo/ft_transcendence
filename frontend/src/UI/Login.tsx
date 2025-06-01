@@ -26,7 +26,6 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
   const HandleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-	  console.log('Attempting login for:', username); // debug
     // Basic validation
     if (!username || !password) {
       setErrorMessage('Please enter both username and password');
@@ -42,7 +41,6 @@ export const LoginPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => 
       if (response && response.token) {
         await setToken(response.token);
         const stored = await getToken();
-        console.log('[LoginPopup] Token after setToken:', stored);
 
       } else {
         console.error('No token received from server.')

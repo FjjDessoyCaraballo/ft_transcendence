@@ -5,7 +5,6 @@ self.onmessage = function(event) {
 
 	switch(action) {
 		case 'setToken':
-			console.log('[Worker] Storing token:', payload);
 			jwtToken = payload;
 			self.postMessage({
 			status: 'success',
@@ -14,7 +13,6 @@ self.onmessage = function(event) {
 			});
 			break;
 		case 'getToken':
-			console.log('[Worker] Returning token:', jwtToken);
 			self.postMessage({
 				status: 'success',
 				action: 'getToken',

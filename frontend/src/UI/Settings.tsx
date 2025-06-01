@@ -88,12 +88,10 @@ export const SettingsPopup: React.FC<SettingsProps> = ({ onClick, onLogout }) =>
 
 	const HandleLogout = async () => {
 
-		console.log('LOG OUT clicked');
 
 		try {
 			await clearToken();
 			sessionStorage.setItem('logged-in', 'false');
-			console.log(`Action: user logged off. Status of logged-in: ${sessionStorage.getItem('logged-in')}`);
 			window.dispatchEvent(new Event('loginStatusChanged'));
 			onLogout(); // Reset Header state
 			onClick(); // Close popup

@@ -23,8 +23,9 @@ const Instructions: React.FC = () => {
   return (
     <div className="mt-8 w-full max-w-4xl min-w-[600px] mx-auto mb-8 bg-gradient-to-r from-pink-100 via-purple-50 to-pink-100 p-6 rounded-xl border border-purple-300 shadow-lg">
       <div className="space-y-8">
+
         {/* Pong Instructions */}
-        <div>
+        <div className="bg-white/80 p-6 rounded-lg shadow-md border border-purple-200">
           <h2 className="text-[#6B21A8] text-2xl font-bold mb-4 text-center">🏓 Pong Instructions</h2>
           <div className="space-y-4 text-[#4B0082] font-medium text-lg">
             <p>🕹️ Use Q / A (Player 1) or O / K (Player 2) to move your paddle up and down.</p>
@@ -34,7 +35,7 @@ const Instructions: React.FC = () => {
         </div>
 
         {/* Block Battle Instructions */}
-        <div>
+        <div className="bg-white/80 p-6 rounded-lg shadow-md border border-purple-200">
           <h2 className="text-[#6B21A8] text-2xl font-bold mb-4 text-center">⚔️ Block Battle Instructions</h2>
           <div className="space-y-4 text-[#4B0082] font-medium text-lg">
             <p>🧱 Block Battle is a 1v1 platform combat game with two paths to victory:</p>
@@ -59,10 +60,12 @@ const Instructions: React.FC = () => {
 
           </div>
         </div>
+
       </div>
     </div>
   );
 };
+
 
 // COMPONENT
 export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onCanvasLogOut }) => {
@@ -159,19 +162,13 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onCanvasLogO
 						<div className="absolute inset-0 bg-black bg-opacity-70 flex justify-center items-center z-10">
 							<div className="relative z-20 max-h-[80vh] overflow-y-auto p-2 bg-white shadow-lg">
 								<Instructions />
-								<button
-									onClick={() => setShowInstructions(false)}
-									className="absolute top-2 right-2 text-purple-800 font-bold text-xl bg-white rounded-full px-3 py-1 shadow hover:bg-purple-100"
-								>
-									✖
-								</button>
 							</div>
 						</div>
 					)}
 				</div>
 
 				{/* Instructions Button */}
-				<div className="ml-4 mt-2">
+				<div className="ml-0 mt-0">
 					<button
 						onClick={() => setShowInstructions((prev) => !prev)}
 						className="buttonsStyle"

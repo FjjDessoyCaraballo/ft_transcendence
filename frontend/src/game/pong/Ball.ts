@@ -36,7 +36,6 @@ export class Ball {
     // Player 1 paddle collision
     if (this.x <= PADDLE_WIDTH + BUFFER && this.y + BALL_SIZE >= player1.y && this.y <= player1.y + PADDLE_HEIGHT) {
         this.currentRallyLen++;
-        //console.log('currentRallyLen =', this.currentRallyLen);
         const hitPos = (this.y + BALL_SIZE / 2) - (player1.y + PADDLE_HEIGHT / 2); // calculates the difference between the centres of the ball and the paddle
         const normalized = hitPos / (PADDLE_HEIGHT / 2); // -1 (top) to 1 (bottom)
       
@@ -55,7 +54,6 @@ export class Ball {
     // Player 2 paddle collision
     if (this.x + BALL_SIZE >= canvasWidth - PADDLE_WIDTH - BUFFER && this.y + BALL_SIZE >= player2.y && this.y <= player2.y + PADDLE_HEIGHT) {
         this.currentRallyLen++;
-        //console.log('currentRallyLen =', this.currentRallyLen);
         const hitPos = (this.y + BALL_SIZE / 2) - (player2.y + PADDLE_HEIGHT / 2);
         const normalized = hitPos / (PADDLE_HEIGHT / 2);
       
@@ -72,14 +70,10 @@ export class Ball {
   }
 
   reset(twoPlayerMode: boolean, canvasWidth: number, canvasHeight: number) {
-    //console.log("Ball reset");
     if (this.currentRallyLen > this.longestRally)
       this.longestRally = this.currentRallyLen;
-    //console.log('longestRally =', this.longestRally);
     this.totalHits += this.currentRallyLen;
-    //console.log('totalHits =', this.totalHits);
     this.pointsPlayed++;
-    //console.log('pointsPlayed =', this.pointsPlayed);
     this.currentRallyLen = 0;
     this.x = canvasWidth / 2 - BALL_SIZE / 2 + 1.5;
     this.y = canvasHeight / 2;

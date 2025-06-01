@@ -1,5 +1,7 @@
 const FriendRepository = require('../repositories/friendRepository');
 const socketManager = require('../utils/socketManager');
+const { sanitizeInput, isIntegerString } = require('../utils/inputSanitizer');
+
 
 async function friendRoutes(fastify, options) {
   const friendRepo = new FriendRepository(fastify.db);
@@ -37,6 +39,14 @@ async function friendRoutes(fastify, options) {
   // Send friend request
   fastify.post('/request/:friendId', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
+
+	const result = sanitizeInput(request.params.friendId, true);
+	if (!result.isValid || !isIntegerString(request.params.friendId)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
+
     const friendId = parseInt(request.params.friendId);
 
     if (userId === friendId) {
@@ -82,6 +92,13 @@ async function friendRoutes(fastify, options) {
   // Accept friend request
   fastify.put('/accept/:friendId', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
+
+	const sanitizeResult = sanitizeInput(request.params.friendId, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.friendId)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     const friendId = parseInt(request.params.friendId);
 
     const result = friendRepo.acceptRequest(userId, friendId);
@@ -106,6 +123,13 @@ async function friendRoutes(fastify, options) {
   // Reject friend request (deletes the request)
   fastify.put('/reject/:friendId', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
+
+	const sanitizeResult = sanitizeInput(request.params.friendId, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.friendId)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     const friendId = parseInt(request.params.friendId);
     
     const result = friendRepo.rejectRequest(userId, friendId);
@@ -121,6 +145,13 @@ async function friendRoutes(fastify, options) {
   // Remove friend
   fastify.delete('/:friendId', { preHandler: authenticate }, async (request, reply) => {
     const userId = request.user.id;
+
+	const sanitizeResult = sanitizeInput(request.params.friendId, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.friendId)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     const friendId = parseInt(request.params.friendId);
     
     friendRepo.removeFriend(userId, friendId);
@@ -136,39 +167,8 @@ async function friendRoutes(fastify, options) {
 
     return { success: true, message: 'Friend removed' };
   });
-  
-  fastify.get('/search', { preHandler: authenticate }, async (request, reply) => {
-	const query = request.query.q;
-	if (!query || query.length < 3) {
-	  reply.code(400);
-	  return { error: 'Search query must be at least 3 characters' };
-	}
-	
-	const users = fastify.db.prepare(`
-	  SELECT id, username, ranking_points 
-	  FROM users 
-	  WHERE username LIKE ? AND id != ? AND deleted_at IS NULL
-	  LIMIT 20
-	`).all(`%${query}%`, request.user.id);
-	
-	return { users };
-  });
 
-  // Get online friends
-  fastify.get('/online', { preHandler: authenticate }, async (request, reply) => {
-    const userId = request.user.id;
-    const friends = friendRepo.getFriends(userId);
-    
-    const onlineFriends = friends
-      .filter(friend => socketManager.isUserOnline(friend.id))
-      .map(friend => ({
-        id: friend.id,
-        username: friend.username,
-        ranking_points: friend.ranking_points
-      }));
-    
-    return { onlineFriends };
-  });
+ 
 }
 
 module.exports = friendRoutes;

@@ -1,5 +1,5 @@
 const { hashPassword, comparePassword } = require('../utils/passwords');
-const { validateUsername, escapeHtml } = require('../utils/inputSanitizer');
+const { sanitizeInput, isIntegerString, validateUsername } = require('../utils/inputSanitizer');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
@@ -104,6 +104,12 @@ fastify.put('/language', { preHandler: authenticate }, async (request, reply) =>
       return { error: 'Language is required' };
     }
     
+	let sanitizeResult = sanitizeInput(language, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     if (!validLanguages.includes(language)) {
       reply.code(400);
       return { error: `Language must be one of: ${validLanguages.join(', ')}` };
@@ -141,6 +147,13 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
 // GET user by ID
   fastify.get('/:id', { preHandler: authenticate }, async (request, reply) => {
+
+	let sanitizeResult = sanitizeInput(request.params.id, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.id)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
              games_played_pong, wins_pong, losses_pong,
@@ -161,6 +174,15 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
   // GET user name & rank by ID
   fastify.get('/name-and-rank/:id', { preHandler: authenticate }, async (request, reply) => {
+
+
+	let sanitizeResult = sanitizeInput(request.params.id, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.id)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
+
     const user = fastify.db.prepare(`
       SELECT username, avatar_url, ranking_points
       FROM users 
@@ -177,6 +199,12 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
   // GET user by USERNAME
   fastify.get('/by-username/:username', { preHandler: authenticate }, async (request, reply) => {
+
+	let sanitizeResult = sanitizeInput(request.params.username, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
 
     const user = fastify.db.prepare(`
       SELECT id, username, avatar_url, ranking_points,
@@ -219,11 +247,18 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
     let userLanguage = 'English';
     if (language) {
-      if (!validLanguages.includes(language)) {
-        reply.code(400);
-        return { error: `Language must be one of: ${validLanguages.join(', ')}` };
-      }
-      userLanguage = language;
+
+		let sanitizeResult = sanitizeInput(language, true);
+		if (!sanitizeResult.isValid) {
+			reply.code(400);
+			return { error: 'Request parameters contain invalid characters' };
+		}
+
+		if (!validLanguages.includes(language)) {
+			reply.code(400);
+			return { error: `Language must be one of: ${validLanguages.join(', ')}` };
+		}
+		userLanguage = language;
     }
     
     try {
@@ -279,7 +314,19 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     }
   }, async (request, reply) => {
     const { username, password } = request.body;
-    
+
+	let sanitizeResult = sanitizeInput(username, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
+	sanitizeResult = sanitizeInput(password, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     // Validate input
     if (!username || !password) {
       reply.code(400);
@@ -323,7 +370,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     return {status: 'OK'};
   });
 
-  // Start new tournament (this should probably be post...?)
+  // Start new tournament
 	fastify.get('/start-new-tournament', { preHandler: authenticate }, async (request, reply) => {
 
 	globalTournamentObj.tournamentArr.length = 0;
@@ -461,6 +508,18 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   fastify.post('/verify-tournament-player', { preHandler: authenticate }, async (request, reply) => {
     const { username, password } = request.body;
 
+	let sanitizeResult = sanitizeInput(username, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
+	sanitizeResult = sanitizeInput(password, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
 	if (globalTournamentObj.tournamentArr.length === 4) {
       reply.code(400);
       return { error: 'Tournament already full' };
@@ -527,6 +586,12 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   fastify.post('/remove-tournament-player', { preHandler: authenticate }, async (request, reply) => {
     const playerId = request.body;
 
+	let sanitizeResult = sanitizeInput(playerId, false);
+	if (!sanitizeResult.isValid || !isIntegerString(playerId)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
 	if (globalTournamentObj.tournamentArr.length === 0) {
       reply.code(400);
       return { error: 'Tournament already empty' };
@@ -550,13 +615,35 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
 	const { p1Weapons, p2Weapons} = request.body;
 
+	let sanitizeResult = sanitizeInput(p1Weapons[0].name, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+	sanitizeResult = sanitizeInput(p1Weapons[1].name, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+	sanitizeResult = sanitizeInput(p2Weapons[0].name, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+	sanitizeResult = sanitizeInput(p2Weapons[1].name, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
+
 	if (globalTournamentObj.tournamentArr.length === 0) {
       reply.code(400);
       return { error: 'Tournament array empty' };
     }
 
-	if (!validWeapons.includes(p1Weapons[0]) || !validWeapons.includes(p1Weapons[1])
-	 || !validWeapons.includes(p2Weapons[0]) || !validWeapons.includes(p2Weapons[1])) {
+	if (!validWeapons.includes(p1Weapons[0].name) || !validWeapons.includes(p1Weapons[1].name)
+	 || !validWeapons.includes(p2Weapons[0].name) || !validWeapons.includes(p2Weapons[1].name)) {
       reply.code(400);
       return { error: 'Bad weapon data; weapon name is nod valid' };
     }
@@ -628,6 +715,17 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   }, async (request, reply) => {
     const { username, password } = request.body;
     
+	let sanitizeResult = sanitizeInput(username, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+	sanitizeResult = sanitizeInput(password, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     if (!username || !password) {
       reply.code(400);
       return { error: 'Username and password are required' };
@@ -683,9 +781,16 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
 
   // Update user profile
   fastify.put('/profile', { preHandler: authenticate }, async (request, reply) => {
+	
     const userId = request.user.id;
     const { username } = request.body;
     
+	let sanitizeResult = sanitizeInput(username, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     try {
       if (!username) {
         reply.code(400);
@@ -745,6 +850,17 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
   }, async (request, reply) => {
     const userId = request.user.id;
     const { currentPassword, newPassword } = request.body;
+
+	let sanitizeResult = sanitizeInput(currentPassword, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+	sanitizeResult = sanitizeInput(newPassword, true);
+	if (!sanitizeResult.isValid) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
     
     if (!currentPassword || !newPassword) {
       reply.code(400);

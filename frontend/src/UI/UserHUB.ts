@@ -225,7 +225,6 @@ export class UserHUB implements IGameState
 				}
 				else if (this.loggedInUserData)
 				{
-					console.log('Challenge buttons clicked');
 
 					this.opponentName = btn.user.username;
 					this.handleOpponentLogin();
@@ -254,22 +253,24 @@ export class UserHUB implements IGameState
 			} catch {
 				this.isCheckingPassword = false;
 				alert("Incorrect password. Please try again.");
+				return ;
 			}
+
+			if (this.state === UserHubState.TOURNAMENT)
+			{
+				try {
+					await checkTournamentStatus();
+					global_stateManager.changeState(new Tournament(this.canvas, this.ctx, this.gameType));
+				} catch {
+				}
+			}
+			
 			},
 			() => {
 				console.log("Password modal canceled");
 			}
 		);
 
-		if (this.state === UserHubState.TOURNAMENT)
-		{
-			try {
-				await checkTournamentStatus();
-				global_stateManager.changeState(new Tournament(this.canvas, this.ctx, this.gameType));
-			} catch {
-				console.log('Tournament not ready yet');
-			}
-		}
 
 	}
 

@@ -1,6 +1,7 @@
 const { globalObj, globalTournamentObj } = require('./sharedObjects');
 const { authenticate } = require('../middleware/auth');
 const { validateFriendship } = require('../middleware/friendValidation');
+const { sanitizeInput, isDecimalString, isIntegerString } = require('../utils/inputSanitizer');
 const socketManager = require('../utils/socketManager');
 
 // Adding ELO ranking calculator to backend
@@ -62,7 +63,14 @@ async function gameRoutes(fastify, options) {
 
   // Get match by ID
   fastify.get('/match/:id', { preHandler: authenticate }, async (request, reply) => {
-    const matchId = request.params.id;
+    
+	const sanitizeResult = sanitizeInput(request.params.id, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.id)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
+	const matchId = request.params.id;
 
     // Get basic match data
     const match = fastify.db.prepare(`
@@ -97,7 +105,15 @@ async function gameRoutes(fastify, options) {
     return { match, gameStats };
   });
 
+  // Get matches based on plaayer ID
   fastify.get('/matches/player/:playerId', { preHandler: authenticate }, async (request, reply) => {
+
+	const sanitizeResult = sanitizeInput(request.params.playerId, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.playerId)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     const playerId = request.params.playerId;
 
     const matches = fastify.db.prepare(`
@@ -117,7 +133,9 @@ async function gameRoutes(fastify, options) {
     return { matches };
   });
 
+  // Get logged in user matches
   fastify.get('/my-matches', { preHandler: authenticate }, async (request, reply) => {
+
     const userId = request.user.id;
 
     const matches = fastify.db.prepare(`
@@ -142,16 +160,38 @@ async function gameRoutes(fastify, options) {
   });
 
 
-  	// Helper function for /record-match
+  	// Helper functions for /record-match
 	function validateMatchData(matchData)
 	{
+		let sanitizeResult = sanitizeInput(matchData.game_type, true);
+		if (!sanitizeResult.isValid) 
+			return false;
+		sanitizeResult = sanitizeInput(matchData.game_duration, false);
+		if (!sanitizeResult.isValid) 
+			return false;
+		sanitizeResult = sanitizeInput(matchData.winner_id, false);
+		if (!sanitizeResult.isValid) 
+			return false;
+
 		if (matchData.game_type !== 'pong' && matchData.game_type !== 'blockbattle')
 			return false;
 
-		// Date and start time can be also checked here... but are they really that important?
 
 		if (matchData.game_type === 'pong')
 		{
+			sanitizeResult = sanitizeInput(matchData.longest_rally, false);
+			if (!sanitizeResult.isValid || !isDecimalString(matchData.longest_rally)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.avg_rally, false);
+			if (!sanitizeResult.isValid || !isDecimalString(matchData.avg_rally)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player1_points, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player1_points)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player2_points, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player2_points)) 
+				return false;
+
 			if (matchData.game_duration < 0 || matchData.game_duration > 1200) // game lasted over 20 minutes
 				return false;
 			if (matchData.longest_rally < 0 || matchData.longest_rally > 100)
@@ -166,6 +206,46 @@ async function gameRoutes(fastify, options) {
 		else
 		{
 			const weaponOptions = ['Pistol', 'Bazooka', 'Land Mine'];
+
+			sanitizeResult = sanitizeInput(matchData.win_method, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player1_weapon1, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player1_weapon2, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player1_damage_taken, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player1_damage_taken)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player1_damage_done, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player1_damage_done)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player1_coins_collected, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player1_coins_collected)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player1_shots_fired, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player1_shots_fired)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player2_weapon1, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player2_weapon2, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player2_damage_taken, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player2_damage_taken)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player2_damage_done, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player2_damage_done)) 
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player2_coins_collected, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player2_coins_collected))
+				return false;
+			sanitizeResult = sanitizeInput(matchData.player2_shots_fired, false);
+			if (!sanitizeResult.isValid || !isIntegerString(matchData.player2_shots_fired)) 
+				return false;
 
 			if (matchData.game_duration < 0 || matchData.game_duration > 1200) // game lasted over 20 minutes
 				return false;
@@ -193,6 +273,76 @@ async function gameRoutes(fastify, options) {
 		return true;
 	}
 
+	function sanitizeTournamentUserData(userData)
+	{
+
+
+		// Validate user data (related to Tournamen player)
+		sanitizeResult = sanitizeInput(userData.id, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.id)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.username, true);
+		if (!sanitizeResult.isValid) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.ranking_points, false);
+		if (!sanitizeResult.isValid || !isDecimalString(userData.ranking_points)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.avatar_url, true);
+		if (!sanitizeResult.isValid) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.games_played_pong, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.games_played_pong)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.wins_pong, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.wins_pong)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.losses_pong, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.losses_pong)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.games_played_blockbattle, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.games_played_blockbattle)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.wins_blockbattle, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.wins_blockbattle)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.losses_blockbattle, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.losses_blockbattle)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.tournaments_played, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.tournaments_played)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.tournaments_won, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.tournaments_won)) 
+			return false;
+		sanitizeResult = sanitizeInput(userData.tournament_points, false);
+		if (!sanitizeResult.isValid || !isIntegerString(userData.tournament_points)) 
+			return false;
+
+		if (userData.created_at)
+		{
+			sanitizeResult = sanitizeInput(userData.created_at, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+		}
+
+		if (userData.updated_at)
+		{
+			sanitizeResult = sanitizeInput(userData.updated_at, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+		}
+
+		if (userData.deleted_at)
+		{
+			sanitizeResult = sanitizeInput(userData.deleted_at, true);
+			if (!sanitizeResult.isValid) 
+				return false;
+		}
+
+		return true;
+
+	}
+
   // Record a new match result
   fastify.post('/record-match', { preHandler: authenticate }, async (request, reply) => {
     const { 
@@ -201,7 +351,16 @@ async function gameRoutes(fastify, options) {
 	  matchData
     } = request.body;
 
-    // Validate users
+
+	// Sanitize user data
+	if (!sanitizeTournamentUserData(player1) || !sanitizeTournamentUserData(player2)) {
+		reply.code(400);
+		return { error: 'Request body contains invalid characters or bad data' };
+	}
+
+
+
+    // Validate users data
     if ((player1.id !== request.user.id && player2.id !== request.user.id)
 	|| (player1.id !== globalObj.opponentData.id && player2.id !== globalObj.opponentData.id)
 	|| player1.id === player2.id
@@ -212,6 +371,7 @@ async function gameRoutes(fastify, options) {
 		return { error: 'Bad user data; are you cheating...?' };
     }
 
+
 	globalObj.opponentData = null; // Reset opponent from backend
 
 	// Validate match data
@@ -219,6 +379,7 @@ async function gameRoutes(fastify, options) {
 		reply.code(400);
 		return { error: 'Bad match data; are you cheating...?' };
     }
+
 
     try {
       const transaction = fastify.db.transaction(() => {
@@ -241,10 +402,12 @@ async function gameRoutes(fastify, options) {
 		player1.ranking_points = p1StartRank; // making sure user ranking matches the databae data
 		player2.ranking_points = p2StartRank;
 
+
 		if (matchData.winner_id === player1.id)
 			RankingHandler.updateRanking(player1, player2);
 		else
 			RankingHandler.updateRanking(player2, player1);
+
 
         // Insert match record
         const matchResult = fastify.db.prepare(`
@@ -374,7 +537,8 @@ async function gameRoutes(fastify, options) {
       });
 
       const matchId = transaction();
-      
+
+
       return { 
         success: true, 
         message: 'Match recorded successfully', 
@@ -396,6 +560,17 @@ async function gameRoutes(fastify, options) {
 	  player2,
 	  matchData
     } = request.body;
+
+	let sanitizeResult = sanitizeInput(player1.id, false);
+	if (!sanitizeResult.isValid || !isIntegerString(player1.id)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+	sanitizeResult = sanitizeInput(player2.id, false);
+	if (!sanitizeResult.isValid || !isIntegerString(player2.id)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
 
 	const player1TournamentObj = globalTournamentObj.tournamentArr.find(p => p.user.id === player1.id);
 	const player2TournamentObj = globalTournamentObj.tournamentArr.find(p => p.user.id === player2.id);
@@ -496,6 +671,13 @@ fastify.get('/get-tournament-end-screen-data', { preHandler: authenticate }, asy
   // Game invitation endpoint
   fastify.post('/invite/:friendId', { preHandler: [authenticate, validateFriendship] }, async (request, reply) => {
     const userId = request.user.id;
+
+	sanitizeResult = sanitizeInput(request.params.friendId, true);
+	if (!sanitizeResult.isValid || !isIntegerString(request.params.friendId)) {
+		reply.code(400);
+		return { error: 'Request parameters contain invalid characters' };
+	}
+
     const friendId = parseInt(request.params.friendId);
 
     // Emit game invitation
