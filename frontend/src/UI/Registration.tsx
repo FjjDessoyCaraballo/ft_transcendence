@@ -79,50 +79,57 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
             </div>
           )}
           
-          <div className="mb-4">
-            <label 
-              htmlFor="username" 
-              className="block text-gray-700 font-mono mb-2"
-            >
-              Username
-            </label>
-            <input 
-              type="text"
-              id="username"
-              placeholder="Choose a username (max 20 characters)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-			  disabled={isLoading}
-			  required
-			  maxLength={20}
-            />
-          </div>
+			<div className="mb-4">
+				<label 
+					htmlFor="username" 
+					className="block text-[#4B0082] font-mono mb-2"
+				>
+					Username
+				</label>
+				<input 
+					type="text"
+					id="username"
+					placeholder="Choose a username"
+					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
+					value={username}
+					onChange={(e) => setUsername(e.target.value)}
+					disabled={isLoading}
+					required
+					maxLength={20}
+				/>
+				<p className="text-sm text-gray-500 mt-1">
+					3–20 characters: letters, numbers, _, -, and .
+				</p>
+			</div>
           
-          <div className="mb-4">
-            <label 
-              htmlFor="password" 
-              className="block text-gray-700 font-mono mb-2"
-            >
-              Password
-            </label>
-            <input 
-              type="password"
-              id="password"
-              placeholder="Create a password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-			  disabled={isLoading}
-			  required
-			  minLength={8}
-            />
-          </div>
+			<div className="mb-4">
+				<label 
+					htmlFor="password" 
+					className="block text-[#4B0082] font-mono mb-2"
+				>
+					Password
+				</label>
+				<input 
+					type="password"
+					id="password"
+					placeholder="Create a password"
+					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
+					value={password}
+					onChange={(e) => setPassword(e.target.value)}
+					disabled={isLoading}
+					required
+					minLength={8}
+				/>
+				<p className="text-sm text-gray-500 mt-1">
+					8+ characters, 1 uppercase, 1 lowercase, 1 number
+				</p>
+		</div>
+
           
           <div className="mb-6">
             <label 
               htmlFor="confirmPassword" 
-              className="block text-gray-700 font-mono mb-2"
+              className="block text-[#4B0082] font-mono mb-2"
             >
               Confirm Password
             </label>
