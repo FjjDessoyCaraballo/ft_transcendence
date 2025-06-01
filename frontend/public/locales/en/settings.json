@@ -15,5 +15,7 @@
     "save": "Save",
     "loading": "Loading...",
     "load_failed": "Failed to load preferred language.",
-    "update_failed": "Failed to update preferred language."
+    "update_failed": "Failed to update preferred language.",
+    "language_saved_success": "Language successfully saved",
+    "language_save_error": "Error saving language"
 }

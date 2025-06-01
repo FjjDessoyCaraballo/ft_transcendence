@@ -15,5 +15,7 @@
     "save": "Tallenna",
     "loading": "Ladataan...",
     "load_failed": "Ensisijaisen kielen lataaminen epäonnistui.",
-    "update_failed": "Ensisijaisen kielen päivittäminen epäonnistui."
+    "update_failed": "Ensisijaisen kielen päivittäminen epäonnistui.",
+    "language_saved_success": "Kieli tallennettu onnistuneesti",
+    "language_save_error": "Virhe kieltä tallennettaessa"
 }

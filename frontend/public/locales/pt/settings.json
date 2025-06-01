@@ -15,5 +15,7 @@
     "save": "Salvar",
     "loading": "Carregando...",
     "load_failed": "Falha ao carregar o idioma preferido.",
-    "update_failed": "Falha ao atualizar o idioma preferido."
+    "update_failed": "Falha ao atualizar o idioma preferido.",
+    "language_saved_success": "Idioma salvo com sucesso",
+    "language_save_error": "Erro ao salvar o idioma"
 }
