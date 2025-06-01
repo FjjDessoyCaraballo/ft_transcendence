@@ -3,7 +3,7 @@ import PasswordModal from './PasswordModal';
 import { GameStateManager, GameStates } from '../game/GameStates';
 import { StartScreen } from '../game/StartScreen';
 import { WALL_THICKNESS, FLOOR_THICKNESS } from '../game/Constants';
-import { User } from './UserManager';
+import { useTranslation } from 'react-i18next';
 
 export const global_stateManager = new GameStateManager();
 
@@ -72,6 +72,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onCanvasLogO
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const prevTimestampRef = useRef<number>(0);
 	const [showInstructions, setShowInstructions] = useState(false);
+	const { t } = useTranslation('game');
 
 	// Password modal state
 	const [passwordModalVisible, setPasswordModalVisible] = useState(false);
@@ -85,7 +86,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onCanvasLogO
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
-		global_stateManager.changeState(new StartScreen(canvas, ctx));
+		global_stateManager.changeState(new StartScreen(canvas, ctx, t));
 
 		const gameLoop = (timestamp: number) => {
 			const deltaTime = (timestamp - prevTimestampRef.current) / 1000;

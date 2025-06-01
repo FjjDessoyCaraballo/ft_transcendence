@@ -9,6 +9,7 @@ import { drawCenteredText, drawText, StartScreen } from "./StartScreen";
 import { BB_SHOOT_1, BB_SHOOT_2, PONG_UP_1, PONG_UP_2, DEEP_PURPLE, BB_LEFT_1, BB_RIGHT_1, BB_LEFT_2, BB_RIGHT_2 } from "./Constants";
 import { Bazooka, LandMine, Pistol, Weapon } from "./Weapons";
 import { getLoggedInUserData, getNextTournamentGameData, getOpponentData, saveWeaponDataToDB } from "../services/userService";
+import { TFunction } from 'i18next';
 
 
 export class MatchIntro implements IGameState
@@ -25,7 +26,7 @@ export class MatchIntro implements IGameState
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	gameType: GameType;
-	weaponOptions: Weapon[] = [new Pistol(), new Bazooka(), new LandMine()]; // add new weapons here
+	weaponOptions: Weapon[];
 	p1Weapons: Weapon [] = [];
 	p2Weapons: Weapon [] = [];
 	weaponIdx1: number;
@@ -43,13 +44,16 @@ export class MatchIntro implements IGameState
 	isSavingData: boolean = false;
 	KeyDownBound: (event: KeyboardEvent) => void;
 	KeyUpBound: (event: KeyboardEvent) => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: GameType, isTournament: boolean)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: GameType, isTournament: boolean, t: TFunction)
 	{
 		this.name = GameStates.MATCH_INTRO;
 		this.isTournament = isTournament;
 		this.isDataReady = false;
 		this.showLoadingText = false;
+		this.t = t;
+		this.weaponOptions = [new Pistol(t), new Bazooka(t), new LandMine(t)]
 
 		// We should create a user in the DB for AI computer. Then we could track it's win/lose stats etc :D
 		if (type === GameType.PONG_AI)
@@ -134,9 +138,9 @@ export class MatchIntro implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("MATCH INTRO: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -156,9 +160,9 @@ export class MatchIntro implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("MATCH INTRO: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -271,11 +275,11 @@ export class MatchIntro implements IGameState
 			if (!this.isTournament)
 			{
 				if (this.gameType === GameType.BLOCK_BATTLE)
-					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.p1Weapons, this.p2Weapons, false));
+					global_stateManager.changeState(new BlockBattle(this.canvas, this.ctx, this.p1Weapons, this.p2Weapons, false, this.t));
 				else if (this.gameType === GameType.PONG && this.player1Data && this.player2Data)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, null, 'playing', false));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, null, 'playing', false, this.t));
 				else if (this.gameType === GameType.PONG_AI && this.player1Data && this.player2Data)
-					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player2Data, 'ai', false));
+					global_stateManager.changeState(new Pong(this.canvas, this.ctx, this.player2Data, 'ai', false, this.t));
 			}
 			else
 			{
@@ -299,15 +303,15 @@ export class MatchIntro implements IGameState
 
 		} catch (error) {
 
-			alert(`Weapon data save failed, returning to main menu! ${error}`)
+			alert(`${this.t('weapon_fail')} ${error}`)
 			console.log("MATCH INTRO: Weapon data saving failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			// Is it a bad idea to exit to StartScreen mid tournament...?
 
 		}
 	}
 
-	drawWeaponMenu(ctx: CanvasRenderingContext2D)
+	drawWeaponMenu(ctx: CanvasRenderingContext2D, t: TFunction)
 	{
 
 		const infoBoxW = 500;
@@ -364,17 +368,25 @@ export class MatchIntro implements IGameState
 		ctx.fillText(name, nameX, nameY);
 
 		ctx.font = '24px arial';
-		const descript = curWeapon.description;
+		let descript = '';
+		// Set the description based on the weapon name - Allows dynamic translation
+		if (name === 'Pistol') {
+			descript = this.t('pistol');
+		} else if (name === 'Bazooka') {
+			descript = this.t('bazooka');
+		} else if (name === 'Land Mine') {
+			descript = this.t('land_mine');
+		}
 		const descriptX = infoBox1X + infoBoxW / 2 - ctx.measureText(descript).width / 2;
 		const descriptY = nameY + 40;
 		ctx.fillText(descript, descriptX, descriptY);
 
-		const damage = `DAMAGE: ${curWeapon.damage}`;
+		const damage = `${this.t('damage')} ${curWeapon.damage}`;
 		const damageX = infoBox1X + 20;
 		const damageY = descriptY + 50;
 		ctx.fillText(damage, damageX, damageY);
 
-		const cooldown = `COOLDOWN: ${curWeapon.cooldown / 1000}s`;
+		const cooldown = `${this.t('cooldown')} ${curWeapon.cooldown / 1000}s`;
 		const cooldownX = infoBox1X + infoBoxW - 20 - ctx.measureText(cooldown).width;
 		ctx.fillText(cooldown, cooldownX, damageY);
 
@@ -427,15 +439,23 @@ export class MatchIntro implements IGameState
 		ctx.fillText(name2, nameX2, nameY);
 
 		ctx.font = '24px arial';
-		const descript2 = curWeapon2.description;
+		let descript2 = '';
+		// Set the description based on the weapon name - Allows dynamic translation
+		if (name2 === 'Pistol') {
+			descript2 = this.t('pistol');
+		} else if (name2 === 'Bazooka') {
+			descript2 = this.t('bazooka');
+		} else if (name2 === 'Land Mine') {
+			descript2 = this.t('land_mine');
+		}
 		const descript2X = infoBox2X + infoBoxW / 2 - ctx.measureText(descript2).width / 2;
 		ctx.fillText(descript2, descript2X, descriptY);
 
-		const damage2 = `DAMAGE: ${curWeapon2.damage}`;
+		const damage2 = `${this.t('damage')} ${curWeapon2.damage}`;
 		const damage2X = infoBox2X + 20;
 		ctx.fillText(damage2, damage2X, damageY);
 
-		const cooldown2 = `COOLDOWN: ${curWeapon2.cooldown / 1000}s`;
+		const cooldown2 = `${this.t('cooldown')} ${curWeapon2.cooldown / 1000}s`;
 		const cooldown2X = infoBox2X + infoBoxW - 20 - ctx.measureText(cooldown2).width;
 		ctx.fillText(cooldown2, cooldown2X, damageY);
 
@@ -450,9 +470,9 @@ export class MatchIntro implements IGameState
 			if (!this.showLoadingText)
 				return ;
 
-			const loadingHeader = 'Fetching user data, please wait.';
+			const loadingHeader = this.t('data_fetch');
 			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
-			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			const loadingInfo = this.t('info_loading');
 			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
 			return ;
 		}
@@ -462,20 +482,20 @@ export class MatchIntro implements IGameState
 
 		// Add the expected ranking point diff here...?
 
-		drawCenteredText(this.canvas, this.ctx, "GAME IS ABOUT TO START!", '70px Impact', DEEP_PURPLE, 100);
+		drawCenteredText(this.canvas, this.ctx, this.t('game_start'), '70px Impact', DEEP_PURPLE, 100);
 
 		let infoText = '';
 		if (this.gameType != GameType.BLOCK_BATTLE && this.player1Data && this.player2Data)
 		{
-			infoText = `Press the up key (${this.player1Data.username}: '${PONG_UP_1}' / ${this.player2Data.username}: '${PONG_UP_2}') when you are ready to play`;
+			infoText = `${this.t('press_up')}(${this.player1Data.username}: '${PONG_UP_1}' / ${this.player2Data.username}: '${PONG_UP_2}')${this.t('when_ready')}`;
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
 
 		}
 		else
 		{
-			infoText = 'Use LEFT and RIGHT keys to navigate through weapons.';
+			infoText = this.t('left_and_right');
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 150);
-			infoText = 'Use SHOOT key to equip/unequip weapons.';
+			infoText = this.t('shoot');
 			drawCenteredText(this.canvas, this.ctx, infoText, '30px arial', 'white', 185);
 		}
 
@@ -493,13 +513,13 @@ export class MatchIntro implements IGameState
 
 		let p1Rank;
 		if (!this.isTournament)
-			p1Rank = `Ranking points: ${this.player1Data.ranking_points.toFixed(2)}`;
+			p1Rank = `${this.t('ranking_points')}${this.player1Data.ranking_points.toFixed(2)}`;
 		else
 		{
 			if (this.player1TournamentData)
 			{
-				p1Rank = `Place: ${this.player1TournamentData.place}
-				Points: ${this.player1TournamentData.tournamentPoints}`;
+				p1Rank = `${this.t('place')}${this.player1TournamentData.place}
+				${this.t('points')}${this.player1TournamentData.tournamentPoints}`;
 			}
 			else
 				p1Rank = 'Error';
@@ -522,13 +542,13 @@ export class MatchIntro implements IGameState
 
 		let p2Rank;
 		if (!this.isTournament)
-			p2Rank = `Ranking points: ${this.player2Data.ranking_points.toFixed(2)}`;
+			p2Rank = `${this.t('ranking_points')}${this.player2Data.ranking_points.toFixed(2)}`;
 		else
 		{
 			if (this.player2TournamentData)
 			{
-				p2Rank = `Place: ${this.player2TournamentData.place}
-				Points: ${this.player2TournamentData.tournamentPoints}`;
+				p2Rank = `${this.t('place')}${this.player2TournamentData.place}
+				${this.t('points')}${this.player2TournamentData.tournamentPoints}`;
 			}
 			else
 				p2Rank = 'Error';
@@ -540,7 +560,7 @@ export class MatchIntro implements IGameState
 		ctx.fillText(p2Rank, rank2X, rankingPointsY);
 
 		if (this.gameType === GameType.BLOCK_BATTLE)
-			this.drawWeaponMenu(ctx);
+			this.drawWeaponMenu(ctx, this.t);
 
 	}
 

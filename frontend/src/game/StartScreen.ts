@@ -6,6 +6,7 @@ import { DEEP_PURPLE, PURPLE, TEXT_PADDING } from "./Constants";
 import { UserManager, User } from "../UI/UserManager";
 import { GameType } from "../UI/Types";
 import { getLoggedInUserData } from "../services/userService";
+import { TFunction } from 'i18next';
 
 
 // GENERAL HELPER FUNCTIONS
@@ -30,16 +31,18 @@ export class PongBtn extends Button
 {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.PONG));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.PONG, this.t));
 	}
 }
 
@@ -47,16 +50,18 @@ export class BlockBattleBtn extends Button
 {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
-		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.BLOCK_BATTLE));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, GameType.BLOCK_BATTLE, this.t));
 	}
 }
 
@@ -73,10 +78,11 @@ export class StartScreen implements IGameState
 	isDataReady: boolean;
 	showLoggedOutText: boolean;
 	isLoggedIn: boolean = true;
+	t: TFunction;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, t: TFunction)
 	{
 		this.name = GameStates.START_SCREEN;
 		this.canvas = canvas;
@@ -84,17 +90,18 @@ export class StartScreen implements IGameState
 		this.isDataReady = false;
 		this.loggedInUserData = null;
 		this.showLoggedOutText = false;
+		this.t = t;
 
 		const pongText = 'PONG';
 		ctx.font = '50px arial';
 		const pongX = (canvas.width / 2) - (ctx.measureText(pongText).width / 2) - TEXT_PADDING;
 		const pongY = 470;
-		this.pongBtn = new PongBtn(this.canvas, this.ctx, pongX, pongY, DEEP_PURPLE, PURPLE, pongText, 'white', '50px', 'arial');
+		this.pongBtn = new PongBtn(this.canvas, this.ctx, pongX, pongY, DEEP_PURPLE, PURPLE, pongText, 'white', '50px', 'arial', this.t);
 
 		const bbText = 'BLOCK BATTLE';
 		const bbX = (canvas.width / 2) - (ctx.measureText(bbText).width / 2) - TEXT_PADDING;
 		const bbY = 570;
-		this.blockBattleBtn = new BlockBattleBtn(this.canvas, this.ctx, bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial');
+		this.blockBattleBtn = new BlockBattleBtn(this.canvas, this.ctx, bbX, bbY, DEEP_PURPLE, PURPLE, bbText, 'white', '50px', 'arial', this.t);
 
 		setTimeout(() => {
 			this.showLoggedOutText = true;
@@ -167,18 +174,18 @@ export class StartScreen implements IGameState
 
 	render(ctx: CanvasRenderingContext2D)
 	{
-		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData);
+		UserManager.drawCurUser(this.canvas, ctx, this.loggedInUserData, this.t);
 		
-		drawCenteredText(this.canvas, this.ctx, 'Welcome, gamer!', '140px Impact', DEEP_PURPLE, 240);
+		drawCenteredText(this.canvas, this.ctx, this.t('welcome_gamer'), '140px Impact', DEEP_PURPLE, 240);
 
 		if (!this.isDataReady && this.showLoggedOutText)
-			drawCenteredText(this.canvas, this.ctx, 'Please log in to play the game', '50px arial', 'white', this.canvas.height / 2 + 100);
+			drawCenteredText(this.canvas, this.ctx, this.t('please_login'), '50px arial', 'white', this.canvas.height / 2 + 100);
 		else if (this.isDataReady)
 		{
-			drawCenteredText(this.canvas, this.ctx, 'Please choose the game you want to play', '40px arial', 'white', 390);
+			drawCenteredText(this.canvas, this.ctx, this.t('please_choose'), '40px arial', 'white', 390);
 
-			this.pongBtn.draw(ctx);
-			this.blockBattleBtn.draw(ctx);
+			this.pongBtn.draw(ctx, this.t, 0);
+			this.blockBattleBtn.draw(ctx, this.t, 0);
 		}
 	}
 

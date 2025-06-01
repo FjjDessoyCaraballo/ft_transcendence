@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WindowManager } from './Header';
 import { registerUser } from '../services/userService'
+import { useTranslation } from 'react-i18next';
 
 export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline }) => {
 	// State management
@@ -11,6 +12,7 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
+	const { t } = useTranslation('registration');
   
 	const HandleCancel = () => {
 	  setUsername('');
@@ -69,7 +71,7 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
     <div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
         <div className="p-6 bg-[#4B0082] text-white">
-          <h2 className="text-2xl font-bold font-mono">Registration</h2>
+          <h2 className="text-2xl font-bold font-mono">{t('registration')}</h2>
         </div>
         
         <form onSubmit={HandleRegistration} className="p-6">
@@ -79,64 +81,63 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
             </div>
           )}
           
-			<div className="mb-4">
-				<label 
-					htmlFor="username" 
-					className="block text-[#4B0082] font-mono mb-2"
-				>
-					Username
-				</label>
-				<input 
-					type="text"
-					id="username"
-					placeholder="Choose a username"
-					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
-					value={username}
-					onChange={(e) => setUsername(e.target.value)}
-					disabled={isLoading}
-					required
-					maxLength={20}
-				/>
-				<p className="text-sm text-gray-500 mt-1">
+
+          <div className="mb-4">
+            <label 
+              htmlFor="username" 
+              className="block text-gray-700 font-mono mb-2"
+            >
+              {t('username')}
+            </label>
+            <input 
+              type="text"
+              id="username"
+              placeholder={t('choose_username')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+			  disabled={isLoading}
+			  required
+			  maxLength={20}
+            />
+			<p className="text-sm text-gray-500 mt-1">
 					3–20 characters: letters, numbers, _, -, and .
 				</p>
-			</div>
-          
-			<div className="mb-4">
-				<label 
-					htmlFor="password" 
-					className="block text-[#4B0082] font-mono mb-2"
-				>
-					Password
-				</label>
-				<input 
-					type="password"
-					id="password"
-					placeholder="Create a password"
-					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
-					disabled={isLoading}
-					required
-					minLength={8}
-				/>
-				<p className="text-sm text-gray-500 mt-1">
+          </div>
+          <div className="mb-4">
+            <label 
+              htmlFor="password" 
+              className="block text-gray-700 font-mono mb-2"
+            >
+              {t('password')}
+            </label>
+            <input 
+              type="password"
+              id="password"
+              placeholder={t('create_password')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+			  disabled={isLoading}
+			  required
+			  minLength={8}
+            />
+			<p className="text-sm text-gray-500 mt-1">
 					8+ characters, 1 uppercase, 1 lowercase, 1 number
 				</p>
-		</div>
-
+          </div>
           
           <div className="mb-6">
             <label 
               htmlFor="confirmPassword" 
               className="block text-[#4B0082] font-mono mb-2"
             >
-              Confirm Password
+              {t('confirm_password')}
             </label>
             <input 
               type="password"
               id="confirmPassword"
-              placeholder="Confirm your password"
+              placeholder={t('confirm_your_password')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -145,7 +146,6 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 			  minLength={8}
             />
           </div>
-          
           <div className="flex justify-end gap-3">
             <button 
               type="button"
@@ -153,17 +153,17 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
               onClick={HandleCancel}
 			  disabled={isLoading}
             >
-              Cancel
+              {t('cancel')}
 		</button>
 		<button 
               type="submit"
-              className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]"
+              className="flex items-center justify-center px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082]"
 			  disabled={isLoading}
 			>
 			{isLoading ? (
 				<span className="inline-block animate-spin mr-2">↻</span>
 			): null}
-      		Register
+      		{t('register')}
           </button>
           </div>
         </form>
@@ -176,54 +176,48 @@ export const RegistrationPopup: React.FC<WindowManager> = ({ onAccept, onDecline
 		<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 		  <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
 			<div className="p-6 bg-[#4B0082] text-white">
-			  <h2 className="text-2xl font-bold font-mono">Terms of Service and Privacy Notice</h2>
+			  <h2 className="text-2xl font-bold font-mono">{t('terms_heading')}</h2>
 			</div>
 			<div className="px-9 p-5 overflow-y-auto max-h-[500px] flex-grow">
-			<p className="gdpr">
-				Dads and Coders Inc. ("controller" and "processor") collects data for (mandatory) statistical purposes.
-				The data is collected during matches and processed in our servers. The data will be stored for a day solely
-				for the purposes of giving statistical insights to players in our two games: Pong and Block Battle.</p>
-			  <p className="gdpr">By pressing "Accept" button you are agreeing to the following:</p>
-			  <p className="gdpr">- Data collection by Dads and Coders Inc.</p>
-			  <p className="gdpr">- Data processing by Dads and Coders Inc.</p>
-			  <p className="gdpr">The data that Dads and Coders Inc. collect for the purposes processing are the following:</p>
-			  <p className="gdpr">- Id;</p>
-			  <p className="gdpr">- Username;</p>
-			  <p className="gdpr">- Password;</p>
-			  <p className="gdpr">- Ranking points;</p>
-			  <p className="gdpr">- Avatar;</p>
-			  <p className="gdpr">- Games played (Pong);</p>
-			  <p className="gdpr">- Wins (Pong);</p>
-			  <p className="gdpr">- Losses (Pong);</p>
-			  <p className="gdpr">- Games played (Block Battle);</p>
-			  <p className="gdpr">- Wins (Block Battle);</p>
-			  <p className="gdpr">- Losses (Block Battle);</p>
-			  <p className="gdpr">- Tournaments played;</p>
-			  <p className="gdpr">- Tournaments won;</p>
-			  <p className="gdpr">- Tournament points overall;</p>
-			  <p className="gdpr">- Friends;</p>
-			  <p className="gdpr">- Match history. </p>
-			  <p className="gdpr"> REQUESTS FOR DATA DELETION: requests for data deletion can be made directly through the settings by end-user.</p>
-			  <p className="gdpr"> REQUESTS FOR OWN DATA: End-users who want to download all their data that is contained within Dads and Coders Inc. 
-				servers can do so by directly downloading the data from the settings section by pressing the "Download data" button.</p>
-			  <p className="gdpr">
-			  If said end-user finds difficulties in deleting their data, they may contact data protection officer. For any inquiries or questions, you can contact the data protection officer:</p>
-			  <p className="texts">
-			  Felipe Dessoy, fdessoy-@hive.student.fi
-			  </p>
+			<p className="gdpr">{t('terms1')}</p>
+			  <p className="gdpr">{t('terms2')}</p>
+			  <p className="gdpr">{t('terms3')}</p>
+			  <p className="gdpr">{t('terms4')}</p>
+			  <p className="gdpr">{t('terms5')}</p>
+			  <p className="gdpr">{t('terms6')}</p>
+			  <p className="gdpr">{t('terms7')}</p>
+			  <p className="gdpr">{t('terms8')}</p>
+			  <p className="gdpr">{t('terms9')}</p>
+			  <p className="gdpr">{t('terms10')}</p>
+			  <p className="gdpr">{t('terms11')}</p>
+			  <p className="gdpr">{t('terms12')}</p>
+			  <p className="gdpr">{t('terms13')}</p>
+			  <p className="gdpr">{t('terms14')}</p>
+			  <p className="gdpr">{t('terms15')}</p>
+			  <p className="gdpr">{t('terms16')}</p>
+			  <p className="gdpr">{t('terms17')}</p>
+			  <p className="gdpr">{t('terms18')}</p>
+			  <p className="gdpr">{t('terms19')}</p>
+			  <p className="gdpr">{t('terms20')}</p>
+			  <p className="gdpr">{t('terms21')}</p>
+			  <p className="gdpr"> {t('terms22')}</p>
+			  <p className="gdpr"> {t('terms23')}</p>
+			  <p className="gdpr">{t('terms24')}</p>
+			  <p className="texts">{t('terms25')}</p>
+			  <p className="texts">{t('terms26')}</p>
 			</div>
 			<div className="flex justify-end p-5 border-t border-gray-200 gap-2">
 			  <button 
 				className="px-5 py-2 rounded bg-red-600 text-white font-mono transition-colors hover:bg-red-700" 
 				onClick={HandleGDPRDecline}
 			  >
-				Decline
+				{t('decline')}
 			  </button>
 			  <button 
 				className="px-5 py-2 rounded bg-green-600 text-white font-mono transition-colors hover:bg-green-700" 
 				onClick={HandleGDPRAccept}
 			  >
-				Accept
+				{t('accept')}
 			  </button>
 			</div>
 		  </div>

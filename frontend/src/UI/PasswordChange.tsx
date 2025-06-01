@@ -1,5 +1,6 @@
 import  React, { useState } from 'react'
 import { changePassword } from '../services/userService'
+import { useTranslation } from 'react-i18next';
 
 export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }) => {
 	const [oldPassword, setOldPassword] = useState('');
@@ -7,6 +8,7 @@ export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { t } = useTranslation('password');
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -25,13 +27,14 @@ export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }
 				newPassword: newPassword
 			})
 			.then(() => {
+				alert("Password changed successfully!");
 				onClose();
 			})
-			
+
 		} catch (error) {
 			console.error("Password change failed: ", error);
+			alert('Failed to change password. Please try again later.');
 		} finally {
-			alert("Password changed successfully!");
 			setIsSubmitting(false);
 		}
 	}
@@ -40,45 +43,45 @@ export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }
 	<div className="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
 		<div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[90%] max-h-[80vh] flex flex-col overflow-hidden mx-auto">
 		  <div className="p-6 bg-[#4B0082] text-white">
-			<h2 className="text-2xl font-bold font-mono">Password Change</h2>
+			<h2 className="text-2xl font-bold font-mono">{t('password_change')}</h2>
 		  </div>
-		  
+
 		  <form onSubmit={handleSubmit} className="p-6">
 			{errorMessage && (
 			  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
 				{errorMessage}
 			  </div>
 			)}
-			
+
 			<div className="mb-4">
-			  <label 
-				htmlFor="oldPassword" 
+			  <label
+				htmlFor="oldPassword"
 				className="block text-gray-700 font-mono mb-2"
 			  >
-				Current Password
+				{t('current_password')}
 			  </label>
-			  <input 
+			  <input
 				type="password"
 				id="oldPassword"
-				placeholder="Enter your current password"
+				placeholder={t('enter_your_current')}
 				className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
 				value={oldPassword}
 				onChange={(e) => setOldPassword(e.target.value)}
 				required
 			  />
 			</div>
-			
+
 			<div className="mb-4">
-			  <label 
-				htmlFor="newPassword" 
+			  <label
+				htmlFor="newPassword"
 				className="block text-gray-700 font-mono mb-2"
 			  >
-				New Password
+				{t('new_password')}
 			  </label>
-			  <input 
+			  <input
 				type="password"
 				id="newPassword"
-				placeholder="Create a new password"
+				placeholder={t('create_new')}
 				className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
 				value={newPassword}
 				onChange={(e) => setNewPassword(e.target.value)}
@@ -86,39 +89,39 @@ export const PasswordChangePopup: React.FC<{onClose: () => void}> = ({ onClose }
 				minLength={8}
 			  />
 			</div>
-			
+
 			<div className="mb-6">
-			  <label 
-				htmlFor="confirmPassword" 
+			  <label
+				htmlFor="confirmPassword"
 				className="block text-gray-700 font-mono mb-2"
 			  >
-				Confirm New Password
+				{t('confirm_new')}
 			  </label>
-			  <input 
+			  <input
 				type="password"
 				id="confirmPassword"
-				placeholder="Confirm your new password"
+				placeholder={t('confirm_your_new')}
 				className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#800080]"
 				value={confirmPassword}
 				onChange={(e) => setConfirmPassword(e.target.value)}
 				required
 			  />
 			</div>
-			
+
 			<div className="flex justify-end gap-3">
-			  <button 
+			  <button
 				type="button"
 				onClick={onClose}
 				className="px-5 py-2 rounded bg-gray-200 text-gray-800 font-mono transition-colors hover:bg-gray-300"
 			  >
-				Cancel
+				{t('cancel')}
 			  </button>
-			  <button 
+			  <button
 				type="submit"
 				disabled={isSubmitting}
 				className="px-5 py-2 rounded bg-[#800080] text-white font-mono transition-colors hover:bg-[#4B0082] disabled:opacity-50 disabled:cursor-not-allowed"
 			  >
-				{isSubmitting ? 'Processing...' : 'Change Password'}
+				{isSubmitting ? t('processing') : t('change_password')}
 			  </button>
 			</div>
 		  </form>

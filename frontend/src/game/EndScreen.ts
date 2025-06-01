@@ -8,35 +8,38 @@ import { TournamentPlayer } from "./Tournament";
 import { GameType } from "../UI/Types";
 import { drawCenteredText, StartScreen } from "./StartScreen";
 import { getEndScreenData } from "../services/userService";
+import { TFunction } from 'i18next';
 
 export class ReturnMainMenuButton extends Button
 {
 	private gameType: GameType;
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType)
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, gameType: GameType, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 		this.gameType = gameType;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.t = t;
 	}
 
 	clickAction(): void {
 		
 		if (this.gameType === GameType.PONG_AI)
 			this.gameType = GameType.PONG;
-		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, this.gameType));
+		global_stateManager.changeState(new MainMenu(this.canvas, this.ctx, this.gameType, this.t));
 
 	}
 }
 
 class ReturnToTournamentBtn extends Button
 {
-	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string)
+	constructor(ctx: CanvasRenderingContext2D, x: number, y: number, boxColor: string, hoverColor: string, text: string, textColor: string, textSize: string, font: string, t: TFunction)
 	{
-		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font);
+		super(ctx, x, y, boxColor, hoverColor, text, textColor, textSize, font, t);
 	}
 
 	clickAction(): void {
@@ -63,8 +66,9 @@ export class EndScreen implements IGameState
 	showLoadingText: boolean;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
+	t: TFunction;
 
-	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winnerId: number, loserId: number, gameType: GameType, isTournament: boolean, AIData: User | null)
+	constructor(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, winnerId: number, loserId: number, gameType: GameType, isTournament: boolean, AIData: User | null, t: TFunction)
 	{
 		this.name = GameStates.END_SCREEN;
 
@@ -78,18 +82,19 @@ export class EndScreen implements IGameState
 		this.showLoadingText = false;
 		this.isTournament = isTournament;
 		this.AIData = AIData;
+		this.t = t;
 
-		let text1 = 'RETURN TO MENU';
+		let text1 = 'return_to_menu';
 		ctx.font = '40px arial' // GLOBAL USE OF CTX!!
-		const buttonX1 = (canvas.width / 2) - (ctx.measureText(text1).width / 2) - TEXT_PADDING;
+		const buttonX1 = (canvas.width / 2) - (ctx.measureText(t('return_to_menu')).width / 2) - TEXT_PADDING;
 		const buttonY1 = (canvas.height / 2) + 200 - TEXT_PADDING;
 
-		let text2 = 'RETURN TO TOURNAMENT';
-		const buttonX2 = (canvas.width / 2) - (ctx.measureText(text2).width / 2) - TEXT_PADDING;
+		let text2 = 'return_to_tournament';
+		const buttonX2 = (canvas.width / 2) - (ctx.measureText(t('return_to_tournament')).width / 2) - TEXT_PADDING;
 		const buttonY2 = (canvas.height / 2) - TEXT_PADDING;
 
-		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType);
-		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial');
+		this.returnMenuButton = new ReturnMainMenuButton(canvas, ctx, buttonX1, buttonY1, 'red', '#780202', text1, 'white', '40px', 'arial', this.gameType, this.t);
+		this.returnToTournamentBtn = new ReturnToTournamentBtn(ctx, buttonX2, buttonY2, 'red', '#780202', text2, 'white', '40px', 'arial', t);
 
 		setTimeout(() => {
 			this.showLoadingText = true;
@@ -119,9 +124,9 @@ export class EndScreen implements IGameState
 			this.isDataReady = true;
 		}
 		catch (error) {
-			alert(`User data fetch failed, returning to main menu! ${error}`)
+			alert(`${this.t('data_fail')} ${error}`)
 			console.log("END SCREEN: User data fetch failed.");
-			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx));
+			global_stateManager.changeState(new StartScreen(this.canvas, this.ctx, this.t));
 			this.isDataReady = false;
 		}
 	}
@@ -177,9 +182,9 @@ export class EndScreen implements IGameState
 			if (!this.showLoadingText)
 				return ;
 
-			const loadingHeader = 'Fetching user data, please wait.';
+			const loadingHeader = this.t('data_fetch');
 			drawCenteredText(this.canvas, this.ctx, loadingHeader, '50px arial', 'white', this.canvas.height / 2);
-			const loadingInfo = 'If this takes more than 10 seconds, please try to log out and in again.';
+			const loadingInfo = this.t('info_loading');
 			drawCenteredText(this.canvas, this.ctx, loadingInfo, '30px arial', 'white', this.canvas.height / 2 + 50);
 			return ;
 		}
@@ -187,30 +192,30 @@ export class EndScreen implements IGameState
 		if (!this.winner || !this.loser)
 			return ;
 
-		const text = this.winner.username + ' wins the game!';
+		const text = this.winner.username + this.t('wins_the_game');
 		drawCenteredText(this.canvas, this.ctx, text, '40px arial', '#1cc706', 200);
 
 		if (this.gameType === GameType.PONG_AI)
 		{
 			if (this.winner.username === 'Computer')
-				drawCenteredText(this.canvas, this.ctx, 'Computers will rule the world... yikes!!', '30px arial', 'white', 300);
+				drawCenteredText(this.canvas, this.ctx, this.t('computers_rule'), '30px arial', 'white', 300);
 			else
-				drawCenteredText(this.canvas, this.ctx, 'Great job, humans ROCK!!', '30px arial', 'white', 300);
+				drawCenteredText(this.canvas, this.ctx, this.t('humans_rock'), '30px arial', 'white', 300);
 
 		}
 		else if (!this.isTournament)
 		{
-			const winnerRankText = `The new rank of ${this.winner.username} is ${this.winner.ranking_points.toFixed(2)}.`;
+			const winnerRankText = `${this.t('new_rank_of')} ${this.winner.username} ${this.t('is')} ${this.winner.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, winnerRankText, '30px arial', 'white', 300);
 			
-			const loserRankText = `The new rank of ${this.loser.username} is ${this.loser.ranking_points.toFixed(2)}.`;
+			const loserRankText = `${this.t('new_rank_of')} ${this.loser.username} ${this.t('is')} ${this.loser.ranking_points.toFixed(2)}.`;
 			drawCenteredText(this.canvas, this.ctx, loserRankText, '30px arial', 'white', 340);
 		}
 
 		if (!this.isTournament)
-			this.returnMenuButton.draw(ctx);
+			this.returnMenuButton.draw(ctx, this.t, 0);
 		else
-			this.returnToTournamentBtn.draw(ctx);
+			this.returnToTournamentBtn.draw(ctx, this.t, 0);
 
 
 	}

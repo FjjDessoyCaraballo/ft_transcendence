@@ -29,6 +29,11 @@ interface PasswordChange {
   newPassword: string;
 }
 
+interface LanguageResponse {
+  language: string;
+}
+
+
 /**
  * Register a new user with the API
  * 
@@ -466,4 +471,24 @@ export const changePassword = async (passwordChange: PasswordChange): Promise<Pa
       throw error;
   }
 };
+
+export const getPreferredLanguage = async (): Promise<LanguageResponse> => {
+  try {
+    return await apiRequest('/users/language');
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updatePreferredLanguage = async (language: string): Promise<{ success: boolean; language: string }> => {
+  try {
+    return await apiRequest('/users/language', {
+      method: 'PUT',
+      body: JSON.stringify({ language })
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
  

@@ -13,8 +13,8 @@ const uploadTracker = new Map();
 async function userRoutes(fastify, options) {
   
     // Valid language options
-  const validLanguages = ['English', 'Finnish', 'Portuguese'];
   const validWeapons = ['Pistol', 'Bazooka', 'Land Mine'];
+  const validLanguages = ['en', 'fi', 'pt'];
   
   const authenticate = async (request, reply) => {
     try {
@@ -245,7 +245,7 @@ fastify.get('/opponent-data', { preHandler: authenticate }, async (request, repl
     }
     
 
-    let userLanguage = 'English';
+    let userLanguage = 'en';
     if (language) {
 
 		let sanitizeResult = sanitizeInput(language, true);

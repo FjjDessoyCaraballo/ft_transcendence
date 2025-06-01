@@ -1,0 +1,9 @@
+{
+    "avatar_change": "Avatar Change",
+    "file_limit": "Files must be in jpg or png format no bigger than 2MB",
+    "avatar": "Avatar",
+    "cancel": "Cancel",
+    "update": "Update",
+    "load_fail": "Failed to load image!",
+    "select_file": "Please select an image file"
+}
