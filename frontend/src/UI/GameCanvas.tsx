@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import PasswordModal from './PasswordModal';
 import { GameStateManager, GameStates } from '../game/GameStates';
 import { StartScreen } from '../game/StartScreen';
 import { WALL_THICKNESS, FLOOR_THICKNESS } from '../game/Constants';
@@ -65,89 +66,120 @@ const Instructions: React.FC = () => {
 
 // COMPONENT
 export const GameCanvas: React.FC<GameCanvasProps> = ({ isLoggedIn, onCanvasLogOut }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const prevTimestampRef = useRef<number>(0);
-  const [showInstructions, setShowInstructions] = useState(false);
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const prevTimestampRef = useRef<number>(0);
+	const [showInstructions, setShowInstructions] = useState(false);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+	// Password modal state
+	const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+	const [opponentName, setOpponentName] = useState('');
+	const passwordSubmitRef = useRef<(password: string) => void>(() => {});
+	const passwordCancelRef = useRef<() => void>(() => {});
 
-    global_stateManager.changeState(new StartScreen(canvas, ctx));
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
 
-    const gameLoop = (timestamp: number) => {
-      const deltaTime = (timestamp - prevTimestampRef.current) / 1000;
-      prevTimestampRef.current = timestamp;
+		global_stateManager.changeState(new StartScreen(canvas, ctx));
 
-      global_stateManager.update(deltaTime);
+		const gameLoop = (timestamp: number) => {
+			const deltaTime = (timestamp - prevTimestampRef.current) / 1000;
+			prevTimestampRef.current = timestamp;
 
-      if (
-        global_stateManager.getStateName() === GameStates.START_SCREEN &&
-        !global_stateManager.getLoggedInStatus() &&
-        isLoggedIn
-      ) {
-        console.log('Game loop onStartScreenLoginFail');
-        onCanvasLogOut();
-        global_stateManager.setLoggedInStatus(true);
-      }
+			global_stateManager.update(deltaTime);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      global_stateManager.render(ctx);
+			if (
+				global_stateManager.getStateName() === GameStates.START_SCREEN &&
+				!global_stateManager.getLoggedInStatus() &&
+				isLoggedIn
+			) {
+				onCanvasLogOut();
+				global_stateManager.setLoggedInStatus(true);
+			}
 
-      animationFrameId = requestAnimationFrame(gameLoop);
-    };
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			global_stateManager.render(ctx);
 
-    let animationFrameId = requestAnimationFrame(gameLoop);
+			animationFrameId = requestAnimationFrame(gameLoop);
+		};
 
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isLoggedIn]);
+		let animationFrameId = requestAnimationFrame(gameLoop);
+		return () => cancelAnimationFrame(animationFrameId);
+	}, [isLoggedIn]);
 
-  return (
-  <div className="pt-8 mb-8 w-full">
-    <div className="grid grid-cols-[1fr_auto_1fr] items-start w-full">
-      {/* Left spacer */}
-      <div />
+	// Expose modal trigger to game logic
+	useEffect(() => {
+		(window as any).showPasswordModal = (
+			name: string,
+			onSubmit: (password: string) => void,
+			onCancel: () => void
+		) => {
+			setOpponentName(name);
+			passwordSubmitRef.current = onSubmit;
+			passwordCancelRef.current = onCancel;
+			setPasswordModalVisible(true);
+		};
+	}, []);
 
-      {/* Centered Canvas */}
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          id="gameCanvas"
-          width="1200"
-          height="800"
-          className="border-2 border-[#FFFFF0] max-w-full max-h-[80vh] bg-black"
-        />
+	const handlePasswordSubmit = (password: string) => {
+		setPasswordModalVisible(false);
+		passwordSubmitRef.current(password);
+	};
 
-        {/* Popup Overlay */}
-        {showInstructions && (
-          <div className="absolute inset-0 bg-black bg-opacity-70 flex justify-center items-center z-10">
-            <div className="relative z-20 max-h-[80vh] overflow-y-auto p-2 bg-white shadow-lg">
-				<Instructions />
-				<button
-					onClick={() => setShowInstructions(false)}
-					className="absolute top-2 right-2 text-purple-800 font-bold text-xl bg-white rounded-full px-3 py-1 shadow hover:bg-purple-100"
-				>
-					✖
-				</button>
+	const handlePasswordCancel = () => {
+		setPasswordModalVisible(false);
+		passwordCancelRef.current();
+	};
+
+	return (
+		<div className="pt-8 mb-8 w-full">
+			<div className="grid grid-cols-[1fr_auto_1fr] items-start w-full">
+				<div />
+				<div className="relative">
+					<canvas
+						ref={canvasRef}
+						id="gameCanvas"
+						width="1200"
+						height="800"
+						className="border-2 border-[#FFFFF0] max-w-full max-h-[80vh] bg-black"
+					/>
+
+					{/* Password Modal */}
+					<PasswordModal
+						opponentName={opponentName}
+						visible={passwordModalVisible}
+						onSubmit={handlePasswordSubmit}
+						onCancel={handlePasswordCancel}
+					/>
+
+					{/* Instructions Popup */}
+					{showInstructions && (
+						<div className="absolute inset-0 bg-black bg-opacity-70 flex justify-center items-center z-10">
+							<div className="relative z-20 max-h-[80vh] overflow-y-auto p-2 bg-white shadow-lg">
+								<Instructions />
+								<button
+									onClick={() => setShowInstructions(false)}
+									className="absolute top-2 right-2 text-purple-800 font-bold text-xl bg-white rounded-full px-3 py-1 shadow hover:bg-purple-100"
+								>
+									✖
+								</button>
+							</div>
+						</div>
+					)}
+				</div>
+
+				{/* Instructions Button */}
+				<div className="ml-4 mt-2">
+					<button
+						onClick={() => setShowInstructions((prev) => !prev)}
+						className="buttonsStyle"
+					>
+						{showInstructions ? 'Close Instructions' : 'Game Instructions'}
+					</button>
+				</div>
 			</div>
-          </div>
-        )}
-    </div>
-
-      {/* Instructions Button */}
-      <div className="ml-4 mt-2">
-        <button
-		onClick={() => setShowInstructions(prev => !prev)}
-		className="buttonsStyle"
-		>
-			{showInstructions ? 'Close Instructions' : 'Game Instructions'}
-		</button>
-      </div>
-    </div>
-  </div>
-);
-
+		</div>
+	);
 };
-

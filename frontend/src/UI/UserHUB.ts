@@ -61,8 +61,6 @@ export class UserHUB implements IGameState
 	isLoggedIn: boolean = false;
 	mouseMoveBound: (event: MouseEvent) => void;
     mouseClickBound: () => void;
-	submitPasswordBound: () => void;
-	cancelPasswordBound: () => void;
 
 	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, state: UserHubState, gameType: GameType)
 	{
@@ -110,8 +108,6 @@ export class UserHUB implements IGameState
 
 		this.mouseMoveBound = (event: MouseEvent) => this.mouseMoveCallback(event);
         this.mouseClickBound = () => this.mouseClickCallback();
-		this.submitPasswordBound = () => this.submitPasswordCallback();
-		this.cancelPasswordBound = () => this.cancelPasswordCallback();
 	}
 
 	async fetchUserDataArr()
@@ -229,24 +225,10 @@ export class UserHUB implements IGameState
 				}
 				else if (this.loggedInUserData)
 				{
+					console.log('Challenge buttons clicked');
+
 					this.opponentName = btn.user.username;
-
-					const passwordHeader = document.getElementById('passwordHeader') as HTMLHeadingElement;
-					if (passwordHeader)
-					{
-						passwordHeader.textContent = `Hello ${this.opponentName}!`;
-						passwordHeader.appendChild(document.createElement('br'));
-						passwordHeader.appendChild(document.createTextNode('Please type in your password to start the game'));
-					}
-
-					const passwordModal = document.getElementById("passwordModal") as HTMLElement;
-					const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
-					const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
-			
-					// Show the password modal
-					passwordModal.style.display = "flex";
-					submitPasswordBtn.addEventListener("click", this.submitPasswordBound);
-					cancelPasswordBtn.addEventListener("click", this.cancelPasswordBound);
+					this.handleOpponentLogin();
 				}
 			}
 		}
@@ -257,49 +239,27 @@ export class UserHUB implements IGameState
 	{
 		this.isCheckingPassword = true;
 
-		const passwordInput = document.getElementById("passwordInput") as HTMLInputElement;
-		if (!passwordInput) {
-			return;
-		}
-		
-		const enteredPassword = passwordInput.value;
+		(window as any).showPasswordModal(
+			this.opponentName,
+			async (password: string) => {
+			try {
+				if (this.state === UserHubState.SINGLE_GAME && this.opponentName) {
+					await verifyOpponent({ username: this.opponentName, password });
+					global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, this.gameType, false));
+				} else if (this.state === UserHubState.TOURNAMENT && this.opponentName) {
+					this.tournamentArr = await verifyTournamentPlayer({ username: this.opponentName, password });
+				}
+				this.isCheckingPassword = false;
 
-		try {
-
-			if (!this.opponentName)
-				return ;
-
-			if (this.state === UserHubState.SINGLE_GAME)
-			{
-				await verifyOpponent({
-						username: this.opponentName,
-						password: enteredPassword
-					  });
+			} catch {
+				this.isCheckingPassword = false;
+				alert("Incorrect password. Please try again.");
 			}
-			else if (this.state === UserHubState.TOURNAMENT)
-			{
-				this.tournamentArr = await verifyTournamentPlayer({
-						username: this.opponentName,
-						password: enteredPassword
-					  });
-
+			},
+			() => {
+				console.log("Password modal canceled");
 			}
-
-			const passwordModal = document.getElementById("passwordModal") as HTMLElement;
-			if (passwordModal) {
-				passwordModal.style.display = "none";
-			}
-			passwordInput.value = "";
-			this.isCheckingPassword = false;
-
-			if (this.state === UserHubState.SINGLE_GAME)
-				global_stateManager.changeState(new MatchIntro(this.canvas, this.ctx, this.gameType, false));
-			
-		} catch {
-			this.isCheckingPassword = false;
-			alert("Incorrect password. Please try again.");
-			passwordInput.value = ""; // Clear the input field
-		}
+		);
 
 		if (this.state === UserHubState.TOURNAMENT)
 		{
@@ -313,26 +273,6 @@ export class UserHUB implements IGameState
 
 	}
 
-	submitPasswordCallback(): void
-	{
-		if (!this.opponentName || !this.loggedInUserData || this.isCheckingPassword)
-			return ;
-
-		this.handleOpponentLogin();
-	}
-
-	cancelPasswordCallback(): void
-	{
-		const passwordModal = document.getElementById("passwordModal") as HTMLElement;
-		const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
-		const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
-		const passwordInput = document.getElementById("passwordInput") as HTMLInputElement;
-		passwordModal.style.display = "none";
-		submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
-		cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
-		passwordInput.value = "";
-	}
-
 	enter()
 	{
 		this.canvas.addEventListener('mousemove', this.mouseMoveBound);
@@ -343,17 +283,6 @@ export class UserHUB implements IGameState
 	{
 		this.canvas.removeEventListener('mousemove', this.mouseMoveBound);
 		this.canvas.removeEventListener('click', this.mouseClickBound);
-
-		const submitPasswordBtn = document.getElementById("submitPasswordBtn") as HTMLButtonElement;
-		const cancelPasswordBtn = document.getElementById("cancelPasswordBtn") as HTMLButtonElement;
-		
-		if (submitPasswordBtn) {
-			submitPasswordBtn.removeEventListener("click", this.submitPasswordBound);
-		}
-		
-		if (cancelPasswordBtn) {
-			cancelPasswordBtn.removeEventListener("click", this.cancelPasswordBound);
-		}
 	}
 
 	update(deltaTime: number)
